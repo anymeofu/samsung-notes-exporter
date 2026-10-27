@@ -1,0 +1,274 @@
+//! Reverse-engineered parser for Samsung Notes `.sdocx` documents.
+//!
+//! # Accuracy and compatibility
+//!
+//! Archive structure, format versions, page ordering, and supported packed
+//! stroke channels, standalone text/image/shape/line frames and media bind IDs
+//! are decoded from observed S Pen SDK contracts. Common shapes and supported
+//! line paths render to SVG. Text layout, image effects, advanced shape styles
+//! and other page objects remain best-effort. A successful parse can omit
+//! unsupported content and does not indicate a lossless decode. Preserve the
+//! source document when fidelity is important.
+
+#[cfg(feature = "render")]
+extern crate alloc;
+
+mod archive_resource;
+mod archive_tail;
+mod binary;
+#[cfg(feature = "render")]
+mod composition;
+mod container;
+mod decode;
+mod end_tag;
+mod error;
+mod formula;
+mod frame;
+mod image;
+#[cfg(feature = "render")]
+mod ink;
+mod integrity;
+mod layer;
+mod layout;
+mod math;
+mod media;
+mod note;
+mod note_metadata;
+mod object;
+mod object_flexible;
+mod page;
+mod page_background;
+mod page_objects;
+mod page_selection;
+#[cfg(feature = "pdf")]
+pub mod pdf;
+mod progress;
+#[cfg(feature = "render")]
+mod render;
+mod report;
+mod shape;
+mod shape_paint_source;
+mod storage;
+mod stroke_metadata;
+mod table;
+mod text_index;
+mod types;
+
+pub use archive_resource::{
+    ArchiveResource, ArchiveResourceContent, ArchiveResourceError, ArchiveResourceResolver,
+    ResolvedArchiveResource,
+};
+pub use end_tag::{
+    EndTagDisplayTimestamps, EndTagEncryption, EndTagFixedStyle, EndTagSource, StoredEndTag,
+    parse_end_tag_bytes, parse_end_tag_bytes_with_limits,
+};
+pub use error::{Error, Result};
+pub use formula::{
+    FormulaLabel, FormulaLabelGraph, FormulaLabelRelation, FormulaLabelRelationKind,
+    FormulaMetadata, FormulaStroke,
+};
+#[cfg(feature = "render")]
+pub use ink::{
+    CoverageMesh, CoverageTriangle, CoverageVertex, InkSupport, OrderedDiskReplay, PEN_PROFILES,
+    PenProfile, PreparedInkPen2V9, PreparedStroke, RectStamp, prepare_stroke,
+};
+pub use integrity::{IntegrityCounts, IntegrityReport};
+pub use layer::LayerMetadata;
+pub use layout::{
+    BodyTextCaptureWindow, BodyTextReflow, BodyTextSlice, LayoutDocument, LayoutPage,
+    layout_document, layout_document_with_progress,
+};
+pub use math::{MathAngleType, MathMargins, MathMetadata, PlotGraph, PlotMetadata};
+pub use media::{
+    MediaManifest, MediaManifestEntry, parse_media_manifest_bytes,
+    parse_media_manifest_bytes_with_limits,
+};
+pub use note::{StoredNote, StoredNoteHeader, parse_note_bytes, parse_note_bytes_with_limits};
+pub use note_metadata::{
+    NoteApplicationVersion, NoteAttachment, NoteAuthor, NoteLocation, NoteMetadata, NotePageEdit,
+    NotePenExtension, NotePenSettings, NoteStringId, NoteStringTable, NoteVoice, NoteVoiceEvent,
+};
+pub use object::{ObjectMetadata, ObjectResizeMode};
+pub use object_flexible::{
+    ObjectBundle, ObjectBundleEntry, ObjectBundleValue, ObjectFlexibleMetadata, ObjectLayoutType,
+    ObjectPageSize, ObjectRenderLayer, ObjectSize, ObjectSpanSnapshot,
+};
+pub use page_objects::{PageObject, PageObjectContent};
+pub use page_selection::{PageSelectionError, parse_page_selection};
+#[cfg(feature = "pdf")]
+pub use pdf::{
+    PdfError, PdfOptions, PdfOutput, PdfPageDiagnostics, render_document_pdf,
+    render_layout_pages_pdf_detailed_with_cache,
+    render_layout_pages_pdf_detailed_with_cache_and_progress,
+    render_layout_pages_pdf_detailed_with_fonts, render_layout_pages_pdf_with_fonts,
+    render_svg_pages_pdf,
+};
+pub use progress::{Progress, ProgressStage};
+#[cfg(feature = "render")]
+pub use render::{
+    BackgroundDiagnostic, ChineseBrushFwidthOutputProfile, ChineseBrushRenderProfile,
+    DocumentTextCache, FountainV14OutputScaleProfile, FountainV16OutputScaleProfile,
+    FountainV17OutputScaleProfile, FountainV17RainbowRenderProfile, GeometryDiagnostic,
+    GeometryDiagnosticKind, InkPen2RenderProfile, ObjectDiagnostic, ObjectDiagnosticKind,
+    PaintDiagnostic, PaintDiagnosticKind, PaintRole, Pencil3PaperSampler, Pencil3RenderProfile,
+    PointMarkerTarget, RenderColorMode, RenderOptions, RenderTheme, RenderedPage, StrokePaint,
+    TextDiagnostic, TextDiagnosticKind, fonts, prepare_stroke_for_page,
+    prepare_stroke_for_page_with_theme, prepare_stroke_for_viewport_with_theme,
+    render_document_svg, render_document_svg_with_fonts, render_layout_page_replay_svg,
+    render_layout_page_replay_svg_with_fonts, render_layout_page_svg,
+    render_layout_page_svg_with_fonts, render_page_svg, stroke_paint,
+};
+pub use report::{DiagnosticCode, DiagnosticSeverity, ParseDiagnostic, ParseReport};
+pub use shape::{
+    LineLegacyPenSource, NativeLine, NativeShape, ShapeBaseSource, ShapePaint, ShapeStyle,
+};
+pub use shape_paint_source::{
+    ColorPaintSource, GradientStopSource, ImagePaintSource, NinePatchSource, PaintFloat32,
+    PatternPaintSource, ShapePaintSource,
+};
+pub use storage::{
+    PageManifest, PageManifestEntry, ParsedDocument, StoredArchivePage, StoredLayer, StoredObject,
+    StoredPage, StoredPageHeader, StoredPageLayers, parse_page_manifest_bytes,
+    parse_page_manifest_bytes_with_limits, parse_stored_page_bytes,
+    parse_stored_page_bytes_with_limits,
+};
+pub use stroke_metadata::{
+    StrokeMetadata, StrokeProperties, StrokeRendering, StrokeResources, StrokeStyle,
+};
+pub use table::{TableAutoFit, TableBorder, TableEdgeStyle, TableRecordMetadata, TableStyle};
+pub use types::*;
+
+use std::fs::File;
+use std::io::Cursor;
+use std::path::Path;
+
+/// Resource limits applied while parsing untrusted `.sdocx` input.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ParseLimits {
+    /// Maximum number of reader-selected ZIP entries.
+    pub max_archive_entries: usize,
+    /// Maximum declared or decoded size of one archive entry.
+    pub max_entry_size: u64,
+    /// Maximum total declared uncompressed size across reader-selected ZIP entries.
+    pub max_total_uncompressed_size: u64,
+    /// Maximum number of pages.
+    pub max_pages: usize,
+    /// Maximum number of strokes declared by one page.
+    pub max_strokes_per_page: usize,
+    /// Maximum number of points declared by one stroke.
+    pub max_points_per_stroke: usize,
+    /// Maximum number of non-stroke objects detected on one page.
+    pub max_objects_per_page: usize,
+    /// Maximum number of physical layers declared by one page.
+    pub max_layers_per_page: usize,
+    /// Maximum nesting depth in physical child records or embedded rich-text objects.
+    pub max_object_nesting_depth: usize,
+    /// Maximum UTF-16 code units in one rich-text object.
+    pub max_text_characters: usize,
+    /// Maximum style spans in one rich-text object.
+    pub max_text_spans: usize,
+    /// Maximum paragraph records in one rich-text object.
+    pub max_text_paragraphs: usize,
+    /// Maximum embedded object spans in one rich-text object.
+    pub max_text_object_spans: usize,
+    pub max_note_metadata_entries: usize,
+    pub max_object_metadata_entries: usize,
+}
+
+impl Default for ParseLimits {
+    fn default() -> Self {
+        Self {
+            max_archive_entries: 65_536,
+            max_entry_size: 512 * 1024 * 1024,
+            max_total_uncompressed_size: 2 * 1024 * 1024 * 1024,
+            max_pages: 10_000,
+            max_strokes_per_page: 100_000,
+            max_points_per_stroke: u16::MAX as usize,
+            max_objects_per_page: 100_000,
+            max_layers_per_page: 64,
+            max_object_nesting_depth: 64,
+            max_text_characters: 250_000,
+            max_text_spans: 10_000,
+            max_text_paragraphs: 10_000,
+            max_text_object_spans: 10_000,
+            max_note_metadata_entries: 10_000,
+            max_object_metadata_entries: 10_000,
+        }
+    }
+}
+
+/// Options controlling `.sdocx` parsing.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ParseOptions {
+    pub verify_integrity: bool,
+    /// Retain original page bytes in detailed results; ordinary parse ignores this option.
+    pub retain_page_sources: bool,
+    /// Retain original note bytes in detailed results; ordinary parse ignores this option.
+    pub retain_note_source: bool,
+    /// Resource limits for untrusted input.
+    pub limits: ParseLimits,
+}
+
+/// Parse a `.sdocx` file from a filesystem path.
+pub fn parse(path: impl AsRef<Path>) -> Result<Document> {
+    parse_with_options(path, &ParseOptions::default())
+}
+
+/// Parse a `.sdocx` file from a filesystem path with explicit options.
+pub fn parse_with_options(path: impl AsRef<Path>, options: &ParseOptions) -> Result<Document> {
+    let file = File::open(path)?;
+    container::parse_from_reader(file, options)
+}
+
+/// Parse a `.sdocx` file and retain its physical page structure and diagnostics.
+pub fn parse_detailed(path: impl AsRef<Path>) -> Result<ParsedDocument> {
+    parse_detailed_with_options(path, &ParseOptions::default())
+}
+
+/// Parse a `.sdocx` file in detail with explicit options.
+pub fn parse_detailed_with_options(
+    path: impl AsRef<Path>,
+    options: &ParseOptions,
+) -> Result<ParsedDocument> {
+    let file = File::open(path)?;
+    container::parse_detailed_from_reader(file, options)
+}
+
+/// Parse a `.sdocx` file from in-memory bytes.
+pub fn parse_bytes(bytes: &[u8]) -> Result<Document> {
+    parse_bytes_with_options(bytes, &ParseOptions::default())
+}
+
+/// Parse in-memory `.sdocx` bytes with explicit options.
+pub fn parse_bytes_with_options(bytes: &[u8], options: &ParseOptions) -> Result<Document> {
+    let cursor = Cursor::new(bytes);
+    container::parse_from_reader(cursor, options)
+}
+
+/// Parse in-memory `.sdocx` bytes and retain physical structure and diagnostics.
+pub fn parse_bytes_detailed(bytes: &[u8]) -> Result<ParsedDocument> {
+    parse_bytes_detailed_with_options(bytes, &ParseOptions::default())
+}
+
+/// Parse in-memory `.sdocx` bytes in detail with explicit options.
+pub fn parse_bytes_detailed_with_options(
+    bytes: &[u8],
+    options: &ParseOptions,
+) -> Result<ParsedDocument> {
+    let cursor = Cursor::new(bytes);
+    container::parse_detailed_from_reader(cursor, options)
+}
+
+/// Parse using the same decoder while observing completed archive and object work.
+pub fn parse_bytes_detailed_with_progress(
+    bytes: &[u8],
+    options: &ParseOptions,
+    observer: &mut dyn FnMut(Progress),
+) -> Result<ParsedDocument> {
+    container::parse_detailed_from_reader_with_progress(Cursor::new(bytes), options, observer)
+}
+
+/// Length of the ZIP portion, excluding Samsung's appended end tag.
+pub fn archive_zip_length(bytes: &[u8]) -> Result<u64> {
+    Ok(archive_tail::ArchiveTail::read(&mut std::io::Cursor::new(bytes))?.archive_length)
+}

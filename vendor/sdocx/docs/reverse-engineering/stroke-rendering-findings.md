@@ -1,0 +1,439 @@
+# Stroke rendering findings
+
+Saved FountainPen V14/V16 geometry is implemented in
+`crates/sdocx/src/ink/fountain.rs`. The
+[vector parity findings](fountain-parity.md) describe directional shading and
+appearance limits; [native geometry checks](../../conformance/README.md#native-geometry-checks)
+describe the retained validation harnesses.
+
+## Root cause of top-right artifacts
+
+The former visible-stroke parser bypassed the structural page/layer/object
+parser and advanced through records using offsets that happened to cancel on
+common files.
+
+- `0x79` is the low byte of the 121-byte base-frame size, not an extension
+  marker.
+- The value called `data_len` is the complete stroke-frame size.
+- The `StartPointMinusThree` fallback begins three bytes early.
+- At that shifted position, common property mask `0x25` is interpreted as a
+  `u16` point count: decimal 37.
+- The fallback prefers the parse containing more points, so every legitimate
+  stroke shorter than 37 points can be replaced by misaligned data.
+
+That misalignment produces the long strokes landing near the top-right corner.
+It is deterministic, not a coordinate transform or SVG renderer problem.
+
+## Correct traversal
+
+```text
+page layer collection
+  -> layer object tree
+  -> outer object type 1
+  -> payload frame type 0 (base)
+  -> payload frame type 1 (stroke)
+  -> point_count at stroke frame +18
+  -> point channels bounded by flexible_offset
+  -> style fields selected by field mask
+```
+
+Compressed channels are stored by channel: first X/Y as `f64`, Q10.5 signed-
+magnitude coordinate deltas, first pressure as `f32`, Q3.12 pressure deltas,
+first timestamp as `i32`, `u16` timestamp deltas, then optional tilt and
+orientation channels in the same Q3.12 form. Two tool/input bytes finish the
+fixed channel block.
+
+The full bit tables and uncompressed form are in
+[`file-format.md`](file-format.md#stroke-frame).
+
+## Rust decoding
+
+The Rust parser walks `StoredPage` layers and recursive object records,
+then decodes type-0/type-1 frames within each stroke's payload. It no longer has
+selection-by-larger-point-count or `StartPointMinusThree`. Channel presence
+comes from the stroke property mask; fixed channel bytes must end exactly at
+the declared flexible-data boundary. Malformed strokes return an error with
+their page ID and payload offset instead of silently returning partial content.
+
+Unknown objects remain in the stored tree, and unexposed flexible data stays
+bounded by its frame. Non-stroke semantic interpretation remains best-effort.
+
+`structural_strokes.rs` covers the synthetic format cases in normal CI.
+The historical three-document audit passed on the new decoder and failed on
+the old decoder's point count for fixture A (322,406 versus the expected
+321,776). Those documents and their runner are retired; the measurements remain
+in [`fixture-validation.md`](fixture-validation.md).
+
+## Drawing-time curves and width interpolation
+
+Static inspection of the Samsung Notes 4.4.45.37 ARM64 libraries
+identifies drawing-time curves independent of the historical parser issue above.
+This is instruction-level evidence, not a native runtime or pixel-equivalence
+comparison. Fixture 02's rough strokes use FountainPen
+`18;0;100;`. The DefaultPen trace below does not describe that fixture.
+
+### Current SDK behavior
+
+`prepare_stroke` chooses geometry shared by SVG export, vector PDF and replay.
+Saved `FountainPen` settings `14;` and `18;0;100;` support input modes 1–3
+and fixed width when the saved inputs pass `ink/fountain.rs` validation.
+Both profiles produce circular stamps and report `InkSupport::Reconstructed`.
+V14 also retains tangent directions for vector gradient shading. SVG consumers
+perform edge antialiasing; zoom does not resample the native stamp geometry.
+
+A saved `Marker2` stroke whose settings are absent or whose first settings
+token is a nonnegative integer uses the same stamp path with one radius for
+the whole stroke. Pressure does not change that radius. The saved ARGB alpha
+is one `fill-opacity` on the path. V1 and V2 share this geometry; the V2
+thin-edge shader is not ported. `Marker` and `Marker3` stay on the pressure
+fallback. Marker4 settings `7;` and `8;` use rounded rectangular stamps; see
+[V7 findings](marker4-v7.md) and [V8 findings](marker4-rendering-findings.md).
+Other Marker4 settings and straight-line aliases stay on the fallback.
+Composition selects root objects into Base, Top and Masking passes, preserving
+stored order within each pass. The shared top batch uses Darken on light paper
+and Lighten on dark paper; replay retains those SVG blend groups. See
+[composition](../svg-rendering.md) and [theme policy](../render-themes.md).
+
+Other pens and rejected saved settings use the pressure approximation. Rainbow,
+eraser and straighten effects are not reproduced. Profile gates reject many
+such inputs; Marker4 V8 accepts straighten and fixed-width flags without
+implementing separate effect behavior. `stroke_paint` uses `pen_width / 2.5`,
+clamped to 0.4–12, then multiplies each segment by
+`0.3 + 0.7 * clamp(pressure, 0.05, 1)` when a
+pressure channel is present. `render_stroke` draws one straight, round-capped
+SVG line per point pair at that segment's starting width, or a straight
+polyline when pressure is absent. A single sample becomes a circle. This path
+does not build centerline curves or continuous width transitions, so straight
+segments can show angular turns and width changes can show shoulders. Raising
+output resolution does not remove those geometry differences.
+
+`Stroke` carries optional `StrokeRendering`: pen name, settings, tool type,
+and style. The approximation ignores timestamps, tilt, and orientation. The
+fountain profiles use pressure, tilt, timestamps and geometric movement history.
+
+### DefaultPen curve-enabled branch
+
+In `libSPenDefaultPen.so`:
+
+- `RedrawPen(ObjectStroke const*, RectF*)`, `0x18b54`, retrieves stored
+  points, pressures, timestamps, tilt and orientation, constructs a
+  `MotionEvent` and dispatches redraw. This path applies to saved strokes.
+- `RedrawPen(MotionEvent const*, RectF*)` calls `redrawLine` at `0x18694`.
+  `redrawLine`, `0x18928`, forms a midpoint between the previous input
+  point and the next accepted point. It calls `SmPath::moveTo` at `0x18a04`
+  and `quadTo` at `0x18a14`, with the previous point as the control point
+  and the midpoint as the endpoint.
+- It obtains curve length at `0x18a48`, chooses a repeat count through
+  `getRepeat`, and samples position/tangent at `0x18ab8`. Width changes
+  are divided across the repeats at `0x18a70` / `0x18a80` and accumulated
+  at `0x18adc`. The drawing call receives half the interpolated width,
+  with a lower bound of 1 (`0x18ac0` onward).
+- The live `drawLine`, `0x18c80`, has the analogous curve construction
+  (`0x18d5c`, `0x18d6c`) and distance sampling (`0x18e10`).
+
+These routines also have sample-acceptance thresholds and startup/end state.
+A generic midpoint spline alone is not a full reproduction. This trace
+establishes width interpolation, not the upstream pressure-to-width law.
+There is also an explicit no-curve branch; this algorithm is not universal.
+
+A bounded host-Mesa paint capture joins one synthetic Drawing-selected
+11-stamp stream (132 bytes) through native RT Update/Draw and host VBO upload,
+with explicit factory/GLES adapters. Its 27 cases vary
+projected diameter (1–3 pixels), phase (0, 0.25, 0.5 pixels), and native
+`SetPenData` ARGB alpha (0, 128, 255). Red and alpha planes are byte-identical
+across alpha controls, matching the fragment shader's use of `inputColor.xyz`
+and derivative-smoothed coverage. The same vector is explicitly materialized
+at RT+88; natural queue transfer, archive loading and device pixels are outside
+this capture. Rust's circle SVG primitives and their vector-PDF conversion
+cover more nonzero pixels than the native reference in all nine opaque controls.
+Source-derived fringes reduce amplitude error but retain support/PDF tradeoffs.
+Matrix receipt SHA-256:
+`cc5379bc06dabd33f46e25fe9da4a5fea87f11c53812b3339c6ab9658847fde8`.
+
+A second matrix holds that stream and opaque paint fixed across 56 cases:
+projected diameters 0.5, 1, 2, 3, 4, 8 and 16 pixels, four XY phases, and
+0°/45° rotations. All 112 red/alpha planes pass integrity and stream-join
+checks with zero GL errors. An offline aligned 2×2 derivative model differs
+by at most three alpha and two red byte values; continuous analytic derivatives are less
+accurate. Unchanged source circles overpaint native support in both resvg and
+MuPDF. These remain component comparisons, not full Rust exports or device
+parity. Matrix receipt SHA-256:
+`ff7d825dded274cd851547185293b3be4e6b8184ec51601c4f6599587cc6d6fe`.
+
+### Marker2 and shared smoothing helpers
+
+In `libSPenMarker2.so`, V2 saved-event redraw calls `drawLine` at `0x22a24`
+and `0x22aa0`. That routine (`0x22c10`) constructs the midpoint quadratic
+at `0x22ce4`–`0x22d08`, obtains its length at `0x22d1c`, samples positions
+at `0x22d58`, and submits them to `Marker2StrokeDrawableRTV2::AddPoint`
+at `0x22d68`. It carries the residual sample distance across segments.
+This establishes curved, distance-spaced rendering, not pressure-dependent
+width for Marker2.
+
+PenCommon `WidthSmoothManager::getSmoothedWidth`, `0x593ec`, computes
+`second + factor * (first - second)`. However, the base
+`PenStrokeTipDrawableGL::CalculateSmoothedWidths`, `0x525dc`, is just a
+return instruction. Symbol names alone therefore cannot prove a selected
+pen actually applies smoothing. This base-method trace does not establish
+the behavior of pen-specific callers or overrides.
+
+The optional post-input coordinate smoother is a separate mechanism:
+[stroke finalization](stroke-finalization-findings.md) documents that the
+ordinary constructor selects no transformer. Input prediction and optional
+beautification are distinct from saved-stroke redraw.
+
+### Marker3 fragment coverage
+
+The captured Marker3 mask uses `clamp((0.5-d)/fwidth(d),0,1) * alpha`,
+where `d` is distance in the stamp's UV coordinates. On host Mesa, `fwidth`
+uses per-lane finite differences across a 2×2 fragment quad. Substituting the
+continuous distance gradient changes the fringe. Replaying the captured VBO,
+projection and quad differences matches isolated-stamp support exactly and
+alpha within two bytes across the tested 1×/2×/4× phase controls. At alpha 128,
+duplicate stamps preserve the single mask and overlapping masks combine by MAX.
+The bounded production route preserves native centers/radii in one compound
+disk fill, applying source alpha once. On the 22-stamp saved control at
+1×/2×/4×, disk geometry improves support and alpha error over the generic
+pressure-width fallback in Firefox, resvg, MuPDF and PDFium. A 32-layer
+continuous-fringe candidate is about 700 times larger and worsens high-zoom
+error; it remains test-only. Neither transport reproduces fragment-quad
+derivatives or proves device parity. The audit is in ignored
+`tmp/vector-parity-plan/marker3-admission-next/`.
+
+On this Marker3 route, Drawing's `GetMorphable` call resolves to PenCommon's
+null-return stub (`0x46468`); the guard at Drawing `0x81ef0` skips the curve
+getter and setter. Two- and three-point controls produce identical complete
+XY streams with curve enabled or disabled, so both use the same page sampler.
+Drawing rejects point counts ≤1 (`0x81a64–0x81a78`); invoking an already selected
+V5 redraw directly emits coincident initial/terminal stamps for one point,
+which does not establish one-point Drawing admission.
+
+## Saved rendering inputs
+
+The semantic `Stroke` carries optional `StrokeRendering`, populated by the
+existing bounded style decoder. It retains the complete known style,
+properties and tool type, plus resolved pen/settings strings. Both document
+parsing and debugger inspection/replay use `StrokeResources` to resolve IDs.
+The modern name takes precedence; only an absent or -1 modern ID uses the
+legacy ID. Original sample arrays are unchanged. Serialized strokes without
+rendering metadata default to `None`.
+
+All 77 strokes in fixture 02 resolve to
+`com.samsung.android.sdk.pen.pen.preload.FountainPen`, settings `18;0;100;`.
+DefaultPen curve findings alone therefore cannot establish parity for this
+fixture. The [FountainPen findings](fountain-parity.md) cover its separate
+renderer versions, pressure/speed width calculation, width smoothing and tips.
+
+## Shared preparation and replay
+
+`prepare_stroke` supplies geometry inputs, paint, conservative bounds and
+profile/support status for SVG exports and vector replay. The fallback profile
+borrows original samples for its pressure/width approximation. Single-sample
+strokes produce a dot. The debugger uses prepared bounds instead of independently
+estimating them, and exposes profile/support
+status without asserting native parity.
+
+The native registry is represented by `PEN_PROFILES`: 44 names, with aliases
+kept separate and 30 distinct bundled library stems. A pen name alone does not
+activate a reconstructed renderer. Saved FountainPen V14/V16 and Marker2 report
+`Reconstructed` only when their inputs pass the profile's validation; Marker4
+V7/V8 remain `Approximate` because vector outlines approximate native coverage.
+
+Texture pens and live tips remain unsupported. Shared preparation does not
+establish full Samsung parity.
+
+### FountainPen version selection refinement
+
+FountainPen `GetStrokeDrawableGL` (`0x61a8c`) clamps the setting version to
+1–18. GOT relocation `0xd5e78` resolves to `versionTable` (`0xdb8f0`), whose
+8-byte entries select drawing and outline versions independently. Entry 18
+is `(16, 12)`: fixture 02 selects drawing V16, not V17 or a hypothetical V18.
+V16 `RedrawPen(MotionEvent...)` (`0x777c4`) calls `drawLine` (`0x77fd4`) at
+`0x77c88`. That drawing routine constructs midpoint quadratics and passes
+computed width through `WidthSmoothManager::getSmoothedWidthFromList` at
+`0x7830c`, then interpolates widths across distance-spaced samples at
+`0x78358`–`0x7839c`.
+
+This is not a pure pressure law. The drawing routine uses a three-entry
+geometric-ratio history, pressure, a tilt-derived parameter, previous width
+and tool type. Saved-event redraw transforms tilt from radians to degrees,
+clamps to 75 degrees and maps the portion above 15 degrees to 0–3
+(`0x77c08`–`0x77c48`). Tolerance, width-manager mode, and endpoint processing
+are included in the V16 geometry port below. The render-thread coverage
+shader is still not ported.
+
+The pure V16 width-limiter helper at `0x79298`–`0x792f4` has a bounded
+native oracle in `conformance/native_ink.py` at revision `40de721`.
+It checks the library SHA-256, executes only that helper in ARM64 emulation,
+and compares a float32 reconstruction over 4,128 deterministic cases. All
+cases match bit-for-bit, exercising all 23 helper instructions. The helper
+limits width changes, enforces pressure/size lower bounds and retains prior
+width in its non-stylus unchanged-pressure branch. This validates one numeric
+primitive, not the complete pressure law or full rendered pen.
+
+## FountainPen V16 saved geometry implementation
+
+`ink/fountain.rs` reconstructs saved `FountainPen` / `18;0;100;` geometry.
+Input modes 1–3 and fixed width are covered by native captures described in
+[vector parity](fountain-parity.md). Unsupported inputs and expansion beyond
+the preparation budget retain `Approximate`. `Reconstructed` describes native
+geometry agreement, not identical edge antialiasing across SVG consumers.
+
+The native saved-object entry (`0x7851c`) performs a width collection pass,
+completes smoothing, then redraws with timestamp-indexed widths. A nonzero tip
+length enables these passes (`0x78794`–`0x7886c`); `18;0;100;` sets tip unit 0
+and length 100 through `SetAdvancedSetting`. The saved redraw itself calls
+`drawLine` for interior samples and `endPen` for the last sample; it does not
+run the live PointTipManager event prediction again.
+
+The implementation includes:
+
+- PenTolerance's large/small thresholds, direction checks and farthest dropped
+  event, plus V16's alternating short-movement filtering.
+- Midpoint quadratics, native SmPath subdivision/length parameterization and
+  distance-spaced circular stamps. The canonical inverse scale is one, giving
+  repeat distance 0.82. Native `getInverseScale` multiplies that repeat distance
+  by the minimum inverse canvas scale; prepared geometry is
+  stable across zoom levels rather than resampled for each native GPU scale.
+- Float32 pressure, direction-history and tilt calculations, width limits,
+  timestamp deduplication/interpolation and forward-window width smoothing.
+  The stylus smoothing configuration is `(4, 8)` with factor 0.15. The native
+  collection pass finalizes index `count - window + 1`; reproducing that timing
+  matters, rather than applying a generic moving average afterward.
+- The native ratio ring surviving between collection and redraw, constant-width
+  final quadratic/endpoint, tap radius and minimum radius 0.1.
+- Original-sample-to-generated-dot mapping, bounds from actual dot radii,
+  bounded geometry expansion, and opacity applied once to each stroke union.
+
+`conformance/fountain_native.py` executes the actual hash-pinned FountainPen,
+PenCommon and Base helpers in Unicorn. Memory allocation is bounded, each
+native call has an instruction limit, and unresolved imports fail closed.
+Object initialization/two-pass orchestration are reconstructed; native
+MotionEvent endpoint getters are stubbed, and `drawPoint` is intercepted to
+capture circles. This is an independent geometry oracle, not a GPU capture.
+The checked-in `fountain-v16.json` contains synthetic channels and native
+results for 26 cases (1,869 dots), covering taps, short strokes, repeats,
+turns, reversals, tilt/pressure changes, timestamps, sizes and seeded paths.
+It is checked by ordinary Rust tests without needing the APK or Unicorn.
+
+To check the native reference and a real parsed document:
+
+```sh
+PYTHONPATH=scratch/apk-analysis-runtime/python python3 conformance/fountain_native.py
+cargo run --offline -p sdocx --features render,serde --example ink_geometry -- hf/02-shapes-and-dot-calibration.sdocx > /tmp/ink-geometry.json
+PYTHONPATH=scratch/apk-analysis-runtime/python python3 conformance/fountain_native.py --prepared /tmp/ink-geometry.json
+```
+
+All 77 fixture-02 strokes produce the same 3,777 dots and sample mappings as
+the native helpers. Maximum position difference is 0.0000611 page units;
+maximum radius difference is 0.000000716. The ordinary whole-page PDF visual
+comparison improves from 1.25% missing / 0.72% extra ink to 0.72% missing /
+0.69% extra ink (0.83% changed pixels). These percentages include the page's
+shapes and background; they are not per-pen or cross-device parity guarantees.
+Texture pens, other FountainPen versions and the native
+scale-dependent shader's thin-line/antialias coverage remain outside this
+profile's validated scope.
+
+The union of all 77 prepared stroke bounds, padded by three pixels, gives a
+more relevant pen-focused comparison than the whole page: at the existing
+ink threshold 32 and one-pixel tolerance, missing ink improves from 3.7626%
+to 0.0360%, with 0% extra ink in both cases. The measurement uses 13,900
+reference ink pixels; gray background dots or other objects overlapping these
+regions are included. Reproduce it with:
+
+```sh
+cargo run -p sdocx-conformance --bin ink -- \
+  /tmp/ink-geometry.json /path/to/reference_page0.png /path/to/sdk.png
+```
+
+The dense `handwritten.sdocx` fixture resolves to FountainPen `14;`.
+Its separate Rust reconstruction retains native positions, radii, tangent
+directions and sample boundaries. SVG/PDF use directional vector shading;
+Bounded Chromium and Firefox appearance checks pass; native fringe and PDF
+sampling differences remain. The [V14 findings](fountain-v14.md) describe its saved redraw;
+[vector parity](fountain-parity.md) records current coverage and measured limits.
+
+## ChineseBrush source and paint controls
+
+The imported shared `Pen::SetSize` clamps finite sizes to 0.4–800 before storing
+them (PenCommon RVA `0x45fdc`, SHA-256
+`afd39c0d55ec5cf47153be48222c8a9ddc0057fc772dd870af9ced74a59ec33d`).
+
+For the pinned ChineseBrush DSO (`25d06b71e525f129e53c3734b957cdc9279ff9bd8dbca19948351c5e5ad237f5`),
+GLV1/2/3 `endPen` at RVAs `0x32624`/`0x35868`/`0x385b4` reads the raw final
+MotionEvent even when its movement was rejected. Quadratic tails retain the
+accepted control point and use the raw endpoint and pressure. V2/V3 terminal
+width uses stored accepted speed (`+280`); the spatial gate precedes timestamp
+updates, and a zero previous timestamp selects the 50,000 time fallback.
+The [Rust source regressions](../../crates/sdocx/src/ink/chinesebrush_glv123.rs)
+pin native input bytes and complete packed streams for long and short controls,
+plus exact output-budget boundaries. They establish synthetic saved-redraw
+behavior, not app-deserialized admission or device pixels. The NoCurve matrix
+adds 45 cases and 294 records: rejected raw endpoints still produce a terminal
+line, duplicate tails emit no segment, and all-rejected inputs produce a
+pressure-scaled dot at the last source point for multi-event sources.
+
+Shared `ObjectDrawing::drawObjectStroke` rejects stored point counts 0 and 1
+before `GetPenName`: Drawing RVAs `0x81a64–0x81a74` call `GetPointCount`, compare
+against 1 and set error 7 on rejection. In-bounds singleton and empty native
+Model arrays produce no pen instance, MotionEvent reads or queued work;
+coincident and separated two-point controls both pass. This is a saved-object
+Drawing gate, distinct from a standalone sampler's ability to construct a dot.
+The capture receipt hashes to
+`2a3f9031c334033fe4ead376d9a5a011a9672c8bc24d2f0a6db9038eda0bb279`.
+
+The live alpha atlas uses nearest/clamp sampling; its complete 144×144 RGBA
+upload hashes to `da75f5d1190e6fe086aa11007b7ed739421cf5d4522e34cb246df273353d2942`.
+It reconstructs byte-for-byte from exported `SPen::g_chinesePtn` at file offset
+`0x14480`: seven 48×48 RGBA cells occupy slots 0–6 of a zero-filled 3×3 atlas.
+Fixed 321×228 logical-page, Y-down host captures use an overridden projection
+and growing framebuffer for a synthetic 1×/2×/4× scale sweep; this is not native
+canvas zoom. The shader's `fwidth(distance)` depends on angle and
+fragment-quad phase. Constant radial gradients lose thin-stamp PDF support;
+corrected angular alpha bands improve size-3.144 1× support IoU to 1.000 in
+MuPDF and 0.971 in PDFium, with lower color error than matched generic lines.
+These are per-scale host comparisons, not device or arbitrary-zoom parity.
+Minimum-size 0.4 controls still miss sparse native pixels at 2×/4×; an empty
+native 1× frame has no active-region error metric and cannot establish parity.
+
+The Y-down projection maps the quad's negative-Y edge to page top, where the
+shader samples atlas row zero. Original atlas rows therefore need no SVG image
+flip; the positive-Y capture requires the opposite orientation. Masks keep RGB
+white and fade alpha alone. The corrected atlas extraction uses the full
+144-pixel row stride; earlier contiguous-cell extraction results are invalid.
+The corrected comparison receipt hashes to
+`f4b2b0388f3984f5b2f23d5dd911fed39f029ec17762ba6ba4400b555d736a1e`.
+Actual applied host matrices were checked with `glGetUniformfv`; they override
+the native matrix and do not establish Samsung's stroke-cache projection.
+
+Native source-array read hooks and AddPoint boundaries also establish cumulative
+record cuts for curved and NoCurve saved redraws. Rust checks all three versions,
+including rejected and duplicate terminal events; these cuts describe saved
+redraw attribution, not live app replay. The source-boundary receipt hashes to
+`76f44ce5613fe5253fe39ade58782d61e7272578b28e40707c593d75b1934730`.
+
+The RTV1 `CreatePenCanvas(int,int,queue)` name does not establish target sizing:
+at `0x3b5d0` it discards those arguments and dispatches `Init()` through vtable
+slot `+0x30` (`0x49690 → 0x3b0f4`). `Draw` at `0x3b9f4` receives an external
+`ISPSubBitmap` and combines its matrix with the caller's matrix before shader
+submission. The fixed 144×144 pattern atlas is a separate allocation. Native callback
+workers enumerate tiles of the existing canvas bitmap; the bitmap's upstream
+size producer and application/device transform remain unresolved.
+
+The native matrix helper at `0x3bc98` computes `M_subbitmap × embed(M_canvas)`.
+A separate capture calls native canvas `SetMatrix` and forwards the shader
+uniform unchanged, then verifies it with `glGetUniformfv`. At fixed 321×228
+allocation, canvas scales 1/2/4 produce X/Y terms
+`(2/321, 2/228) × scale` and 33/125/501 alpha-support pixels for one synthetic
+stroke. Growing allocation alone divides the projection terms and preserves
+pixel scale. The capture receipt hashes to
+`dc948f2d0e21aa730881ff717d89e6d052a13550f1be119187783361a01e1b70`;
+it does not establish application matrix provenance or device rasterization.
+
+A CPU mirror of the shader's 2×2 derivative lanes reproduces the minimum-size
+synthetic host readbacks byte-for-byte, including their faint singleton pixels.
+Changing alpha-band counts trades missed coverage for false positives; more
+bands do not consistently improve support. These derivative/quantization
+controls use the overridden Y-down sweep, not the native canvas-zoom capture.
+Their receipt hashes to
+`c680c9ec6f88866287a06110f5a8cd7e8f3586a2c49128ce2340455c2e851cfe`.

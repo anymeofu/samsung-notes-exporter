@@ -1,0 +1,715 @@
+use std::collections::{BTreeMap, HashSet};
+use std::fs;
+use std::path::{Component, Path, PathBuf};
+
+use serde::Deserialize;
+use sha2::{Digest, Sha256};
+
+const MANIFEST: &str = include_str!("../../../conformance/corpus.json");
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Manifest {
+    version: u32,
+    fixtures: Vec<Fixture>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Fixture {
+    id: String,
+    sdocx: Asset,
+    reference_pdf: Asset,
+    expected: Expectations,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Asset {
+    path: PathBuf,
+    sha256: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Expectations {
+    stored_pages: usize,
+    visible_pages: usize,
+    title: Option<String>,
+    body: Option<BodyExpectations>,
+    flow: Option<FlowExpectations>,
+    page_objects: Option<PageObjectExpectations>,
+    #[serde(default)]
+    diagnostics: BTreeMap<String, usize>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BodyExpectations {
+    #[serde(default)]
+    minimum_characters: usize,
+    #[serde(default)]
+    required_text: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FlowExpectations {
+    text_sections: Option<usize>,
+    hyperlinks: Option<usize>,
+    tables: Option<usize>,
+    code_blocks: Option<usize>,
+    images: Option<usize>,
+    resolved_images: Option<usize>,
+    #[serde(default)]
+    required_link_targets: Vec<String>,
+    #[serde(default)]
+    required_table_text: Vec<String>,
+    #[serde(default)]
+    required_code_text: Vec<String>,
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PageObjectExpectations {
+    strokes: Option<usize>,
+    images: Option<usize>,
+    text_boxes: Option<usize>,
+    shapes: Option<usize>,
+    lines: Option<usize>,
+}
+
+fn read_manifest(json: &str) -> Result<Manifest, String> {
+    let manifest: Manifest = serde_json::from_str(json).map_err(|error| error.to_string())?;
+    if manifest.version != 1 || manifest.fixtures.is_empty() {
+        return Err("manifest must use version 1 and contain fixtures".into());
+    }
+    let mut ids = HashSet::new();
+    for fixture in &manifest.fixtures {
+        if fixture.id.is_empty()
+            || !fixture
+                .id
+                .bytes()
+                .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
+            || !ids.insert(&fixture.id)
+        {
+            return Err(format!("invalid or duplicate fixture ID: {}", fixture.id));
+        }
+        if fixture.expected.visible_pages == 0
+            || fixture.expected.stored_pages < fixture.expected.visible_pages
+        {
+            return Err(format!("{}: invalid page counts", fixture.id));
+        }
+        if fixture
+            .expected
+            .diagnostics
+            .values()
+            .any(|count| *count == 0)
+        {
+            return Err(format!(
+                "{}: diagnostic counts must be positive",
+                fixture.id
+            ));
+        }
+        let required_text = fixture
+            .expected
+            .body
+            .iter()
+            .flat_map(|body| &body.required_text)
+            .chain(fixture.expected.flow.iter().flat_map(|flow| {
+                flow.required_link_targets
+                    .iter()
+                    .chain(&flow.required_table_text)
+                    .chain(&flow.required_code_text)
+            }));
+        if required_text.into_iter().any(|text| text.trim().is_empty()) {
+            return Err(format!("{}: required text must not be empty", fixture.id));
+        }
+        for asset in [&fixture.sdocx, &fixture.reference_pdf] {
+            if asset.path.as_os_str().is_empty()
+                || asset.path.to_string_lossy().contains('\\')
+                || asset.path.to_string_lossy().contains(':')
+                || asset
+                    .path
+                    .components()
+                    .any(|part| !matches!(part, Component::Normal(_)))
+                || asset.sha256.len() != 64
+                || !asset
+                    .sha256
+                    .bytes()
+                    .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+            {
+                return Err(format!("{}: invalid asset path or SHA-256", fixture.id));
+            }
+        }
+    }
+    Ok(manifest)
+}
+
+fn corpus_root() -> PathBuf {
+    std::env::var_os("SDOCX_CORPUS_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../hf"))
+}
+
+fn verified_asset(root: &Path, asset: &Asset) -> Result<PathBuf, String> {
+    let path = root
+        .join(&asset.path)
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
+    if !path.starts_with(root) {
+        return Err(format!("{} is outside the corpus", asset.path.display()));
+    }
+    let bytes = fs::read(&path).map_err(|error| error.to_string())?;
+    let actual = format!("{:x}", Sha256::digest(bytes));
+    if actual != asset.sha256 {
+        return Err(format!("{}: SHA-256 mismatch", asset.path.display()));
+    }
+    Ok(path)
+}
+
+fn check_count(label: &str, actual: usize, expected: Option<usize>) -> Result<(), String> {
+    if let Some(expected) = expected
+        && actual != expected
+    {
+        return Err(format!("{label}: expected {expected}, got {actual}"));
+    }
+    Ok(())
+}
+
+fn check_document(parsed: &sdocx::ParsedDocument, expected: &Expectations) -> Result<(), String> {
+    check_count(
+        "stored pages",
+        parsed.stored_pages.len(),
+        Some(expected.stored_pages),
+    )?;
+    check_count(
+        "visible pages",
+        sdocx::layout_document(&parsed.document).pages.len(),
+        Some(expected.visible_pages),
+    )?;
+    if let Some(title) = &expected.title
+        && parsed.note.as_ref().map(|note| &note.title.text) != Some(title)
+    {
+        return Err("note title differs".into());
+    }
+    if let Some(expected) = &expected.body {
+        let body = &parsed
+            .note
+            .as_ref()
+            .ok_or("structured note is missing")?
+            .body
+            .text;
+        if body.chars().count() < expected.minimum_characters {
+            return Err("body is unexpectedly short".into());
+        }
+        for text in &expected.required_text {
+            if !body.contains(text) {
+                return Err(format!("required body text is missing: {text}"));
+            }
+        }
+    }
+    if let Some(expected) = &expected.flow {
+        check_flow(
+            parsed
+                .document
+                .metadata
+                .note_text
+                .as_ref()
+                .ok_or("document-level text flow is missing")?,
+            expected,
+        )?;
+    }
+    if let Some(expected) = &expected.page_objects {
+        check_page_objects(&parsed.document, expected)?;
+    }
+    let mut diagnostics = BTreeMap::new();
+    for diagnostic in &parsed.report.diagnostics {
+        *diagnostics
+            .entry(format!("{:?}", diagnostic.code))
+            .or_insert(0) += 1;
+    }
+    if diagnostics != expected.diagnostics {
+        return Err(format!(
+            "diagnostics: expected {:?}, got {diagnostics:?}",
+            expected.diagnostics
+        ));
+    }
+    Ok(())
+}
+
+fn check_flow(flow: &sdocx::RichTextBox, expected: &FlowExpectations) -> Result<(), String> {
+    let images: Vec<_> = flow
+        .object_spans
+        .iter()
+        .filter_map(|span| match &span.content {
+            Some(sdocx::RichTextObjectContent::Image(image)) => Some(image),
+            _ => None,
+        })
+        .collect();
+    check_count("embedded images", images.len(), expected.images)?;
+    check_count(
+        "resolved embedded images",
+        images
+            .iter()
+            .filter(|image| image.media_index.is_some())
+            .count(),
+        expected.resolved_images,
+    )?;
+
+    check_count(
+        "text sections",
+        flow.text_sections.len(),
+        expected.text_sections,
+    )?;
+    let hyperlinks: Vec<_> = flow
+        .spans
+        .iter()
+        .filter(|span| span.kind == sdocx::RichTextSpanType::Hyperlink)
+        .collect();
+    check_count("hyperlinks", hyperlinks.len(), expected.hyperlinks)?;
+    for target in &expected.required_link_targets {
+        if !hyperlinks.iter().any(|span| {
+            span.hyperlink_value()
+                .and_then(|link| link.custom_data)
+                .as_ref()
+                == Some(target)
+        }) {
+            return Err(format!("required hyperlink target is missing: {target}"));
+        }
+    }
+    let tables: Vec<_> = flow
+        .object_spans
+        .iter()
+        .filter_map(|span| match span.content.as_ref() {
+            Some(sdocx::RichTextObjectContent::Table(table)) => Some(table.as_ref()),
+            _ => None,
+        })
+        .collect();
+    check_count("tables", tables.len(), expected.tables)?;
+    for text in &expected.required_table_text {
+        if !tables.iter().any(|table| {
+            table.rows.iter().any(|row| {
+                row.cells
+                    .iter()
+                    .any(|cell| cell.content.text.contains(text))
+            })
+        }) {
+            return Err(format!("required table text is missing: {text}"));
+        }
+    }
+    let code_blocks: Vec<_> = flow
+        .object_spans
+        .iter()
+        .filter_map(|span| match span.content.as_ref() {
+            Some(sdocx::RichTextObjectContent::CodeBlock(code)) => Some(code.as_ref()),
+            _ => None,
+        })
+        .collect();
+    check_count("code blocks", code_blocks.len(), expected.code_blocks)?;
+    for text in &expected.required_code_text {
+        if !code_blocks.iter().any(|code| {
+            code.body
+                .as_ref()
+                .is_some_and(|body| body.text.contains(text))
+        }) {
+            return Err(format!("required code-block text is missing: {text}"));
+        }
+    }
+    Ok(())
+}
+
+fn check_page_objects(
+    document: &sdocx::Document,
+    expected: &PageObjectExpectations,
+) -> Result<(), String> {
+    let mut images = 0;
+    let mut text_boxes = 0;
+    let mut shapes = 0;
+    let mut lines = 0;
+    for page in &document.pages {
+        for element in page.elements() {
+            match element {
+                sdocx::PageElement::Image { .. } | sdocx::PageElement::PlacedImage(_) => {
+                    images += 1
+                }
+                sdocx::PageElement::TextBox(_) => text_boxes += 1,
+                sdocx::PageElement::Shape(_) => shapes += 1,
+                sdocx::PageElement::Line(_) => lines += 1,
+                _ => {}
+            }
+        }
+    }
+    check_count(
+        "page strokes",
+        document
+            .pages
+            .iter()
+            .map(|page| page.strokes().count())
+            .sum(),
+        expected.strokes,
+    )?;
+    check_count("page images", images, expected.images)?;
+    check_count("page text boxes", text_boxes, expected.text_boxes)?;
+    check_count("page shapes", shapes, expected.shapes)?;
+    check_count("page lines", lines, expected.lines)
+}
+
+#[test]
+fn locked_manifest_is_valid_without_external_files() {
+    read_manifest(MANIFEST).unwrap();
+}
+
+#[allow(dead_code)]
+mod support;
+
+fn drawing_fixture() -> (sdocx::ParsedDocument, Expectations) {
+    let archive = support::archive(&support::page(&[vec![]], 0, &[]));
+    let parsed = sdocx::parse_bytes_detailed(&archive).unwrap();
+    let expected = serde_json::from_value(serde_json::json!({
+        "stored_pages": 1,
+        "visible_pages": 1,
+        "page_objects": {"strokes": 0, "images": 0, "text_boxes": 0, "shapes": 0, "lines": 0},
+        "diagnostics": {"MissingPageManifest": 1, "UnlistedPageEntry": 1}
+    }))
+    .unwrap();
+    (parsed, expected)
+}
+
+#[test]
+fn drawing_notes_do_not_require_a_title_or_flow_text() {
+    let (parsed, expected) = drawing_fixture();
+    assert!(parsed.note.is_none());
+    assert!(parsed.document.metadata.note_text.is_none());
+    check_document(&parsed, &expected).unwrap();
+}
+
+#[test]
+fn missing_or_unexpected_page_objects_fail_exact_counts() {
+    let (mut parsed, mut expected) = drawing_fixture();
+    parsed.document.pages[0].objects.push(
+        sdocx::PageElement::Image {
+            bbox: Default::default(),
+            media_index: 0,
+        }
+        .into(),
+    );
+    assert!(
+        check_document(&parsed, &expected)
+            .unwrap_err()
+            .contains("page images")
+    );
+    expected.page_objects.as_mut().unwrap().images = Some(1);
+    check_document(&parsed, &expected).unwrap();
+    parsed.document.pages[0].clear_elements();
+    assert!(
+        check_document(&parsed, &expected)
+            .unwrap_err()
+            .contains("page images")
+    );
+    for kind in ["strokes", "text_boxes", "shapes", "lines"] {
+        let mut counts = serde_json::json!({});
+        counts[kind] = serde_json::json!(1);
+        let counts = serde_json::from_value(counts).unwrap();
+        assert!(
+            check_page_objects(&parsed.document, &counts).is_err(),
+            "{kind}"
+        );
+    }
+}
+
+#[test]
+fn expected_diagnostics_are_exact_counts_not_a_warning_allowlist() {
+    let (mut parsed, mut expected) = drawing_fixture();
+    let warning = sdocx::ParseDiagnostic {
+        severity: sdocx::DiagnosticSeverity::Warning,
+        code: sdocx::DiagnosticCode::UnsupportedShapeFeature,
+        archive_entry: Some("page.page".into()),
+        message: "unsupported fill".into(),
+    };
+    parsed.report.diagnostics.push(warning.clone());
+    assert!(
+        check_document(&parsed, &expected)
+            .unwrap_err()
+            .contains("diagnostics")
+    );
+    expected
+        .diagnostics
+        .insert("UnsupportedShapeFeature".into(), 1);
+    check_document(&parsed, &expected).unwrap();
+    parsed.report.diagnostics.push(warning);
+    assert!(
+        check_document(&parsed, &expected)
+            .unwrap_err()
+            .contains("diagnostics")
+    );
+    parsed.report.diagnostics.clear();
+    assert!(
+        check_document(&parsed, &expected)
+            .unwrap_err()
+            .contains("diagnostics")
+    );
+}
+
+#[test]
+fn zero_flow_object_counts_do_not_require_a_table_link_or_code_block() {
+    let flow = sdocx::RichTextBox {
+        text_area_type: None,
+        bbox: Default::default(),
+        rotation_degrees: None,
+        text: "simple text".into(),
+        color: None,
+        highlight_color: None,
+        underline: false,
+        font_size: None,
+        runs: vec![],
+        spans: vec![],
+        paragraphs: vec![],
+        object_spans: vec![],
+        text_sections: vec![],
+        margins: None,
+        gravity: None,
+    };
+    let expected = serde_json::from_value(serde_json::json!({
+        "text_sections": 0, "hyperlinks": 0, "tables": 0, "code_blocks": 0, "images": 0, "resolved_images": 0
+    }))
+    .unwrap();
+    check_flow(&flow, &expected).unwrap();
+    for key in ["images", "resolved_images"] {
+        let mut expected = serde_json::json!({});
+        expected[key] = serde_json::json!(1);
+        assert!(check_flow(&flow, &serde_json::from_value(expected).unwrap()).is_err());
+    }
+    for key in [
+        "required_link_targets",
+        "required_table_text",
+        "required_code_text",
+    ] {
+        let mut expected = serde_json::json!({});
+        expected[key] = serde_json::json!(["must exist"]);
+        assert!(
+            check_flow(&flow, &serde_json::from_value(expected).unwrap()).is_err(),
+            "{key}"
+        );
+    }
+}
+
+#[test]
+fn manifest_rejects_unknown_fields_duplicates_and_invalid_metadata() {
+    let original: serde_json::Value = serde_json::from_str(MANIFEST).unwrap();
+    let mut value = original.clone();
+    value["version"] = serde_json::json!(2);
+    assert!(read_manifest(&value.to_string()).is_err());
+    value = original.clone();
+    let fixture = value["fixtures"][0].clone();
+    value["fixtures"].as_array_mut().unwrap().push(fixture);
+    assert!(
+        read_manifest(&value.to_string())
+            .unwrap_err()
+            .contains("duplicate")
+    );
+    for key in ["title_typo", "images"] {
+        value = original.clone();
+        value["fixtures"][0]["expected"][key] = serde_json::json!(1);
+        assert!(
+            read_manifest(&value.to_string())
+                .unwrap_err()
+                .contains("unknown field")
+        );
+    }
+    for path in ["../note.sdocx", "/note.sdocx", "C:\\note.sdocx"] {
+        value = original.clone();
+        value["fixtures"][0]["sdocx"]["path"] = serde_json::json!(path);
+        assert!(read_manifest(&value.to_string()).is_err());
+    }
+    for pages in [0, 7] {
+        value = original.clone();
+        value["fixtures"][0]["expected"]["visible_pages"] = serde_json::json!(pages);
+        assert!(read_manifest(&value.to_string()).is_err());
+    }
+    value = original.clone();
+    value["fixtures"][0]["expected"]["body"]["required_text"] = serde_json::json!([""]);
+    assert!(
+        read_manifest(&value.to_string())
+            .unwrap_err()
+            .contains("must not be empty")
+    );
+    value = original;
+    value["fixtures"][0]["expected"]["diagnostics"] = serde_json::json!({"MissingPageManifest": 0});
+    assert!(
+        read_manifest(&value.to_string())
+            .unwrap_err()
+            .contains("must be positive")
+    );
+}
+
+#[test]
+#[ignore = "requires the external Hugging Face compatibility corpus"]
+fn external_corpus_matches_locked_expectations() {
+    let root = corpus_root()
+        .canonicalize()
+        .expect("corpus directory; see conformance/README.md");
+    for fixture in read_manifest(MANIFEST).unwrap().fixtures {
+        let path = verified_asset(&root, &fixture.sdocx)
+            .unwrap_or_else(|error| panic!("{}: {error}", fixture.id));
+        let _reference = verified_asset(&root, &fixture.reference_pdf)
+            .unwrap_or_else(|error| panic!("{}: {error}", fixture.id));
+        #[cfg(feature = "pdf")]
+        {
+            let reference = lopdf::Document::load(_reference)
+                .unwrap_or_else(|error| panic!("{}: invalid reference PDF: {error}", fixture.id));
+            check_count(
+                "reference PDF pages",
+                reference.get_pages().len(),
+                Some(fixture.expected.visible_pages),
+            )
+            .unwrap_or_else(|error| panic!("{}: {error}", fixture.id));
+        }
+        let parsed =
+            sdocx::parse_detailed(path).unwrap_or_else(|error| panic!("{}: {error}", fixture.id));
+        check_document(&parsed, &fixture.expected)
+            .unwrap_or_else(|error| panic!("{}: {error}", fixture.id));
+    }
+}
+
+#[test]
+#[cfg(feature = "render")]
+#[ignore = "requires the external Hugging Face compatibility corpus"]
+fn image_fixture_renders_all_embedded_images_on_their_reference_pages() {
+    let root = corpus_root().canonicalize().unwrap();
+    let fixture = read_manifest(MANIFEST)
+        .unwrap()
+        .fixtures
+        .into_iter()
+        .find(|fixture| fixture.id == "03-image-placement")
+        .unwrap();
+    let document = sdocx::parse(verified_asset(&root, &fixture.sdocx).unwrap()).unwrap();
+    let rendered = sdocx::render_document_svg(&document, &sdocx::RenderOptions::default());
+    assert_eq!(rendered.len(), 3);
+    assert_eq!(
+        rendered
+            .iter()
+            .map(|page| page.svg.matches("<image ").count())
+            .collect::<Vec<_>>(),
+        [3, 2, 2]
+    );
+    assert!(rendered[2].svg.contains("overflow=\"hidden\""));
+}
+
+#[test]
+#[cfg(feature = "render")]
+#[ignore = "requires the external Hugging Face compatibility corpus"]
+fn shapes_fixture_preserves_calibration_samples_and_renders_native_geometry() {
+    let root = corpus_root().canonicalize().unwrap();
+    let fixture = read_manifest(MANIFEST)
+        .unwrap()
+        .fixtures
+        .into_iter()
+        .find(|fixture| fixture.id == "02-shapes-and-dot-calibration")
+        .unwrap();
+    let document = sdocx::parse(verified_asset(&root, &fixture.sdocx).unwrap()).unwrap();
+    assert_eq!(document.pages.len(), 2);
+    assert_eq!(
+        document.metadata.default_page_dimensions,
+        Some((1848, 2613))
+    );
+    let page = &document.pages[0];
+    let shapes: Vec<_> = page
+        .elements()
+        .filter_map(|element| {
+            if let sdocx::PageElement::Shape(shape) = element {
+                Some(shape)
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert_eq!(shapes.len(), 5);
+    assert!(shapes.iter().all(|shape| shape.text_editable));
+    let native_rect = |bounds: sdocx::BoundingBox| {
+        [bounds.x_min, bounds.y_min, bounds.x_max, bounds.y_max]
+            .map(|value| (value as f32).to_bits())
+    };
+    for shape in &shapes {
+        assert_eq!(
+            native_rect(shape.metadata.bbox),
+            native_rect(shape.drawn_bbox),
+            "template {} reloads without native saved-bounds resizing",
+            shape.shape_type,
+        );
+        assert_ne!(
+            native_rect(shape.geometry_bbox),
+            native_rect(shape.drawn_bbox)
+        );
+        assert_eq!(shape.rotation_degrees, 0.0);
+        assert_eq!(shape.metadata.rotation_degrees, None);
+        assert!(shape.text.as_ref().is_none_or(|text| text.text.is_empty()));
+    }
+    assert_eq!(page.template.unwrap().id, 7);
+    assert_eq!(page.background.image_mode, Some(2));
+    assert_eq!(page.background.width, Some(1848));
+    for stroke in page.strokes() {
+        let rendering = stroke.rendering.as_ref().unwrap();
+        assert_eq!(
+            rendering.pen_name.as_deref(),
+            Some("com.samsung.android.sdk.pen.pen.preload.FountainPen")
+        );
+        assert_eq!(rendering.advanced_settings.as_deref(), Some("18;0;100;"));
+    }
+    for stroke in page.strokes().skip(47).take(12) {
+        assert!((297..=462).contains(&stroke.points.len()));
+        assert_eq!(stroke.pressures.len(), stroke.points.len());
+        assert_eq!(stroke.timestamps.len(), stroke.points.len());
+    }
+    let rendered = sdocx::render_document_svg(&document, &Default::default());
+    assert_eq!(rendered.len(), 1);
+    assert_eq!(rendered[0].source_page_index, 0);
+    let mut read_only = document.clone();
+    for element in read_only.pages[0].elements_mut() {
+        if let sdocx::PageElement::Shape(shape) = element {
+            shape.text_editable = false;
+        }
+    }
+    assert_eq!(
+        sdocx::render_document_svg(&read_only, &Default::default())[0].svg,
+        rendered[0].svg,
+        "text editability must not change saved geometry rendering"
+    );
+    assert_eq!(rendered[0].svg.matches("data-page-template=").count(), 1);
+    let layout = sdocx::layout_document(&document);
+    assert_eq!(
+        sdocx::render_layout_page_svg(&document, &layout, 0, &Default::default())
+            .unwrap()
+            .svg,
+        rendered[0].svg
+    );
+    // A debugger background removes ink, but shares template and native objects.
+    let mut background = document.clone();
+    background.pages[0].clear_strokes();
+    let svg = &sdocx::render_document_svg(&background, &Default::default())[0].svg;
+    let xml = roxmltree::Document::parse(svg).unwrap();
+    let paths: Vec<_> = xml
+        .descendants()
+        .filter(|node| node.has_tag_name("path") && node.attribute("data-page-template").is_none())
+        .collect();
+    assert_eq!(paths.len(), 6, "five native shapes and one line");
+    let saved_shape_starts = [
+        (466.0503845214844, 403.8978271484375),
+        (678.822021484375, 398.5047912597656),
+    ];
+    for (expected_x, expected_y) in saved_shape_starts {
+        assert!(paths.iter().any(
+            |node| matches!(svgtypes::PathParser::from(node.attribute("d").unwrap()).next(),
+            Some(Ok(svgtypes::PathSegment::MoveTo { abs: true, x, y }))
+                if (x - expected_x).abs() < 0.0001 && (y - expected_y).abs() < 0.0001)
+        ));
+    }
+    assert!(svg.contains("data-page-template="));
+    #[cfg(feature = "pdf")]
+    {
+        let bytes = sdocx::render_document_pdf(&document, &Default::default(), &Default::default())
+            .unwrap();
+        let pdf = lopdf::Document::load_mem(&bytes).unwrap();
+        assert_eq!(pdf.get_pages().len(), 1);
+    }
+}

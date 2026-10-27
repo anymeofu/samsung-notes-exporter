@@ -1,0 +1,898 @@
+use clap::{Parser, ValueEnum};
+use sdocx::{Document, LayoutDocument, PageTemplate, PageTemplateSource, RenderOptions};
+use std::fs;
+use std::path::PathBuf;
+
+#[derive(Default)]
+struct RenderWarnings {
+    pages: std::collections::HashSet<usize>,
+}
+
+impl RenderWarnings {
+    fn report(
+        &mut self,
+        page: (usize, usize),
+        text: &[sdocx::TextDiagnostic],
+        objects: &[sdocx::ObjectDiagnostic],
+        geometry: &[sdocx::GeometryDiagnostic],
+        paint: &[sdocx::PaintDiagnostic],
+        backgrounds: &[sdocx::BackgroundDiagnostic],
+    ) {
+        let (page_index, source_page_index) = page;
+        if !self.pages.insert(page_index) {
+            return;
+        }
+        for diagnostic in text {
+            let codepoints = diagnostic
+                .codepoints
+                .iter()
+                .map(|value| format!("U+{value:04X}"))
+                .collect::<Vec<_>>()
+                .join(", ");
+            let affected = if codepoints.is_empty() {
+                String::new()
+            } else {
+                format!("; codepoints {codepoints}")
+            };
+            eprintln!(
+                "Warning [{:?}] visible page {}: font {:?}{affected}",
+                diagnostic.kind,
+                page_index + 1,
+                diagnostic.family,
+            );
+        }
+        for diagnostic in objects {
+            eprintln!(
+                "Warning [{:?}] visible page {}: object at UTF-16 offset {}",
+                diagnostic.kind,
+                page_index + 1,
+                diagnostic.anchor_utf16,
+            );
+        }
+        for diagnostic in paint {
+            let source = match diagnostic.source_offset {
+                Some(offset) => format!("page payload byte offset {offset}"),
+                None => "no retained page payload byte offset".into(),
+            };
+            eprintln!(
+                "Warning [{:?}] visible page {} (source page {}): {:?} paint object UUID {:?}, {source}",
+                diagnostic.kind,
+                page_index + 1,
+                source_page_index + 1,
+                diagnostic.role,
+                diagnostic.object_uuid,
+            );
+        }
+        for diagnostic in backgrounds {
+            match diagnostic {
+                sdocx::BackgroundDiagnostic::PdfPaperOmitted { .. } => eprintln!(
+                    "Warning [PdfPaperOmitted] visible page {} (source page {}): imported PDF background is omitted from this output",
+                    page_index + 1,
+                    source_page_index + 1,
+                ),
+                _ => eprintln!(
+                    "Warning [{diagnostic:?}] visible page {} (source page {})",
+                    page_index + 1,
+                    source_page_index + 1,
+                ),
+            }
+        }
+        for diagnostic in geometry {
+            let source = match diagnostic.source_offset {
+                Some(offset) => format!("page payload byte offset {offset}"),
+                None => "no retained page payload byte offset".into(),
+            };
+            eprintln!(
+                "Warning [{:?}] visible page {} (source page {}): geometry object UUID {:?}, {source}",
+                diagnostic.kind,
+                page_index + 1,
+                source_page_index + 1,
+                diagnostic.object_uuid,
+            );
+        }
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, ValueEnum)]
+enum ColorMode {
+    Auto,
+    Light,
+    Dark,
+}
+
+impl From<ColorMode> for sdocx::RenderColorMode {
+    fn from(value: ColorMode) -> Self {
+        match value {
+            ColorMode::Auto => sdocx::RenderColorMode::Auto,
+            ColorMode::Light => sdocx::RenderColorMode::Light,
+            ColorMode::Dark => sdocx::RenderColorMode::Dark,
+        }
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, ValueEnum)]
+enum Format {
+    Svg,
+    Png,
+    Pdf,
+}
+
+fn resolve_format(
+    flag: Option<Format>,
+    output: Option<&std::path::Path>,
+) -> Result<Format, String> {
+    if let Some(f) = flag {
+        return Ok(f);
+    }
+    match output
+        .and_then(|p| p.extension())
+        .and_then(|e| e.to_str())
+        .map(|e| e.to_ascii_lowercase())
+        .as_deref()
+    {
+        Some("svg") => Ok(Format::Svg),
+        Some("png") => Ok(Format::Png),
+        Some("pdf") => Ok(Format::Pdf),
+        Some(other) => Err(format!(
+            "unknown output extension '.{other}'; use -f/--format to set svg, png or pdf"
+        )),
+        None => Ok(Format::Svg),
+    }
+}
+
+impl Format {
+    fn ext(self) -> &'static str {
+        match self {
+            Format::Svg => "svg",
+            Format::Png => "png",
+            Format::Pdf => "pdf",
+        }
+    }
+}
+
+fn load_fonts(font_files: &[PathBuf]) -> Result<sdocx::fonts::FontBook, String> {
+    let bundled = sdocx::fonts::FontBook::default();
+    if font_files.is_empty() {
+        return Ok(bundled);
+    }
+    let mut fontdb = resvg::usvg::fontdb::Database::new();
+    for path in font_files {
+        let before = fontdb.faces().count();
+        fontdb
+            .load_font_file(path)
+            .map_err(|error| format!("cannot load font {}: {error}", path.display()))?;
+        if fontdb.faces().count() == before {
+            return Err(format!("no usable font faces in {}", path.display()));
+        }
+    }
+    for face in bundled.database().faces() {
+        fontdb.load_font_source(face.source.clone());
+    }
+    fontdb.set_sans_serif_family("Roboto");
+    fontdb.set_monospace_family("Roboto Mono");
+    Ok(sdocx::fonts::FontBook::new(std::sync::Arc::new(fontdb)))
+}
+
+fn svg_options(fonts: &sdocx::fonts::FontBook) -> resvg::usvg::Options<'static> {
+    resvg::usvg::Options {
+        font_resolver: sdocx::fonts::svg_font_resolver(&fonts.database()),
+        fontdb: fonts.database(),
+        ..Default::default()
+    }
+}
+
+fn parse_pdf_dpi(value: &str) -> Result<f32, String> {
+    let dpi = value.parse::<f32>().map_err(|error| error.to_string())?;
+    if !dpi.is_finite() || dpi <= 0.0 {
+        return Err("PDF DPI must be finite and greater than zero".into());
+    }
+    Ok(dpi)
+}
+
+fn parse_pdf_load_width(value: &str) -> Result<u32, String> {
+    let width = value.parse::<u32>().map_err(|error| error.to_string())?;
+    if !(32..=i32::MAX as u32).contains(&width) {
+        return Err("PDF load width must be between 32 and 2147483647".into());
+    }
+    Ok(width)
+}
+
+fn validate_pdf_only_options(
+    format: Format,
+    has_pdf_dpi: bool,
+    has_pdf_load_width: bool,
+) -> Result<(), &'static str> {
+    if format != Format::Pdf && has_pdf_dpi {
+        return Err("--pdf-dpi applies to PDF output; use -f pdf or a .pdf output path");
+    }
+    if format != Format::Pdf && has_pdf_load_width {
+        return Err("--pdf-load-width applies to PDF output; use -f pdf or a .pdf output path");
+    }
+    Ok(())
+}
+
+fn svg_to_png(svg: &str, options: &resvg::usvg::Options<'_>) -> Result<Vec<u8>, String> {
+    let tree =
+        resvg::usvg::Tree::from_str(svg, options).map_err(|e| format!("invalid SVG: {e}"))?;
+    let size = tree.size().to_int_size();
+    let (w, h) = (size.width(), size.height());
+    let mut pixmap = resvg::tiny_skia::Pixmap::new(w, h)
+        .ok_or_else(|| "failed to allocate pixmap".to_string())?;
+    let mut pm = pixmap.as_mut();
+    resvg::render(&tree, resvg::tiny_skia::Transform::identity(), &mut pm);
+    pixmap
+        .encode_png()
+        .map_err(|e| format!("PNG encode failed: {e}"))
+}
+
+#[derive(Parser)]
+#[command(name = "sdocx", version, about = "Parse Samsung Notes .sdocx files")]
+struct Cli {
+    #[arg(help = "Path to an .sdocx file")]
+    path: PathBuf,
+
+    #[arg(
+        long,
+        help = "Report stored hash matches, mismatches and unavailable checks during conversion"
+    )]
+    verify_integrity: bool,
+
+    #[arg(
+        short,
+        long,
+        help = "Output path (format inferred from extension; defaults to input with the selected format extension)"
+    )]
+    output: Option<PathBuf>,
+
+    #[arg(
+        short,
+        long,
+        value_enum,
+        help = "Output format (overrides extension inference)"
+    )]
+    format: Option<Format>,
+
+    #[arg(
+        long = "font",
+        value_name = "PATH",
+        help = "Additional font for SVG/PNG/PDF rendering; repeat for multiple files"
+    )]
+    font_files: Vec<PathBuf>,
+
+    #[arg(long, value_parser = parse_pdf_dpi, help = "SVG units per inch for PDF physical page size (default: 96)")]
+    pdf_dpi: Option<f32>,
+
+    #[arg(
+        long,
+        value_name = "WIDTH",
+        value_parser = parse_pdf_load_width,
+        help = "Samsung Notes load width for PDF-backed notes; preserves stored width by default"
+    )]
+    pdf_load_width: Option<u32>,
+
+    #[arg(
+        long,
+        value_name = "RANGE",
+        help = "Visible pages to export, e.g. 1-3,5 (default: all pages)"
+    )]
+    pages: Option<String>,
+
+    #[arg(
+        long,
+        value_enum,
+        default_value = "auto",
+        help = "Color treatment for page backgrounds, ink, and compatibility text"
+    )]
+    color_mode: ColorMode,
+}
+
+fn print_info(doc: &Document, layout: &LayoutDocument) {
+    if let Some(dims) = doc.metadata.page_dimensions {
+        eprintln!("Page dimensions: {} x {}", dims.0, dims.1);
+    }
+    if let Some(bg) = doc.metadata.background_color {
+        eprintln!("Document background: #{:02x}{:02x}{:02x}", bg.r, bg.g, bg.b);
+    }
+    if let (Some(dimensions), Some(padding)) =
+        (doc.metadata.flow_dimensions, doc.metadata.flow_page_padding)
+    {
+        eprintln!(
+            "Text flow: {} x {}, padding {} x {}",
+            dimensions.0, dimensions.1, padding.0, padding.1
+        );
+    }
+    if let Some(margins) = doc
+        .metadata
+        .note_text
+        .as_ref()
+        .and_then(|text| text.margins)
+    {
+        eprintln!(
+            "Text margins: {:.0}, {:.0}, {:.0}, {:.0}",
+            margins[0], margins[1], margins[2], margins[3]
+        );
+    }
+    if let Some(enabled) = doc.metadata.dark_mode_compatibility {
+        eprintln!("Dark mode compatibility: {enabled}");
+    }
+    eprintln!(
+        "{} visible page(s), {} stored page record(s)",
+        layout.pages.len(),
+        layout.stored_page_count
+    );
+    for (i, layout_page) in layout.pages.iter().enumerate() {
+        let page = &layout_page.page;
+        let total_points: usize = page.strokes().map(|s| s.points.len()).sum();
+        let colors: std::collections::HashSet<_> = page.strokes().map(|s| s.color).collect();
+        let with_pressure = page.strokes().filter(|s| !s.pressures.is_empty()).count();
+        eprintln!(
+            "  Page {}: {} x {}, background {}, template {}, {} strokes, {} points, {} colors, {} with pressure",
+            i,
+            page.width,
+            page.height,
+            page.background_color
+                .map(|color| format!("#{:02x}{:02x}{:02x}", color.r, color.g, color.b))
+                .unwrap_or_else(|| "none".to_string()),
+            page.template
+                .map(|template| {
+                    let source_index = page
+                        .background
+                        .pdf_paper
+                        .as_ref()
+                        .and_then(|records| records.first())
+                        .map(|record| record.page_index);
+                    format_template(template, source_index)
+                })
+                .unwrap_or_else(|| "none".to_string()),
+            page.strokes().count(),
+            total_points,
+            colors.len(),
+            with_pressure,
+        );
+    }
+}
+
+fn format_template(template: PageTemplate, source_index: Option<i32>) -> String {
+    match template.source {
+        PageTemplateSource::BuiltIn => format!("built-in {}", template.id),
+        PageTemplateSource::CustomPdf { page_index } => {
+            match source_index.filter(|index| *index < 0 && *index as u32 == page_index) {
+                Some(index) => format!("custom PDF page index {index}"),
+                None => format!("custom PDF page {}", u64::from(page_index) + 1),
+            }
+        }
+        _ => format!("template {}", template.id),
+    }
+}
+
+fn write_page(path: &std::path::Path, svg: &str, png_options: Option<&resvg::usvg::Options<'_>>) {
+    match png_options {
+        None => {
+            if let Err(e) = fs::write(path, svg) {
+                eprintln!("Error: failed to write {}: {e}", path.display());
+                std::process::exit(1);
+            }
+            eprintln!("Wrote {} ({} bytes)", path.display(), svg.len());
+        }
+        Some(options) => {
+            let png = svg_to_png(svg, options).unwrap_or_else(|e| {
+                eprintln!("Error: {e}");
+                std::process::exit(1);
+            });
+            if let Err(e) = fs::write(path, &png) {
+                eprintln!("Error: failed to write {}: {e}", path.display());
+                std::process::exit(1);
+            }
+            eprintln!("Wrote {} ({} bytes)", path.display(), png.len());
+        }
+    }
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    let options = sdocx::ParseOptions {
+        verify_integrity: cli.verify_integrity,
+        ..Default::default()
+    };
+    let parsed = match sdocx::parse_detailed_with_options(&cli.path, &options) {
+        Ok(parsed) => parsed,
+        Err(e) => {
+            eprintln!("Error: {e}");
+            std::process::exit(1);
+        }
+    };
+    for diagnostic in &parsed.report.diagnostics {
+        if let Some(entry) = &diagnostic.archive_entry {
+            eprintln!(
+                "Warning [{:?}] {entry}: {}",
+                diagnostic.code, diagnostic.message
+            );
+        } else {
+            eprintln!("Warning [{:?}]: {}", diagnostic.code, diagnostic.message);
+        }
+    }
+    if let Some(integrity) = &parsed.integrity {
+        for (name, counts) in [
+            ("note", integrity.note),
+            ("objects", integrity.objects),
+            ("layers", integrity.layers),
+            ("pages", integrity.pages),
+            ("manifest", integrity.manifest),
+        ] {
+            eprintln!(
+                "Integrity {name}: {} matched, {} mismatched, {} unavailable",
+                counts.matched, counts.mismatched, counts.unavailable
+            );
+        }
+    }
+    let doc = parsed.document;
+    let layout = sdocx::layout_document(&doc);
+
+    print_info(&doc, &layout);
+
+    let format = match resolve_format(cli.format, cli.output.as_deref()) {
+        Ok(f) => f,
+        Err(e) => {
+            eprintln!("Error: {e}");
+            std::process::exit(1);
+        }
+    };
+    if let Err(message) =
+        validate_pdf_only_options(format, cli.pdf_dpi.is_some(), cli.pdf_load_width.is_some())
+    {
+        eprintln!("Error: {message}");
+        std::process::exit(1);
+    }
+    let fonts = load_fonts(&cli.font_files).unwrap_or_else(|error| {
+        eprintln!("Error: {error}");
+        std::process::exit(1);
+    });
+    let svg_options = svg_options(&fonts);
+
+    let output_base = cli
+        .output
+        .unwrap_or_else(|| cli.path.with_extension(format.ext()));
+    let page_indices = match cli.pages.as_deref() {
+        Some(selection) => sdocx::parse_page_selection(selection, layout.pages.len())
+            .unwrap_or_else(|error| {
+                eprintln!("Error: {error}");
+                std::process::exit(1);
+            }),
+        None => (0..layout.pages.len()).collect(),
+    };
+    let mut render_warnings = RenderWarnings::default();
+    let mut render_options = RenderOptions::default();
+    render_options.color_mode = cli.color_mode.into();
+
+    if format == Format::Pdf {
+        let mut options = sdocx::PdfOptions::from_font_book(&fonts);
+        if let Some(dpi) = cli.pdf_dpi {
+            options.dpi = dpi;
+        }
+        options.pdf_paper_fixed_axis_size = cli.pdf_load_width;
+        let output = sdocx::render_layout_pages_pdf_detailed_with_fonts(
+            &doc,
+            &layout,
+            &page_indices,
+            &render_options,
+            &options,
+            &fonts,
+        )
+        .unwrap_or_else(|error| {
+            eprintln!("Error: {error}");
+            std::process::exit(1);
+        });
+        for page in &output.pages {
+            render_warnings.report(
+                (page.page_index, page.source_page_index),
+                &page.text_diagnostics,
+                &page.object_diagnostics,
+                &page.geometry_diagnostics,
+                &page.paint_diagnostics,
+                &page.background_diagnostics,
+            );
+        }
+        let page_count = output.pages.len();
+        let pdf = output.bytes;
+        if let Err(error) = fs::write(&output_base, &pdf) {
+            eprintln!("Error: failed to write {}: {error}", output_base.display());
+            std::process::exit(1);
+        }
+        eprintln!(
+            "Wrote {} ({} bytes, {} pages)",
+            output_base.display(),
+            pdf.len(),
+            page_count
+        );
+        return;
+    }
+
+    let mut text_cache = sdocx::DocumentTextCache::default();
+    let rendered_pages: Vec<_> = page_indices
+        .iter()
+        .map(|&index| {
+            text_cache
+                .render_layout_page_svg(&doc, &layout, index, &render_options, &fonts)
+                .expect("validated visible page index")
+        })
+        .collect();
+    for (&page_index, page) in page_indices.iter().zip(&rendered_pages) {
+        render_warnings.report(
+            (page_index, page.source_page_index),
+            &page.text_diagnostics,
+            &page.object_diagnostics,
+            &page.geometry_diagnostics,
+            &page.paint_diagnostics,
+            &page.background_diagnostics,
+        );
+    }
+
+    let png_options = (format == Format::Png).then_some(&svg_options);
+    if rendered_pages.len() == 1 {
+        write_page(&output_base, &rendered_pages[0].svg, png_options);
+    } else {
+        for (i, rendered_page) in page_indices.iter().zip(&rendered_pages) {
+            let stem = output_base
+                .file_stem()
+                .unwrap_or_default()
+                .to_string_lossy();
+            let ext = output_base
+                .extension()
+                .and_then(|e| e.to_str())
+                .unwrap_or(format.ext());
+            let path = output_base.with_file_name(format!("{stem}_page{i}.{ext}"));
+            write_page(&path, &rendered_page.svg, png_options);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Format, resolve_format, validate_pdf_only_options};
+    use std::path::Path;
+
+    #[test]
+    fn custom_pdf_template_display_preserves_negative_source_indices() {
+        for index in [-1, i32::MIN] {
+            let template = sdocx::PageTemplate {
+                id: 0,
+                source: sdocx::PageTemplateSource::CustomPdf {
+                    page_index: index as u32,
+                },
+            };
+            assert_eq!(
+                super::format_template(template, Some(index)),
+                format!("custom PDF page index {index}")
+            );
+        }
+        for (index, expected) in [
+            (0, "custom PDF page 1"),
+            (i32::MAX as u32, "custom PDF page 2147483648"),
+            (u32::MAX, "custom PDF page 4294967296"),
+        ] {
+            let template = sdocx::PageTemplate {
+                id: 0,
+                source: sdocx::PageTemplateSource::CustomPdf { page_index: index },
+            };
+            assert_eq!(super::format_template(template, None), expected);
+        }
+    }
+
+    fn svg_options(
+        font_files: &[std::path::PathBuf],
+    ) -> Result<resvg::usvg::Options<'static>, String> {
+        Ok(super::svg_options(&super::load_fonts(font_files)?))
+    }
+
+    #[test]
+    fn default_font_resources_keep_native_names_and_one_database() {
+        let fonts = super::load_fonts(&[]).unwrap();
+        assert!(fonts.native_name_config().is_some());
+        let options = super::svg_options(&fonts);
+        assert!(std::sync::Arc::ptr_eq(&options.fontdb, &fonts.database()));
+    }
+
+    fn svg_to_png(svg: &str) -> Result<Vec<u8>, String> {
+        super::svg_to_png(svg, &svg_options(&[])?)
+    }
+
+    struct FontFile(std::path::PathBuf);
+
+    impl FontFile {
+        fn new(data: &[u8]) -> Self {
+            use std::io::Write;
+            use std::sync::atomic::{AtomicUsize, Ordering};
+            static SEQUENCE: AtomicUsize = AtomicUsize::new(0);
+            let path = std::env::temp_dir().join(format!(
+                "sdocx-font-{}-{}.ttf",
+                std::process::id(),
+                SEQUENCE.fetch_add(1, Ordering::Relaxed)
+            ));
+            let mut file = std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&path)
+                .unwrap();
+            file.write_all(data).unwrap();
+            Self(path)
+        }
+    }
+
+    impl Drop for FontFile {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_file(&self.0);
+        }
+    }
+
+    #[test]
+    fn explicit_font_file_wins_over_the_same_bundled_face() {
+        use resvg::usvg::fontdb::{Family, Query, Source};
+        let bundled = svg_options(&[]).unwrap();
+        let face = bundled.fontdb.faces().next().expect("bundled font");
+        let data = bundled
+            .fontdb
+            .with_face_data(face.id, |data, _| data.to_vec())
+            .unwrap();
+        let file = FontFile::new(&data);
+        let explicit_fonts = super::load_fonts(std::slice::from_ref(&file.0)).unwrap();
+        assert!(explicit_fonts.native_name_config().is_none());
+        let explicit = super::svg_options(&explicit_fonts);
+        let selected = explicit
+            .fontdb
+            .query(&Query {
+                families: &[Family::Name(&face.families[0].0)],
+                weight: face.weight,
+                stretch: face.stretch,
+                style: face.style,
+            })
+            .unwrap();
+        match explicit.fontdb.face_source(selected).unwrap().0 {
+            Source::File(path) | Source::SharedFile(path, _) => assert_eq!(path, file.0),
+            _ => panic!("expected the explicitly supplied font file"),
+        }
+    }
+
+    #[test]
+    fn missing_or_invalid_explicit_fonts_fail_instead_of_falling_back() {
+        let invalid = FontFile::new(b"not a font");
+        assert!(matches!(
+            svg_options(std::slice::from_ref(&invalid.0)),
+            Err(message) if message.contains("no usable font faces")
+        ));
+        assert!(matches!(
+            svg_options(&[invalid.0.with_extension("missing")]),
+            Err(message) if message.contains("cannot load font")
+        ));
+    }
+
+    #[test]
+    fn cli_accepts_repeated_explicit_fonts() {
+        use clap::Parser;
+        let cli = super::Cli::try_parse_from([
+            "sdocx",
+            "note.sdocx",
+            "-f",
+            "png",
+            "--font",
+            "regular.ttf",
+            "--font",
+            "symbols.otf",
+        ])
+        .unwrap();
+        assert_eq!(
+            cli.font_files,
+            vec![Path::new("regular.ttf"), Path::new("symbols.otf")]
+        );
+    }
+
+    #[test]
+    fn format_flag_wins_over_extension() {
+        let format = resolve_format(Some(Format::Svg), Some(Path::new("out.png"))).unwrap();
+        assert_eq!(format, Format::Svg);
+        assert_eq!(
+            resolve_format(Some(Format::Pdf), Some(Path::new("out.svg"))).unwrap(),
+            Format::Pdf
+        );
+    }
+
+    #[test]
+    fn format_is_inferred_from_extension() {
+        assert_eq!(
+            resolve_format(None, Some(Path::new("out.PDF"))).unwrap(),
+            Format::Pdf
+        );
+        assert_eq!(
+            resolve_format(None, Some(Path::new("out.png"))).unwrap(),
+            Format::Png
+        );
+        assert_eq!(
+            resolve_format(None, Some(Path::new("out.Svg"))).unwrap(),
+            Format::Svg
+        );
+    }
+
+    #[test]
+    fn format_defaults_to_svg_without_an_output() {
+        assert_eq!(resolve_format(None, None).unwrap(), Format::Svg);
+    }
+
+    #[test]
+    fn pdf_scale_must_be_finite_and_positive() {
+        use clap::Parser;
+        for value in ["0", "NaN", "inf", "-96", "words"] {
+            assert!(
+                super::Cli::try_parse_from([
+                    "sdocx",
+                    "note.sdocx",
+                    "-f",
+                    "pdf",
+                    "--pdf-dpi",
+                    value
+                ])
+                .is_err()
+            );
+        }
+        let cli = super::Cli::try_parse_from([
+            "sdocx",
+            "note.sdocx",
+            "-f",
+            "pdf",
+            "--pdf-dpi",
+            "129.6",
+            "--font",
+            "Roboto.ttf",
+        ])
+        .unwrap();
+        assert_eq!(cli.format, Some(Format::Pdf));
+        assert_eq!(cli.pdf_dpi, Some(129.6));
+        assert_eq!(cli.font_files, vec![Path::new("Roboto.ttf")]);
+    }
+
+    #[test]
+    fn pdf_load_width_accepts_only_the_native_signed_range() {
+        use clap::Parser;
+        for value in ["0", "31", "2147483648", "4294967295", "-1080", "words"] {
+            assert!(
+                super::Cli::try_parse_from([
+                    "sdocx",
+                    "note.sdocx",
+                    "-f",
+                    "pdf",
+                    "--pdf-load-width",
+                    value,
+                ])
+                .is_err(),
+                "width {value} must be rejected"
+            );
+        }
+        for width in ["32", "1080", "2147483647"] {
+            let cli = super::Cli::try_parse_from([
+                "sdocx",
+                "note.sdocx",
+                "-f",
+                "pdf",
+                "--pdf-load-width",
+                width,
+            ])
+            .unwrap();
+            assert_eq!(cli.pdf_load_width, Some(width.parse().unwrap()));
+        }
+    }
+
+    #[test]
+    fn pdf_load_width_is_rejected_for_non_pdf_formats() {
+        assert!(validate_pdf_only_options(Format::Pdf, false, true).is_ok());
+        assert!(matches!(
+            validate_pdf_only_options(Format::Svg, false, true),
+            Err(message) if message.contains("--pdf-load-width")
+        ));
+        assert!(matches!(
+            validate_pdf_only_options(Format::Png, true, false),
+            Err(message) if message.contains("--pdf-dpi")
+        ));
+    }
+
+    #[test]
+    fn unknown_extension_without_flag_is_an_error() {
+        assert!(resolve_format(None, Some(Path::new("out.gif"))).is_err());
+    }
+
+    #[test]
+    fn svg_to_png_produces_a_png_with_the_expected_size() {
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 10" width="20" height="10"><rect x="0" y="0" width="20" height="10" fill="#252525"/><line x1="0" y1="0" x2="20" y2="10" stroke="#ffffff" stroke-width="1"/></svg>"##;
+        let png = svg_to_png(svg).expect("render should succeed");
+        assert_eq!(&png[..8], b"\x89PNG\r\n\x1a\n");
+        let width = u32::from_be_bytes([png[16], png[17], png[18], png[19]]);
+        let height = u32::from_be_bytes([png[20], png[21], png[22], png[23]]);
+        assert_eq!((width, height), (20, 10));
+    }
+
+    #[test]
+    fn svg_to_png_rasterizes_text_with_bundled_fonts() {
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60"><rect width="200" height="60" fill="#252525"/><text x="5" y="40" fill="#ffffff" font-family="Arial, sans-serif" font-size="32">visible</text></svg>"##;
+        let png = svg_to_png(svg).expect("render should succeed");
+        let pixmap = resvg::tiny_skia::Pixmap::decode_png(&png).expect("decode rendered PNG");
+        assert!(
+            pixmap
+                .pixels()
+                .iter()
+                .any(|pixel| { pixel.red() > 0x80 && pixel.green() > 0x80 && pixel.blue() > 0x80 })
+        );
+    }
+
+    #[test]
+    fn svg_to_png_rasterizes_monospace_text() {
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60"><rect width="200" height="60" fill="#fcfcfc"/><text x="5" y="40" fill="#252525" font-family="Roboto Mono, monospace" font-size="32">fn main()</text></svg>"##;
+        let png = svg_to_png(svg).expect("render code text");
+        let pixmap = resvg::tiny_skia::Pixmap::decode_png(&png).expect("decode rendered PNG");
+
+        assert!(
+            pixmap
+                .pixels()
+                .iter()
+                .any(|pixel| { pixel.red() < 0x80 && pixel.green() < 0x80 && pixel.blue() < 0x80 })
+        );
+    }
+
+    #[test]
+    fn shared_renderer_output_rasterizes_to_png() {
+        let mut document = sdocx::Document {
+            pages: vec![sdocx::Page {
+                uuid: "page".into(),
+                width: 100,
+                height: 100,
+                content_bbox: sdocx::BoundingBox::default(),
+                background_color: None,
+                template: None,
+                background: Default::default(),
+                objects: vec![
+                    sdocx::Stroke {
+                        rendering: None,
+                        bbox: sdocx::BoundingBox::default(),
+                        points: vec![
+                            sdocx::Point { x: 1.0, y: 1.0 },
+                            sdocx::Point { x: 9.0, y: 9.0 },
+                        ],
+                        pressures: Vec::new(),
+                        timestamps: Vec::new(),
+                        tilts: Vec::new(),
+                        orientations: Vec::new(),
+                        color: None,
+                        pen_width: 2.0,
+                    }
+                    .into(),
+                ],
+            }],
+            metadata: sdocx::DocumentMetadata::default(),
+        };
+        let rendered = sdocx::render_document_svg(&document, &sdocx::RenderOptions::default());
+        let png = svg_to_png(&rendered[0].svg).expect("render page to png");
+
+        assert_eq!(&png[..8], b"\x89PNG\r\n\x1a\n");
+        assert!(png.len() > 100, "PNG should be non-trivial");
+
+        document.pages[0].width = 1080;
+        document.pages[0].height = 1527;
+        document.pages[0].clear_strokes();
+        document.pages[0].template = Some(sdocx::PageTemplate {
+            id: 7,
+            source: sdocx::PageTemplateSource::BuiltIn,
+        });
+        document.metadata.default_page_dimensions = Some((1080, 1527));
+        document.metadata.orientation = Some(0);
+        let svg = &sdocx::render_document_svg(&document, &Default::default())[0].svg;
+        let png = svg_to_png(svg).unwrap();
+        let pixels = resvg::tiny_skia::Pixmap::decode_png(&png).unwrap();
+        // Far-away intersections catch cumulative rounding of fractional tile
+        // pitches (53.5 x 48.6), which a first-dot assertion would miss.
+        for (x, y) in [(963, 859), (107, 1491)] {
+            let offset = (y * 1080 + x) * 4;
+            assert!(
+                pixels.data()[offset] < 225,
+                "missing grid intersection at {x},{y}"
+            );
+        }
+        assert_eq!(&pixels.data()[(20 * 1080 + 963) * 4..][..3], &[252; 3]);
+    }
+}

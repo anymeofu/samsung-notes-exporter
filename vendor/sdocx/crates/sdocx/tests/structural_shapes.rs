@@ -1,0 +1,2506 @@
+#[cfg(feature = "render")]
+#[path = "support/svg.rs"]
+mod svg_support;
+
+mod support;
+
+use sdocx::{
+    DiagnosticCode, Error, NativeLine, NativeShape, PageElement, ParseLimits, ParseOptions,
+    ShapePaint, TextAreaType,
+};
+use support::{archive, object, page, page_with_current_layer};
+
+// Different mask widths exercise the generic reader, independent of native
+// fixed header offsets. Short identities deliberately defeat UUID scanning.
+fn frame(kind: i16, mask: u32, fixed: &[u8], flexible: &[u8]) -> Vec<u8> {
+    let offset = 18 + fixed.len();
+    let mut bytes = ((offset + flexible.len()) as u32).to_le_bytes().to_vec();
+    bytes.extend(kind.to_le_bytes());
+    bytes.extend((offset as u32).to_le_bytes());
+    bytes.extend([1, u8::from(kind == 0) << 3, 5]);
+    bytes.extend(mask.to_le_bytes());
+    bytes.push(0);
+    bytes.extend(fixed);
+    bytes.extend(flexible);
+    bytes
+}
+
+fn numbers(values: &[f64]) -> Vec<u8> {
+    values.iter().flat_map(|v| v.to_le_bytes()).collect()
+}
+fn sized(bytes: &[u8]) -> Vec<u8> {
+    let mut result = (bytes.len() as u32).to_le_bytes().to_vec();
+    result.extend(bytes);
+    result
+}
+fn base(rotation: f32) -> Vec<u8> {
+    let mut fixed = 5500_u32.to_le_bytes().to_vec();
+    fixed.extend(2_u16.to_le_bytes());
+    fixed.extend(b"sh");
+    fixed.extend(1234_i64.to_le_bytes());
+    fixed.extend(numbers(&[10.0, 20.0, 210.0, 220.0]));
+    fixed.extend([0; 5]);
+    frame(0, 1, &fixed, &rotation.to_le_bytes())
+}
+fn base_fixed() -> Vec<u8> {
+    [0_u32, 4, 0]
+        .iter()
+        .flat_map(|v| v.to_le_bytes())
+        .chain([0])
+        .collect()
+}
+fn color(outline: bool, kind: u8, argb: u32) -> Vec<u8> {
+    let mut bytes = vec![1, if outline { 0 } else { kind }];
+    if outline {
+        bytes.push(kind);
+    }
+    bytes.extend(argb.to_le_bytes());
+    bytes.extend([0; 12]); // gradient type, angle, position and stop count
+    bytes
+}
+fn style(width: f32) -> Vec<u8> {
+    let mut bytes = width.to_le_bytes().to_vec();
+    bytes.extend([0, 0, 1, 2, 0, 0, 0, 0]);
+    bytes
+}
+fn outline() -> Vec<u8> {
+    let mut fields = sized(&color(true, 0, 0x800000ff));
+    fields.extend(sized(&style(3.5)));
+    frame(6, 12, &base_fixed(), &fields)
+}
+fn shape_fixed(kind: u32, rotation: f32) -> Vec<u8> {
+    let mut bytes = kind.to_le_bytes().to_vec();
+    bytes.extend(numbers(&[-10.0, 0.0, 90.0, 60.0]));
+    bytes.extend(rotation.to_le_bytes());
+    bytes.extend([0; 5]); // empty path and control points
+    bytes.extend(numbers(&[10.0, 20.0, 210.0, 220.0]));
+    bytes
+}
+fn shape_fields() -> Vec<u8> {
+    let effect = color(false, 0, 0x40ff0000);
+    let mut fields = (effect.len() as u32).to_le_bytes().to_vec();
+    fields.push(1);
+    fields.extend(effect);
+    fields
+}
+fn shape(kind: u32) -> Vec<u8> {
+    let mut bytes = base(0.0);
+    bytes.extend(outline());
+    bytes.extend(frame(7, 32, &shape_fixed(kind, 30.0), &shape_fields()));
+    bytes
+}
+
+#[cfg(feature = "render")]
+const FRACTIONAL_BOUNDS: [f64; 4] = [
+    1025.0 / 1024.0,
+    2049.0 / 1024.0,
+    1027.0 / 1024.0,
+    2052.0 / 1024.0,
+];
+
+#[cfg(feature = "render")]
+fn svg_number(node: roxmltree::Node<'_, '_>, name: &str) -> f64 {
+    node.attribute(name).unwrap().parse().unwrap()
+}
+
+#[cfg(feature = "render")]
+fn shape_outline_node<'a, 'input>(
+    xml: &'a roxmltree::Document<'input>,
+) -> roxmltree::Node<'a, 'input> {
+    xml.descendants()
+        .find(|node| node.attribute("stroke") == Some("#0000ff"))
+        .unwrap()
+}
+
+#[cfg(feature = "render")]
+fn shape_with_geometry(kind: u32, bounds: [f64; 4], rotation: f32) -> Vec<u8> {
+    let mut fixed = shape_fixed(kind, rotation);
+    fixed[4..36].copy_from_slice(&numbers(&bounds));
+    [base(0.0), outline(), frame(7, 32, &fixed, &shape_fields())].concat()
+}
+fn line_fixed(kind: u8) -> Vec<u8> {
+    let mut fixed = vec![kind, 0, 0];
+    fixed.extend(numbers(&[90.0, 45.0, -10.0, 45.0]));
+    fixed.extend(numbers(&[-10.0, 45.0, 90.0, 45.0]));
+    fixed.extend(numbers(&[-10.0, 45.0, 90.0, 45.0]));
+    fixed.extend([0; 4]);
+    assert_eq!(fixed.len(), 103);
+    fixed
+}
+fn line(kind: u8, fields: u32, flexible: &[u8]) -> Vec<u8> {
+    let mut bytes = base(90.0);
+    bytes.extend(outline());
+    bytes.extend(frame(8, fields, &line_fixed(kind), flexible));
+    bytes
+}
+fn single(kind: u8, payload: &[u8]) -> Vec<u8> {
+    archive(&page(&[vec![object(kind, payload, &[])]], 0, &[]))
+}
+
+#[test]
+fn hidden_shapes_and_lines_are_retained_outside_the_visible_page() {
+    for (kind, mut payload) in [(7, shape(1)), (8, line(0, 0, &[]))] {
+        payload[11] &= !(1 << 3);
+        let raw = page(&[vec![object(kind, &payload, &[])]], 0, &[]);
+        let parsed = sdocx::parse_bytes_detailed(&archive(&raw)).unwrap();
+        assert!(parsed.document.pages[0].elements().next().is_none());
+        let stored = &parsed.stored_pages[0].page.layers.layers[0].objects[0];
+        assert_eq!(stored.payload(&raw).unwrap(), payload);
+        assert!(!stored.base_metadata(&raw).unwrap().visible);
+        #[cfg(feature = "render")]
+        assert!(
+            sdocx::render_document_svg(&parsed.document, &Default::default())[0]
+                .geometry_diagnostics
+                .is_empty()
+        );
+    }
+}
+
+fn as_shape(element: &PageElement) -> &NativeShape {
+    let PageElement::Shape(value) = element else {
+        panic!("expected shape")
+    };
+    value
+}
+fn as_line(element: &PageElement) -> &NativeLine {
+    let PageElement::Line(value) = element else {
+        panic!("expected line")
+    };
+    value
+}
+fn has_shape_warning(parsed: &sdocx::ParsedDocument) -> bool {
+    parsed
+        .report
+        .diagnostics
+        .iter()
+        .any(|d| d.code == DiagnosticCode::UnsupportedShapeFeature)
+}
+#[cfg(feature = "render")]
+fn assert_geometry_issue(
+    parsed: &sdocx::ParsedDocument,
+    rendered: &sdocx::RenderedPage,
+    kind: sdocx::GeometryDiagnosticKind,
+) {
+    assert_eq!(
+        rendered.geometry_diagnostics,
+        [sdocx::GeometryDiagnostic {
+            source_offset: parsed.document.pages[0].objects[0].source_offset,
+            object_uuid: "sh".into(),
+            kind,
+        }]
+    );
+}
+fn assert_format(kind: u8, payload: &[u8]) {
+    let error = sdocx::parse_bytes(&single(kind, payload)).unwrap_err();
+    assert!(
+        matches!(&error, Error::Format(message) if message.contains("page page:") && message.contains("at 0x")),
+        "{error}"
+    );
+}
+
+#[test]
+fn shape_text_editability_is_metadata_and_unknown_properties_still_warn() {
+    #[cfg(feature = "render")]
+    let mut baseline = None;
+    for mask in [0, 0x04, 0x40, 0x44] {
+        let mut payload = base(0.0);
+        payload.extend(outline());
+        let mut geometry = frame(7, 32, &shape_fixed(4, 30.0), &shape_fields());
+        geometry[11] = mask;
+        payload.extend(geometry);
+        let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+        assert_eq!(
+            as_shape(parsed.document.pages[0].elements().next().unwrap()).text_editable,
+            mask & 4 != 0
+        );
+        assert_eq!(has_shape_warning(&parsed), mask & 0x40 != 0);
+        #[cfg(feature = "render")]
+        {
+            let svg = sdocx::render_document_svg(&parsed.document, &Default::default())[0]
+                .svg
+                .clone();
+            if let Some(expected) = &baseline {
+                assert_eq!(&svg, expected);
+            } else {
+                baseline = Some(svg);
+            }
+        }
+    }
+}
+
+#[test]
+fn decodes_shape_geometry_rotation_and_independent_outline_and_fill() {
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &shape(4))).unwrap();
+    assert!(!has_shape_warning(&parsed));
+    let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+    assert_eq!(shape.metadata.uuid, "sh");
+    assert_eq!(shape.shape_type, 4);
+    assert_eq!(shape.geometry_bbox.x_min, -10.0);
+    assert_eq!(shape.metadata.bbox.x_min, 10.0);
+    assert_eq!(shape.drawn_bbox.x_max, 210.0);
+    assert_eq!(shape.rotation_degrees, 30.0);
+    assert_eq!(shape.metadata.rotation_degrees, Some(0.0));
+    assert_eq!(shape.style.width, 3.5);
+    assert_eq!(shape.style.cap, 1);
+    assert_eq!(shape.style.join, 2);
+    assert!(matches!(shape.style.paint, ShapePaint::Solid(0x800000ff)));
+    assert!(matches!(shape.fill, ShapePaint::Solid(0x40ff0000)));
+    #[cfg(feature = "render")]
+    {
+        let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+        svg_support::assert_svg_element(
+            svg,
+            "rect",
+            &[("x", "-10"), ("y", "0"), ("width", "100"), ("height", "60")],
+        );
+        svg_support::assert_svg_element(
+            svg,
+            "g",
+            &[
+                ("fill", "#ff0000"),
+                ("fill-opacity", "0.2510"),
+                ("stroke", "#0000ff"),
+                ("stroke-opacity", "0.5020"),
+                ("stroke-width", "3.5"),
+                ("stroke-linecap", "round"),
+                ("stroke-linejoin", "bevel"),
+            ],
+        );
+        assert!(svg.contains("rotate(30 40 30)"));
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn pathless_shape_templates_keep_positive_fractional_geometry() {
+    let bounds = FRACTIONAL_BOUNDS;
+    let center = [1026.0 / 1024.0, 4101.0 / 2048.0];
+    for (kind, tag) in [
+        (1, "ellipse"),
+        (2, "polygon"),
+        (3, "polygon"),
+        (4, "rect"),
+        (8, "polygon"),
+    ] {
+        let parsed =
+            sdocx::parse_bytes_detailed(&single(7, &shape_with_geometry(kind, bounds, 0.0)))
+                .unwrap();
+        let retained = as_shape(parsed.document.pages[0].elements().next().unwrap());
+        assert_eq!(
+            [
+                retained.geometry_bbox.x_min,
+                retained.geometry_bbox.y_min,
+                retained.geometry_bbox.x_max,
+                retained.geometry_bbox.y_max
+            ]
+            .map(f64::to_bits),
+            bounds.map(f64::to_bits)
+        );
+        assert!(retained.path_data.is_empty());
+        let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+        let xml = roxmltree::Document::parse(svg).unwrap();
+        let node = shape_outline_node(&xml)
+            .children()
+            .find(|node| node.has_tag_name(tag))
+            .unwrap();
+        let number = |name| svg_number(node, name).to_bits();
+        match kind {
+            1 => assert_eq!(
+                ["cx", "cy", "rx", "ry"].map(number),
+                [center[0], center[1], 1.0 / 1024.0, 3.0 / 2048.0].map(f64::to_bits)
+            ),
+            4 => assert_eq!(
+                ["x", "y", "width", "height"].map(number),
+                [bounds[0], bounds[1], 2.0 / 1024.0, 3.0 / 1024.0].map(f64::to_bits)
+            ),
+            _ => {
+                let expected = match kind {
+                    2 => vec![
+                        (center[0], bounds[1]),
+                        (bounds[2], bounds[3]),
+                        (bounds[0], bounds[3]),
+                    ],
+                    3 => vec![
+                        (bounds[0], bounds[1]),
+                        (bounds[2], bounds[3]),
+                        (bounds[0], bounds[3]),
+                    ],
+                    8 => vec![
+                        (center[0], bounds[1]),
+                        (bounds[2], center[1]),
+                        (center[0], bounds[3]),
+                        (bounds[0], center[1]),
+                    ],
+                    _ => unreachable!(),
+                };
+                let actual: Vec<_> =
+                    svgtypes::PointsParser::from(node.attribute("points").unwrap()).collect();
+                assert_eq!(actual, expected, "template {kind}");
+            }
+        }
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn pathless_shape_rotation_keeps_fractional_angle_and_pivot() {
+    let angle = 1.0_f32 / 1024.0;
+    let parsed = sdocx::parse_bytes_detailed(&single(
+        7,
+        &shape_with_geometry(4, FRACTIONAL_BOUNDS, angle),
+    ))
+    .unwrap();
+    assert_eq!(
+        as_shape(parsed.document.pages[0].elements().next().unwrap())
+            .rotation_degrees
+            .to_bits(),
+        angle.to_bits()
+    );
+    let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+    let xml = roxmltree::Document::parse(svg).unwrap();
+    let group = shape_outline_node(&xml);
+    let tokens: Vec<_> = svgtypes::TransformListParser::from(group.attribute("transform").unwrap())
+        .map(Result::unwrap)
+        .collect();
+    use svgtypes::TransformListToken::{Rotate, Translate};
+    assert_eq!(
+        tokens,
+        [
+            Translate {
+                tx: 1026.0 / 1024.0,
+                ty: 4101.0 / 2048.0
+            },
+            Rotate {
+                angle: f64::from(angle)
+            },
+            Translate {
+                tx: -1026.0 / 1024.0,
+                ty: -4101.0 / 2048.0
+            },
+        ]
+    );
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn shape_and_line_outlines_keep_positive_fractional_width() {
+    let width = 1.0_f32 / 1024.0;
+    let mut fields = sized(&color(true, 0, 0xff0000ff));
+    fields.extend(sized(&style(width)));
+    for (kind, geometry) in [
+        (7, frame(7, 0, &shape_fixed(4, 0.0), &[])),
+        (8, frame(8, 0, &line_fixed(0), &[])),
+    ] {
+        let payload = [base(0.0), frame(6, 12, &base_fixed(), &fields), geometry].concat();
+        let parsed = sdocx::parse_bytes_detailed(&single(kind, &payload)).unwrap();
+        let retained = match parsed.document.pages[0].elements().next().unwrap() {
+            PageElement::Shape(shape) => shape.style.width,
+            PageElement::Line(line) => line.style.width,
+            _ => unreachable!(),
+        };
+        assert_eq!(retained.to_bits(), width.to_bits());
+        let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+        let xml = roxmltree::Document::parse(svg).unwrap();
+        let group = shape_outline_node(&xml);
+        let emitted = svg_number(group, "stroke-width");
+        assert_eq!(emitted.to_bits(), f64::from(width).to_bits());
+        assert!(group.children().any(|node| node.is_element()));
+    }
+}
+
+#[cfg(feature = "pdf")]
+#[test]
+fn positive_fractional_shape_extent_survives_vector_pdf_conversion() {
+    let parsed =
+        sdocx::parse_bytes_detailed(&single(7, &shape_with_geometry(4, FRACTIONAL_BOUNDS, 0.0)))
+            .unwrap();
+    let options = sdocx::PdfOptions::new(std::sync::Arc::new(Default::default()));
+    let bytes =
+        sdocx::render_document_pdf(&parsed.document, &Default::default(), &options).unwrap();
+    let pdf = lopdf::Document::load_mem(&bytes).unwrap();
+    let operations =
+        lopdf::content::Content::decode(&pdf.get_page_content(pdf.get_pages()[&1]).unwrap())
+            .unwrap()
+            .operations;
+    assert!(operations.iter().any(|operation| operation.operator == "S"));
+    assert!(operations.iter().any(|operation| {
+        operation.operator == "w" && operation.operands[0].as_float().unwrap() > 0.0
+    }));
+    assert!(!pdf.objects.values().any(|object| {
+        object.as_stream().is_ok_and(|stream| {
+            stream
+                .dict
+                .get(b"Subtype")
+                .is_ok_and(|value| value.as_name().is_ok_and(|name| name == b"Image"))
+        })
+    }));
+}
+
+#[test]
+fn preserves_reversed_horizontal_line_without_rotating_it_twice() {
+    let parsed = sdocx::parse_bytes_detailed(&single(8, &line(0, 0, &[]))).unwrap();
+    assert!(!has_shape_warning(&parsed));
+    let line = as_line(parsed.document.pages[0].elements().next().unwrap());
+    assert_eq!(line.begin, [90.0, 45.0]);
+    assert_eq!(line.end, [-10.0, 45.0]);
+    assert_eq!(line.metadata.rotation_degrees, Some(90.0));
+    #[cfg(feature = "render")]
+    {
+        let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+        let xml = roxmltree::Document::parse(svg).unwrap();
+        let node = xml
+            .descendants()
+            .find(|node| node.has_tag_name("line"))
+            .unwrap();
+        let endpoints = ["x1", "y1", "x2", "y2"]
+            .map(|attribute| node.attribute(attribute).unwrap().parse::<f64>().unwrap());
+        assert_eq!(endpoints, [90.0, 45.0, -10.0, 45.0]);
+        assert!(!svg.contains("rotate("));
+        assert!(!svg.contains("/ >"));
+    }
+}
+
+#[test]
+fn missing_effects_use_native_defaults_and_unknown_templates_remain_shapes() {
+    for kind in [1, 2, 3, 4, 8, 900] {
+        let mut payload = base(0.0);
+        payload.extend(frame(6, 0, &base_fixed(), &[]));
+        payload.extend(frame(7, 0, &shape_fixed(kind, 0.0), &[]));
+        let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+        let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+        assert_eq!(shape.shape_type, kind);
+        assert_eq!(shape.style.width, 2.0);
+        assert!(matches!(shape.style.paint, ShapePaint::Solid(0xff000000)));
+        assert!(matches!(shape.fill, ShapePaint::None));
+        assert_eq!(has_shape_warning(&parsed), kind == 900);
+        #[cfg(feature = "render")]
+        if kind == 900 {
+            let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+            let xml = roxmltree::Document::parse(&rendered[0].svg).unwrap();
+            assert!(
+                xml.descendants()
+                    .all(|node| node.attribute("stroke-width").is_none())
+            );
+            assert_geometry_issue(
+                &parsed,
+                &rendered[0],
+                sdocx::GeometryDiagnosticKind::UnsupportedShapeTemplate,
+            );
+        }
+    }
+}
+
+#[test]
+fn shape_and_line_payloads_cannot_borrow_from_the_next_object() {
+    for (kind, payload) in [(7, shape(4)), (8, line(0, 0, &[]))] {
+        for end in 0..payload.len() {
+            assert_format(kind, &payload[..end]);
+        }
+        let mut wrong_kind = payload.clone();
+        wrong_kind[4..6].copy_from_slice(&9_i16.to_le_bytes());
+        assert_format(kind, &wrong_kind);
+        let mut bad_size = payload;
+        bad_size[..4].copy_from_slice(&u32::MAX.to_le_bytes());
+        assert_format(kind, &bad_size);
+    }
+}
+
+#[test]
+fn rejects_nonfinite_geometry_and_negative_or_nonfinite_widths() {
+    for value in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+        let mut fixed = line_fixed(0);
+        fixed[3..11].copy_from_slice(&value.to_le_bytes());
+        let mut payload = base(0.0);
+        payload.extend(outline());
+        payload.extend(frame(8, 0, &fixed, &[]));
+        assert_format(8, &payload);
+    }
+    for value in [-1.0_f32, f32::NAN, f32::INFINITY] {
+        let mut payload = base(0.0);
+        payload.extend(frame(6, 8, &base_fixed(), &sized(&style(value))));
+        payload.extend(frame(7, 0, &shape_fixed(4, 0.0), &[]));
+        assert_format(7, &payload);
+    }
+}
+
+#[test]
+fn current_layer_shapes_keep_child_order_without_phantom_text() {
+    let decoy = shape(4);
+    let layers = [
+        vec![object(
+            4,
+            &[],
+            &[object(7, &shape(1), &[]), object(8, &line(0, 0, &[]), &[])],
+        )],
+        vec![object(7, &shape(8), &[]), object(200, &decoy, &[])],
+    ];
+    for current_layer_index in [0, 1] {
+        let bytes = archive(&page_with_current_layer(
+            &layers,
+            current_layer_index,
+            0,
+            &[],
+        ));
+        let parsed = sdocx::parse_bytes_detailed(&bytes).unwrap();
+        let elements: Vec<_> = parsed.document.pages[0].elements().collect();
+        if current_layer_index == 0 {
+            assert_eq!(elements.len(), 2);
+            assert_eq!(as_shape(elements[0]).shape_type, 1);
+            assert_eq!(as_line(elements[1]).line_type, 0);
+        } else {
+            assert_eq!(elements.len(), 1);
+            assert_eq!(as_shape(elements[0]).shape_type, 8);
+        }
+        assert_eq!(parsed.stored_pages[0].page.layers.layers.len(), 2);
+        let limits = ParseLimits {
+            max_objects_per_page: 4,
+            ..Default::default()
+        };
+        assert!(matches!(
+            sdocx::parse_bytes_with_options(
+                &bytes,
+                &ParseOptions {
+                    limits,
+                    ..Default::default()
+                }
+            ),
+            Err(Error::LimitExceeded {
+                resource: "objects per page",
+                limit: 4,
+                actual: 5,
+            })
+        ));
+    }
+}
+
+fn native_path(commands: &[(u8, &[f64])]) -> Vec<u8> {
+    let mut path = (commands.len() as u32).to_le_bytes().to_vec();
+    for (verb, values) in commands {
+        path.push(*verb);
+        path.extend(numbers(values));
+    }
+    path
+}
+
+#[test]
+fn line_paths_preserve_curves_and_stop_before_future_fields() {
+    let path = native_path(&[
+        (1, &[10.0, 20.0]),
+        (2, &[30.0, 40.0]),
+        (3, &[50.0, 60.0, 70.0, 80.0]),
+        (4, &[90.0, 10.0, 110.0, 30.0, 120.0, 40.0]),
+        (6, &[]),
+    ]);
+    let mut fields = path.clone();
+    fields.extend(b"future");
+    let parsed = sdocx::parse_bytes_detailed(&single(8, &line(2, 24, &fields))).unwrap();
+    assert_eq!(
+        as_line(parsed.document.pages[0].elements().next().unwrap()).path_data,
+        path
+    );
+    assert!(has_shape_warning(&parsed));
+    #[cfg(feature = "render")]
+    {
+        let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+        assert_svg_path(
+            svg,
+            "M 10.00 20.00 L 30.00 40.00 Q 50.00 60.00 70.00 80.00 C 90.00 10.00 110.00 30.00 120.00 40.00 Z",
+        );
+        assert!(!svg.contains("<line "));
+        assert!(!svg.contains("rotate("));
+    }
+}
+
+#[test]
+fn path_counts_coordinates_and_truncation_are_bounded() {
+    let path = native_path(&[
+        (1, &[10.0, 20.0]),
+        (4, &[30.0, 40.0, 50.0, 60.0, 70.0, 80.0]),
+    ]);
+    for end in 0..path.len() {
+        assert_format(8, &line(2, 8, &path[..end]));
+    }
+    assert_format(8, &line(2, 8, &u32::MAX.to_le_bytes()));
+    assert_format(8, &line(2, 8, &native_path(&[(1, &[f64::NAN, 0.0])])));
+}
+
+#[test]
+fn unknown_line_types_or_path_verbs_do_not_become_straight_lines() {
+    for (index, payload) in [
+        line(88, 0, &[]),
+        line(1, 0, &[]),
+        line(2, 8, &native_path(&[(99, &[])])),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let parsed = sdocx::parse_bytes_detailed(&single(8, &payload)).unwrap();
+        assert!(has_shape_warning(&parsed));
+        assert_eq!(parsed.document.pages[0].elements().count(), 1);
+        #[cfg(feature = "render")]
+        {
+            let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+            assert!(!rendered[0].svg.contains("<line "));
+            assert!(!rendered[0].svg.contains("<path "));
+            assert_geometry_issue(
+                &parsed,
+                &rendered[0],
+                [
+                    sdocx::GeometryDiagnosticKind::UnsupportedLineType,
+                    sdocx::GeometryDiagnosticKind::MissingLinePath,
+                    sdocx::GeometryDiagnosticKind::UnsupportedPath,
+                ][index],
+            );
+        }
+        #[cfg(not(feature = "render"))]
+        let _ = index;
+    }
+}
+
+#[test]
+fn native_shapes_and_lines_survive_document_parsing() {
+    let bytes = archive(&page(
+        &[vec![
+            object(7, &shape(4), &[]),
+            object(8, &line(0, 0, &[]), &[]),
+        ]],
+        0,
+        &[],
+    ));
+    let document = sdocx::parse_bytes(&bytes).unwrap();
+    assert_eq!(document.pages[0].elements().count(), 2);
+}
+
+fn text_common(text: &str) -> Vec<u8> {
+    let mut bytes = (text.encode_utf16().count() as u32).to_le_bytes().to_vec();
+    for unit in text.encode_utf16() {
+        bytes.extend(unit.to_le_bytes());
+    }
+    bytes.extend(1_u32.to_le_bytes()); // one font-size span
+    bytes.extend(20_u16.to_le_bytes());
+    for value in [3_u32, 0, text.encode_utf16().count() as u32, 1] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.extend(18.0_f32.to_le_bytes());
+    bytes.extend([0; 4 + 16 + 1 + 2 + 8]); // paragraphs, margins, gravity, sections, object flags
+    sized(&bytes)
+}
+
+#[test]
+fn embedded_shape_text_preserves_unicode_and_keeps_fill_aligned() {
+    let common = text_common("A日本語😀");
+    let mut fields = common.clone();
+    fields.push(1);
+    fields.extend((-9_i32).to_le_bytes()); // pen name ID is before fill
+    fields.extend(123456_i32.to_le_bytes()); // advanced pen settings ID
+    fields.extend(shape_fields());
+    let mut payload = base(0.0);
+    payload.extend(outline());
+    payload.extend(frame(7, 0x37, &shape_fixed(4, 30.0), &fields));
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+    let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+    let text = shape.text.as_ref().unwrap();
+    assert_eq!(shape.text_area_type, Some(TextAreaType::Free));
+    assert_eq!(text.text_area_type, shape.text_area_type);
+    assert_eq!(text.text, "A日本語😀");
+    assert_eq!(text.spans[0].end_utf16, 6);
+    assert_eq!(text.bbox.x_min, -10.0);
+    assert_eq!(text.rotation_degrees, Some(30.0));
+    assert_eq!(shape.pen_name_id, Some(-9));
+    assert_eq!(shape.pen_settings_id, Some(123456));
+    assert!(matches!(shape.style.paint, ShapePaint::Solid(0x800000ff)));
+    assert!(matches!(shape.fill, ShapePaint::Solid(0x40ff0000)));
+    assert!(has_shape_warning(&parsed));
+    for limits in [
+        ParseLimits {
+            max_text_characters: 5,
+            ..Default::default()
+        },
+        ParseLimits {
+            max_text_spans: 0,
+            ..Default::default()
+        },
+        ParseLimits {
+            max_object_nesting_depth: 0,
+            ..Default::default()
+        },
+    ] {
+        assert!(matches!(
+            sdocx::parse_bytes_with_options(
+                &single(7, &payload),
+                &ParseOptions {
+                    limits,
+                    ..Default::default()
+                }
+            ),
+            Err(Error::LimitExceeded { .. })
+        ));
+    }
+    for end in 0..common.len() {
+        let mut broken = base(0.0);
+        broken.extend(outline());
+        broken.extend(frame(7, 1, &shape_fixed(4, 0.0), &common[..end]));
+        assert_format(7, &broken);
+    }
+    #[cfg(feature = "render")]
+    {
+        let pages = sdocx::render_document_svg(&parsed.document, &Default::default());
+        let svg = roxmltree::Document::parse(&pages[0].svg).unwrap();
+        let source: String = svg
+            .descendants()
+            .filter(|node| node.has_tag_name("tspan"))
+            .filter_map(|node| node.text())
+            .collect();
+        assert_eq!(source, "A日本語😀");
+
+        let mut document = parsed.document.clone();
+        let PageElement::Shape(shape) = document.pages[0].elements_mut().next().unwrap() else {
+            panic!("expected shape")
+        };
+        shape.path_data = native_path(&[(1, &[1.0, 2.0]), (99, &[])]);
+        let rendered = sdocx::render_document_svg(&document, &Default::default());
+        assert_geometry_issue(
+            &parsed,
+            &rendered[0],
+            sdocx::GeometryDiagnosticKind::UnsupportedPath,
+        );
+        let svg = roxmltree::Document::parse(&rendered[0].svg).unwrap();
+        let source: String = svg
+            .descendants()
+            .filter(|node| node.has_tag_name("tspan"))
+            .filter_map(|node| node.text())
+            .collect();
+        assert_eq!(source, "A日本語😀");
+    }
+}
+
+#[test]
+fn text_area_modes_without_text_keep_shape_fill_aligned() {
+    for raw in 0..=u8::MAX {
+        let mut fields = vec![raw];
+        fields.extend(shape_fields());
+        let mut payload = base(0.0);
+        payload.extend(outline());
+        payload.extend(frame(7, 0x22, &shape_fixed(4, 30.0), &fields));
+        let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+        let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+        let expected = match raw {
+            0 => TextAreaType::Margin,
+            1 => TextAreaType::Free,
+            2 => TextAreaType::Path,
+            raw => TextAreaType::Other(raw),
+        };
+        assert_eq!(shape.text_area_type, Some(expected));
+        assert_eq!(shape.text_area_type.unwrap().raw(), raw);
+        assert!(shape.text.is_none());
+        assert!(matches!(shape.fill, ShapePaint::Solid(0x40ff0000)));
+    }
+    let parsed = sdocx::parse_bytes(&single(7, &shape(1))).unwrap();
+    assert_eq!(
+        as_shape(parsed.pages[0].elements().next().unwrap()).text_area_type,
+        None
+    );
+}
+
+#[test]
+fn line_pen_settings_and_name_ids_precede_the_path_in_native_order() {
+    let path = native_path(&[(1, &[90.0, 45.0]), (2, &[-10.0, 45.0])]);
+    let mut fields = (-9_i32).to_le_bytes().to_vec(); // advanced settings, bit 1
+    fields.extend(123456_i32.to_le_bytes()); // pen name, bit 2
+    fields.extend(&path);
+    let parsed = sdocx::parse_bytes_detailed(&single(8, &line(2, 14, &fields))).unwrap();
+    let decoded = as_line(parsed.document.pages[0].elements().next().unwrap());
+    assert_eq!(decoded.pen_settings_id, Some(-9));
+    assert_eq!(decoded.pen_name_id, Some(123456));
+    assert_eq!(decoded.path_data, path);
+    assert!(matches!(decoded.style.paint, ShapePaint::Solid(0x800000ff)));
+    assert!(has_shape_warning(&parsed));
+    for end in 0..8 {
+        assert_format(8, &line(0, 6, &fields[..end]));
+    }
+    #[cfg(feature = "render")]
+    {
+        let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+        assert_svg_path(svg, "M 90 45 L -10 45");
+        assert!(svg.contains("stroke=\"#0000ff\""));
+    }
+}
+
+#[test]
+fn legacy_line_pen_source_keeps_modern_ids_and_vector_path_aligned() {
+    let path = native_path(&[(1, &[90.0, 45.0]), (2, &[-10.0, 45.0])]);
+    for (pen_name_id, modern_id) in [(-123456_i32, 123456_i32), (-123456, -1), (-1, -2)] {
+        let mut fields = pen_name_id.to_le_bytes().to_vec();
+        fields.extend([0xde, 0xad, 0, 0xff]);
+        fields.extend((-9_i32).to_le_bytes());
+        fields.extend(modern_id.to_le_bytes());
+        fields.extend(&path);
+        let parsed = sdocx::parse_bytes_detailed(&single(8, &line(2, 15, &fields))).unwrap();
+        let decoded = as_line(parsed.document.pages[0].elements().next().unwrap());
+        let legacy = decoded.legacy_pen_source.as_ref().unwrap();
+        assert_eq!(legacy.pen_name_id, pen_name_id);
+        assert_eq!(legacy.remainder, [0xde, 0xad, 0, 0xff]);
+        assert_eq!(decoded.pen_settings_id, Some(-9));
+        assert_eq!(decoded.pen_name_id, Some(modern_id));
+        assert_eq!(decoded.path_data, path);
+        assert!(has_shape_warning(&parsed));
+        #[cfg(feature = "serde")]
+        {
+            let restored: NativeLine =
+                serde_json::from_value(serde_json::to_value(decoded).unwrap()).unwrap();
+            let legacy = restored.legacy_pen_source.as_ref().unwrap();
+            assert_eq!(legacy.pen_name_id, pen_name_id);
+            assert_eq!(legacy.remainder, [0xde, 0xad, 0, 0xff]);
+            assert_eq!(restored.pen_name_id, Some(modern_id));
+            assert_eq!(restored.path_data, path);
+        }
+        #[cfg(feature = "render")]
+        assert_svg_path(
+            &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg,
+            "M 90 45 L -10 45",
+        );
+    }
+}
+
+#[test]
+fn legacy_line_pen_source_distinguishes_zero_from_absent_and_old_json() {
+    for present in [false, true] {
+        let fields = if present { vec![0; 8] } else { Vec::new() };
+        let parsed =
+            sdocx::parse_bytes_detailed(&single(8, &line(0, u32::from(present), &fields))).unwrap();
+        let decoded = as_line(parsed.document.pages[0].elements().next().unwrap());
+        assert_eq!(decoded.legacy_pen_source.is_some(), present);
+        if let Some(legacy) = &decoded.legacy_pen_source {
+            assert_eq!(legacy.pen_name_id, 0);
+            assert_eq!(legacy.remainder, [0; 4]);
+        }
+        assert!(decoded.pen_name_id.is_none());
+        assert_eq!(has_shape_warning(&parsed), present);
+        #[cfg(feature = "serde")]
+        {
+            let mut json = serde_json::to_value(decoded).unwrap();
+            let restored: NativeLine = serde_json::from_value(json.clone()).unwrap();
+            assert_eq!(restored.legacy_pen_source.is_some(), present);
+            if let Some(legacy) = &restored.legacy_pen_source {
+                assert_eq!(legacy.pen_name_id, 0);
+                assert_eq!(legacy.remainder, [0; 4]);
+            }
+            json.as_object_mut().unwrap().remove("legacy_pen_source");
+            let restored: NativeLine = serde_json::from_value(json).unwrap();
+            assert!(restored.legacy_pen_source.is_none());
+        }
+    }
+}
+
+#[test]
+fn short_legacy_line_pen_sources_cannot_consume_the_following_frame() {
+    for length in 0..8 {
+        let mut payload = line(0, 1, &[0xff; 7][..length]);
+        payload.extend(frame(66, 0, b"future", &[]));
+        assert_format(8, &payload);
+    }
+}
+
+#[test]
+fn effect_sizes_and_fixed_geometry_cannot_consume_adjacent_fields() {
+    for (mask, effect) in [(4, color(true, 0, 0xff123456)), (8, style(4.0))] {
+        for end in 0..effect.len() {
+            let mut payload = base(0.0);
+            payload.extend(frame(6, mask, &base_fixed(), &sized(&effect[..end])));
+            payload.extend(frame(7, 32, &shape_fixed(4, 0.0), &shape_fields()));
+            assert_format(7, &payload);
+        }
+    }
+    for end in 0..shape_fixed(4, 0.0).len() {
+        let mut payload = base(0.0);
+        payload.extend(outline());
+        payload.extend(frame(7, 32, &shape_fixed(4, 0.0)[..end], &shape_fields()));
+        assert_format(7, &payload);
+    }
+    let fill = color(false, 0, 0xffff0000);
+    for end in 0..fill.len() {
+        let mut fields = (end as u32).to_le_bytes().to_vec();
+        fields.push(1);
+        fields.extend(&fill[..end]);
+        let mut payload = base(0.0);
+        payload.extend(outline());
+        payload.extend(frame(7, 32, &shape_fixed(4, 0.0), &fields));
+        assert_format(7, &payload);
+    }
+}
+
+#[test]
+fn shape_pen_slots_keep_fill_aligned_and_unknown_line_fields_still_warn() {
+    let mut payload = base(0.0);
+    payload.extend(outline());
+    let mut fields = 77_i32.to_le_bytes().to_vec();
+    fields.extend([0xde, 0xad, 0, 0xff]);
+    fields.extend((-123456_i32).to_le_bytes());
+    fields.extend(shape_fields());
+    payload.extend(frame(7, 4 | 8 | 16 | 32, &shape_fixed(4, 0.0), &fields));
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+    let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+    assert_eq!(shape.pen_name_id, Some(77));
+    assert_eq!(shape.pen_data_field_3_raw, Some([0xde, 0xad, 0, 0xff]));
+    assert_eq!(shape.pen_settings_id, Some(-123456));
+    assert!(matches!(shape.fill, ShapePaint::Solid(0x40ff0000)));
+    let Some(sdocx::ShapePaintSource::Color(source)) = &shape.fill_source else {
+        panic!("expected retained fill source")
+    };
+    assert_eq!(source.solid_argb, 0x40ff0000);
+    assert!(has_shape_warning(&parsed));
+    let parsed = sdocx::parse_bytes_detailed(&single(8, &line(0, 16, b"future"))).unwrap();
+    assert!(
+        as_line(parsed.document.pages[0].elements().next().unwrap())
+            .path_data
+            .is_empty()
+    );
+    assert!(has_shape_warning(&parsed));
+}
+
+#[test]
+fn zero_pen_slot_is_distinct_from_absent_and_old_json_defaults_to_absent() {
+    for present in [false, true] {
+        let mut payload = base(0.0);
+        payload.extend(outline());
+        let mut fields = if present { vec![0; 4] } else { Vec::new() };
+        fields.extend(shape_fields());
+        payload.extend(frame(
+            7,
+            32 | if present { 8 } else { 0 },
+            &shape_fixed(4, 0.0),
+            &fields,
+        ));
+        let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+        let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+        assert_eq!(shape.pen_data_field_3_raw, present.then_some([0; 4]));
+        assert!(matches!(shape.fill, ShapePaint::Solid(0x40ff0000)));
+        assert!(shape.fill_source.is_some());
+        assert_eq!(has_shape_warning(&parsed), present);
+        #[cfg(feature = "serde")]
+        {
+            let mut json = serde_json::to_value(shape).unwrap();
+            let restored: NativeShape = serde_json::from_value(json.clone()).unwrap();
+            assert_eq!(restored.pen_data_field_3_raw, shape.pen_data_field_3_raw);
+            json.as_object_mut().unwrap().remove("pen_data_field_3_raw");
+            let restored: NativeShape = serde_json::from_value(json).unwrap();
+            assert!(restored.pen_data_field_3_raw.is_none());
+        }
+    }
+}
+
+#[test]
+fn short_pen_slots_cannot_consume_the_following_frame() {
+    for length in 0..4 {
+        let mut payload = base(0.0);
+        payload.extend(outline());
+        payload.extend(frame(7, 8, &shape_fixed(4, 0.0), &[0xff; 3][..length]));
+        payload.extend(frame(66, 0, b"future", &[]));
+        assert_format(7, &payload);
+    }
+}
+
+#[test]
+fn future_frames_masks_and_outline_settings_are_retained_or_reported() {
+    let mut native_style = style(5.0);
+    native_style[4..12].copy_from_slice(&[1, 3, 2, 1, 2, 1, 4, 2]);
+    let mut payload = base(0.0);
+    payload.extend(frame(6, 8, &base_fixed(), &sized(&native_style)));
+    let mut shape_frame = frame(7, 32, &shape_fixed(4, 0.0), &shape_fields());
+    shape_frame[17] = 1; // field 32, after the known fill
+    payload.extend(shape_frame);
+    payload.extend(frame(66, 0, b"future", &[]));
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+    let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+    assert_eq!(shape.style.compound, 1);
+    assert_eq!(shape.style.dash, 3);
+    assert_eq!(shape.style.begin_arrow, [2, 1]);
+    assert_eq!(shape.style.end_arrow, [4, 2]);
+    assert!(matches!(shape.fill, ShapePaint::Solid(0x40ff0000)));
+    assert!(has_shape_warning(&parsed));
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn saved_dashes_match_native_constructor_inputs_without_changing_caps_or_source() {
+    #[derive(serde::Deserialize)]
+    struct Capture {
+        cases: Vec<Case>,
+    }
+    #[derive(serde::Deserialize)]
+    struct Case {
+        width: f32,
+        dash: u8,
+        intervals: Vec<f32>,
+        phase: f32,
+    }
+    let capture: Capture =
+        serde_json::from_str(include_str!("../../../conformance/shape-styles.json")).unwrap();
+    for case in capture
+        .cases
+        .into_iter()
+        .filter(|case| case.width > 0.0 && case.dash <= 7)
+    {
+        for kind in [7, 8] {
+            let mut saved_style = style(case.width);
+            saved_style[5] = case.dash;
+            let mut effects = sized(&color(true, 0, 0x800000ff));
+            effects.extend(sized(&saved_style));
+            let specific = if kind == 7 {
+                frame(7, 32, &shape_fixed(4, 30.0), &shape_fields())
+            } else {
+                frame(8, 0, &line_fixed(0), &[])
+            };
+            let payload = [base(0.0), frame(6, 12, &base_fixed(), &effects), specific].concat();
+            let parsed = sdocx::parse_bytes_detailed(&single(kind, &payload)).unwrap();
+            assert!(!has_shape_warning(&parsed), "{} {}", case.width, case.dash);
+            let saved = match parsed.document.pages[0].elements().next().unwrap() {
+                PageElement::Shape(shape) => &shape.style,
+                PageElement::Line(line) => &line.style,
+                _ => unreachable!(),
+            };
+            assert_eq!(saved.dash, case.dash);
+            assert_eq!(saved.width, case.width);
+            let output = sdocx::render_document_svg(&parsed.document, &Default::default());
+            assert!(output[0].paint_diagnostics.is_empty());
+            let xml = roxmltree::Document::parse(&output[0].svg).unwrap();
+            let outline = shape_outline_node(&xml);
+            assert_eq!(outline.attribute("stroke-linecap"), Some("round"));
+            assert_eq!(outline.attribute("stroke-linejoin"), Some("bevel"));
+            match outline.attribute("stroke-dasharray") {
+                Some(pattern) => {
+                    let actual = pattern
+                        .split([' ', ','])
+                        .filter(|v| !v.is_empty())
+                        .map(|value| value.parse::<f64>().unwrap())
+                        .collect::<Vec<_>>();
+                    assert_eq!(
+                        actual,
+                        case.intervals
+                            .iter()
+                            .copied()
+                            .map(f64::from)
+                            .collect::<Vec<_>>()
+                    );
+                    assert_eq!(
+                        svg_number(outline, "stroke-dashoffset"),
+                        f64::from(case.phase)
+                    );
+                }
+                None => assert!(case.intervals.is_empty()),
+            }
+        }
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn unsupported_dashes_report_the_omitted_outline_and_preserve_fill_and_saved_style() {
+    for (width, dash) in [(0.0, 3), (3.5, 8), (3.5, 255), (f32::MAX, 5)] {
+        let mut saved_style = style(width);
+        saved_style[5] = dash;
+        let mut effects = sized(&color(true, 0, 0xff0000ff));
+        effects.extend(sized(&saved_style));
+        let payload = [
+            base(0.0),
+            frame(6, 12, &base_fixed(), &effects),
+            frame(7, 32, &shape_fixed(4, 0.0), &shape_fields()),
+        ]
+        .concat();
+        let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+        assert!(has_shape_warning(&parsed));
+        let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+        assert_eq!(shape.style.dash, dash);
+        let output = sdocx::render_document_svg(&parsed.document, &Default::default());
+        assert_eq!(output[0].paint_diagnostics.len(), 1);
+        let issue = &output[0].paint_diagnostics[0];
+        assert_eq!(
+            issue.kind,
+            sdocx::PaintDiagnosticKind::UnsupportedDashPattern
+        );
+        assert_eq!(issue.role, sdocx::PaintRole::Outline);
+        assert_eq!(issue.object_uuid, "sh");
+        assert!(issue.source_offset.is_some());
+        svg_support::assert_svg_element(
+            &output[0].svg,
+            "g",
+            &[("stroke", "none"), ("fill", "#ff0000")],
+        );
+    }
+}
+
+#[cfg(feature = "pdf")]
+#[test]
+fn dashed_outlines_remain_pdf_path_operations_without_new_images() {
+    let mut saved_style = style(3.5);
+    saved_style[5] = 7;
+    let mut effects = sized(&color(true, 0, 0xff0000ff));
+    effects.extend(sized(&saved_style));
+    let payload = [
+        base(0.0),
+        frame(6, 12, &base_fixed(), &effects),
+        frame(8, 0, &line_fixed(0), &[]),
+    ]
+    .concat();
+    let document = sdocx::parse_bytes(&single(8, &payload)).unwrap();
+    let fonts = sdocx::fonts::FontBook::default();
+    let output = sdocx::render_layout_pages_pdf_detailed_with_fonts(
+        &document,
+        &sdocx::layout_document(&document),
+        &[0],
+        &Default::default(),
+        &sdocx::PdfOptions::from_font_book(&fonts),
+        &fonts,
+    )
+    .unwrap();
+    assert!(output.pages[0].paint_diagnostics.is_empty());
+    let pdf = lopdf::Document::load_mem(&output.bytes).unwrap();
+    let content = pdf
+        .get_page_content(*pdf.get_pages().values().next().unwrap())
+        .unwrap();
+    let operations = lopdf::content::Content::decode(&content)
+        .unwrap()
+        .operations;
+    assert!(operations.iter().any(|operation| operation.operator == "S"));
+    let dashes = operations
+        .iter()
+        .find(|operation| operation.operator == "d")
+        .unwrap();
+    let lengths = dashes.operands[0].as_array().unwrap();
+    assert_eq!(
+        lengths
+            .iter()
+            .map(|value| value.as_float().unwrap())
+            .collect::<Vec<_>>(),
+        [28.0, 10.5, 3.5, 10.5, 3.5, 10.5]
+    );
+    assert_eq!(dashes.operands[1].as_float().unwrap(), 1.0);
+    assert!(
+        !pdf.objects
+            .values()
+            .any(|object| object.as_stream().is_ok_and(|stream| stream
+                .dict
+                .get(b"Subtype")
+                .is_ok_and(|value| value.as_name().is_ok_and(|name| name == b"Image"))))
+    );
+}
+
+#[cfg(feature = "render")]
+mod arrow_transport_tests {
+    use super::*;
+
+    fn single_transform(node: roxmltree::Node<'_, '_>) -> Option<svgtypes::TransformListToken> {
+        let mut tokens = svgtypes::TransformListParser::from(node.attribute("transform")?);
+        let transform = tokens.next()?.ok()?;
+        tokens.next().is_none().then_some(transform)
+    }
+
+    fn arrow_at<'a, 'input>(
+        xml: &'a roxmltree::Document<'input>,
+        endpoint: [f64; 2],
+    ) -> (roxmltree::Node<'a, 'input>, f64) {
+        xml.descendants()
+            .filter(|node| {
+                matches!(single_transform(*node), Some(svgtypes::TransformListToken::Translate { tx, ty }) if [tx, ty] == endpoint)
+            })
+            .flat_map(|node| node.children())
+            .find_map(|node| match single_transform(node)? {
+                svgtypes::TransformListToken::Rotate { angle } => Some((node, angle)),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("missing arrow rotation at {endpoint:?}"))
+    }
+
+    fn document(width: f32, kind: u8, size: u8) -> sdocx::Document {
+        let mut settings = style(width);
+        settings[5] = 3;
+        settings[8..10].copy_from_slice(&[kind, size]);
+        let mut effects = sized(&color(true, 0, 0x800000ff));
+        effects.extend(sized(&settings));
+        let path = native_path(&[(1, &[0.0, 0.0]), (2, &[1000.0, 0.0])]);
+        let payload = [
+            base(0.0),
+            frame(6, 12, &base_fixed(), &effects),
+            frame(8, 8, &line_fixed(0), &path),
+        ]
+        .concat();
+        let parsed = sdocx::parse_bytes_detailed(&single(8, &payload)).unwrap();
+        assert!(!has_shape_warning(&parsed));
+        parsed.document
+    }
+
+    #[test]
+    fn arrow_geometry_matches_native_calls_and_keeps_open_arrows_undashed() {
+        let capture: serde_json::Value =
+            serde_json::from_str(include_str!("../../../conformance/shape-arrows.json")).unwrap();
+        for case in capture["geometry"].as_array().unwrap() {
+            let width = case["width"].as_f64().unwrap() as f32;
+            let kind = case["type"].as_u64().unwrap() as u8;
+            let size = case["size"].as_u64().unwrap() as u8;
+            if width < 1.0 && kind <= 3 {
+                continue;
+            }
+            let document = document(width, kind, size);
+            let rendered = sdocx::render_document_svg(&document, &Default::default());
+            assert!(rendered[0].paint_diagnostics.is_empty(), "{case}");
+            let xml = roxmltree::Document::parse(&rendered[0].svg).unwrap();
+            let (arrow, _) = arrow_at(&xml, [0.0, 0.0]);
+            let events = case["events"].as_array().unwrap();
+            if kind <= 3 {
+                let data = arrow
+                    .descendants()
+                    .find(|node| node.has_tag_name("path"))
+                    .unwrap();
+                let points = svgtypes::PathParser::from(data.attribute("d").unwrap())
+                    .filter_map(|command| match command.unwrap() {
+                        svgtypes::PathSegment::MoveTo { x, y, .. }
+                        | svgtypes::PathSegment::LineTo { x, y, .. } => Some([x as f32, y as f32]),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>();
+                let expected = events
+                    .iter()
+                    .filter(|event| matches!(event["op"].as_str(), Some("move" | "line")))
+                    .map(|event| {
+                        [
+                            event["values"][0].as_f64().unwrap() as f32,
+                            event["values"][1].as_f64().unwrap() as f32,
+                        ]
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(points, expected, "{case}");
+                let parent = data.parent_element().unwrap();
+                assert!(parent.attribute("stroke-dasharray").is_none());
+                if kind == 2 {
+                    assert_eq!(parent.attribute("stroke-linecap"), Some("round"));
+                    assert_eq!(parent.attribute("stroke-linejoin"), Some("bevel"));
+                    assert_eq!(parent.attribute("fill"), Some("none"));
+                } else {
+                    assert_eq!(parent.attribute("fill"), Some("#0000ff"));
+                }
+                let clip = xml
+                    .descendants()
+                    .find(|node| node.attribute("clip-rule") == Some("evenodd"))
+                    .unwrap();
+                let clip_points = svgtypes::PathParser::from(clip.attribute("d").unwrap())
+                    .filter_map(|command| match command.unwrap() {
+                        svgtypes::PathSegment::MoveTo { x, y, .. }
+                        | svgtypes::PathSegment::LineTo { x, y, .. } => Some([x, y]),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>();
+                let cut = events
+                    .iter()
+                    .find(|event| event["op"] == "cleanup_request")
+                    .unwrap();
+                assert!(
+                    ((clip_points[5][1] - clip_points[4][1]).abs()
+                        - cut["width"].as_f64().unwrap())
+                    .abs()
+                        < 1e-4
+                );
+                assert!(
+                    ((clip_points[6][0] - clip_points[5][0]).abs()
+                        - cut["height"].as_f64().unwrap())
+                    .abs()
+                        < 1e-4
+                );
+            } else if kind == 4 {
+                let expected = events
+                    .iter()
+                    .find(|event| event["op"] == "rectangle")
+                    .unwrap();
+                let rect = arrow
+                    .descendants()
+                    .find(|node| node.has_tag_name("rect"))
+                    .unwrap();
+                assert_eq!(
+                    svg_number(rect, "x") as f32,
+                    expected["values"][0].as_f64().unwrap() as f32
+                );
+                assert_eq!(
+                    svg_number(rect, "width") as f32,
+                    (expected["values"][2].as_f64().unwrap()
+                        - expected["values"][0].as_f64().unwrap()) as f32
+                );
+            } else {
+                let expected = events.iter().find(|event| event["op"] == "circle").unwrap();
+                let circle = arrow
+                    .descendants()
+                    .find(|node| node.has_tag_name("circle"))
+                    .unwrap();
+                assert_eq!(
+                    svg_number(circle, "r") as f32,
+                    expected["values"][2].as_f64().unwrap() as f32
+                );
+            }
+            assert!(
+                xml.descendants()
+                    .any(|node| node.attribute("stroke-dasharray").is_some())
+            );
+            assert_eq!(
+                as_line(document.pages[0].elements().next().unwrap())
+                    .style
+                    .begin_arrow,
+                [kind, size]
+            );
+        }
+    }
+
+    #[test]
+    fn arrow_angles_follow_native_straight_path_poses_and_reject_uncaptured_contexts() {
+        let capture: serde_json::Value =
+            serde_json::from_str(include_str!("../../../conformance/shape-arrows.json")).unwrap();
+        for case in capture["poses"].as_array().unwrap().iter().take(5) {
+            let mut document = document(3.5, 4, 0);
+            let PageElement::Line(line) = document.pages[0].elements_mut().next().unwrap() else {
+                unreachable!()
+            };
+            let end = [
+                case["end"][0].as_f64().unwrap(),
+                case["end"][1].as_f64().unwrap(),
+            ];
+            line.path_data = native_path(&[(1, &[0.0, 0.0]), (2, &end)]);
+            line.style.end_arrow = [4, 0];
+            let rendered = sdocx::render_document_svg(&document, &Default::default());
+            assert!(rendered[0].paint_diagnostics.is_empty());
+            let xml = roxmltree::Document::parse(&rendered[0].svg).unwrap();
+            for event in case["events"].as_array().unwrap() {
+                let endpoint = [
+                    event["values"][0].as_f64().unwrap(),
+                    event["values"][1].as_f64().unwrap(),
+                ];
+                let (_, actual) = arrow_at(&xml, endpoint);
+                let expected = event["values"][2].as_f64().unwrap();
+                let difference = ((actual - expected + 180.0).rem_euclid(360.0) - 180.0).abs();
+                // Budget four f32 rounding steps at a full turn for platform libm differences.
+                const ANGLE_TOLERANCE_DEGREES: f64 = 4.0 * f32::EPSILON as f64 * 360.0;
+                assert!(
+                    difference <= ANGLE_TOLERANCE_DEGREES,
+                    "arrow at {endpoint:?}: actual {actual}°, expected {expected}°, \
+                     difference {difference}°, tolerance {ANGLE_TOLERANCE_DEGREES}°; {case}"
+                );
+            }
+        }
+        for case in 0..6 {
+            let mut document = document(3.5, 1, 0);
+            let PageElement::Line(line) = document.pages[0].elements_mut().next().unwrap() else {
+                unreachable!()
+            };
+            match case {
+                0 => line.style.begin_arrow = [6, 0],
+                1 => line.style.begin_arrow = [1, 3],
+                2 => line.path_data = native_path(&[(1, &[0.0, 0.0]), (2, &[1.0, 0.0])]),
+                3 => {
+                    line.path_data =
+                        native_path(&[(1, &[0.0, 0.0]), (4, &[20.0, 0.0, 40.0, 30.0, 100.0, 0.0])])
+                }
+                4 => line.path_data = native_path(&[(1, &[0.1, 0.0]), (2, &[100.0, 0.0])]),
+                _ => line.style.width = 0.1,
+            }
+            let output = sdocx::render_document_svg(&document, &Default::default());
+            assert_eq!(
+                output[0].paint_diagnostics[0].kind,
+                sdocx::PaintDiagnosticKind::UnsupportedArrowGeometry
+            );
+            assert!(!output[0].svg.contains("<clipPath"));
+        }
+    }
+
+    #[cfg(feature = "pdf")]
+    #[test]
+    fn arrow_cleanup_and_all_named_tips_remain_pdf_vectors_in_both_themes() {
+        for mode in [sdocx::RenderColorMode::Light, sdocx::RenderColorMode::Dark] {
+            let mut document = document(3.5, 1, 0);
+            for kind in 2..=5 {
+                document.pages[0]
+                    .objects
+                    .push(self::document(3.5, kind, 0).pages[0].objects.remove(0));
+            }
+            let fonts = sdocx::fonts::FontBook::default();
+            let mut options = sdocx::RenderOptions::default();
+            options.color_mode = mode;
+            let output = sdocx::render_layout_pages_pdf_detailed_with_fonts(
+                &document,
+                &sdocx::layout_document(&document),
+                &[0],
+                &options,
+                &sdocx::PdfOptions::from_font_book(&fonts),
+                &fonts,
+            )
+            .unwrap();
+            assert!(output.pages[0].paint_diagnostics.is_empty());
+            let pdf = lopdf::Document::load_mem(&output.bytes).unwrap();
+            let content = pdf
+                .get_page_content(*pdf.get_pages().values().next().unwrap())
+                .unwrap();
+            let operations = lopdf::content::Content::decode(&content)
+                .unwrap()
+                .operations;
+            assert!(
+                operations
+                    .iter()
+                    .any(|operation| operation.operator == "W*")
+            );
+            assert!(operations.iter().any(|operation| operation.operator == "f"));
+            assert!(operations.iter().any(|operation| operation.operator == "S"));
+            assert!(
+                !pdf.objects
+                    .values()
+                    .any(|object| object
+                        .as_stream()
+                        .is_ok_and(|stream| stream.dict.get(b"Subtype").is_ok_and(|value| value
+                            .as_name()
+                            .is_ok_and(|name| name == b"Image"))))
+            );
+        }
+    }
+}
+
+#[test]
+fn no_outline_and_unsupported_gradient_are_distinct_from_solid_black() {
+    for kind in [1, 2, 99] {
+        let effect = color(true, kind, 0xff000000);
+        let mut payload = base(0.0);
+        payload.extend(frame(6, 4, &base_fixed(), &sized(&effect)));
+        payload.extend(frame(7, 32, &shape_fixed(4, 0.0), &shape_fields()));
+        let parsed = sdocx::parse_bytes_detailed(&single(7, &payload)).unwrap();
+        let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+        if kind == 2 {
+            assert!(matches!(shape.style.paint, ShapePaint::None));
+        } else {
+            assert!(
+                matches!(&shape.style.paint, ShapePaint::Unsupported { data, .. } if data == &effect)
+            );
+        }
+        assert_eq!(has_shape_warning(&parsed), kind != 2);
+        #[cfg(feature = "render")]
+        assert!(
+            sdocx::render_document_svg(&parsed.document, &Default::default())[0]
+                .svg
+                .contains("stroke=\"none\"")
+        );
+    }
+}
+
+#[test]
+fn shapes_and_lines_own_precise_magnetic_points_and_opaque_connections() {
+    let points = [
+        [1.0000000000000002, -0.0],
+        [-2.0000000000000004, f64::from_bits(1)],
+    ];
+    let mut connections = 1_u32.to_le_bytes().to_vec();
+    connections.extend(b"\xffunresolved");
+    let mut fixed = (points.len() as u32).to_le_bytes().to_vec();
+    for point in &points {
+        fixed.extend(numbers(point));
+    }
+    fixed.extend(sized(&connections));
+    fixed.push(0);
+    let source_frame = frame(6, 0, &fixed, &[]);
+    let objects = [7, 8].map(|kind| object(kind, &with_shape_base(kind, &source_frame), &[]));
+    let parsed = sdocx::parse_bytes_detailed(&archive(&page(&[objects.to_vec()], 0, &[]))).unwrap();
+    assert!(has_shape_warning(&parsed));
+    let elements: Vec<_> = parsed.document.pages[0].elements().collect();
+    assert_eq!(elements.len(), 2);
+    for element in elements {
+        let source = shape_base_source(element).unwrap();
+        assert_eq!(source.connection_data, connections);
+        assert_eq!(
+            source
+                .magnetic_points
+                .iter()
+                .map(|point| point.map(f64::to_bits))
+                .collect::<Vec<_>>(),
+            points.map(|point| point.map(f64::to_bits))
+        );
+    }
+}
+
+fn with_shape_base(kind: u8, source_frame: &[u8]) -> Vec<u8> {
+    let mut payload = base(0.0);
+    payload.extend(source_frame);
+    payload.extend(match kind {
+        7 => frame(7, 32, &shape_fixed(4, 0.0), &shape_fields()),
+        8 => frame(8, 0, &line_fixed(0), &[]),
+        _ => panic!("expected shape or line"),
+    });
+    payload
+}
+
+fn shape_base_source(element: &PageElement) -> Option<&sdocx::ShapeBaseSource> {
+    match element {
+        PageElement::Shape(shape) => shape.base_source.as_deref(),
+        PageElement::Line(line) => line.base_source.as_deref(),
+        _ => panic!("expected shape or line"),
+    }
+}
+
+#[test]
+fn parsed_empty_shape_base_is_present_and_older_json_can_omit_it() {
+    for (kind, payload) in [(7, shape(4)), (8, line(0, 0, &[]))] {
+        let parsed = sdocx::parse_bytes_detailed(&single(kind, &payload)).unwrap();
+        assert!(!has_shape_warning(&parsed));
+        let element = parsed.document.pages[0].elements().next().unwrap();
+        let source = shape_base_source(element).unwrap();
+        assert!(source.magnetic_points.is_empty());
+        assert_eq!(source.connection_data, [0; 4]);
+        #[cfg(feature = "serde")]
+        {
+            let mut json = serde_json::to_value(element).unwrap();
+            let restored: PageElement = serde_json::from_value(json.clone()).unwrap();
+            let source = shape_base_source(&restored).unwrap();
+            assert!(source.magnetic_points.is_empty());
+            assert_eq!(source.connection_data, [0; 4]);
+            json.as_object_mut()
+                .unwrap()
+                .values_mut()
+                .next()
+                .unwrap()
+                .as_object_mut()
+                .unwrap()
+                .remove("base_source");
+            let restored: PageElement = serde_json::from_value(json).unwrap();
+            assert!(shape_base_source(&restored).is_none());
+        }
+    }
+}
+
+#[test]
+fn connection_counts_and_shape_paths_are_bounded_before_allocation() {
+    for fixed in [
+        u32::MAX.to_le_bytes().to_vec(),
+        [0_u32, u32::MAX]
+            .iter()
+            .flat_map(|v| v.to_le_bytes())
+            .collect(),
+    ] {
+        let mut payload = base(0.0);
+        payload.extend(frame(6, 0, &fixed, &[]));
+        payload.extend(frame(7, 0, &shape_fixed(4, 0.0), &[]));
+        assert_format(7, &payload);
+    }
+    let mut fixed = shape_fixed(4, 0.0);
+    fixed[40..44].copy_from_slice(&u32::MAX.to_le_bytes()); // path length
+    let mut payload = base(0.0);
+    payload.extend(outline());
+    payload.extend(frame(7, 0, &fixed, &[]));
+    assert_format(7, &payload);
+}
+
+#[test]
+fn unrepresentable_arc_and_empty_paths_remain_bounded() {
+    for path in [
+        native_path(&[
+            (1, &[0.0, 0.0]),
+            (5, &[0.0, 0.0, f64::MAX, 40.0, 0.0, 90.0]),
+        ]),
+        native_path(&[]),
+    ] {
+        let parsed = sdocx::parse_bytes_detailed(&single(8, &line(2, 8, &path))).unwrap();
+        assert_eq!(
+            as_line(parsed.document.pages[0].elements().next().unwrap()).path_data,
+            path
+        );
+        assert!(has_shape_warning(&parsed));
+        #[cfg(feature = "render")]
+        {
+            let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+            assert!(!svg.contains("<path "));
+            assert!(!svg.contains("<line "));
+        }
+    }
+}
+
+#[test]
+fn drawing_line_and_model_shape_paths_use_native_implicit_origin() {
+    let path = native_path(&[(2, &[30.0, 40.0])]);
+    for (kind, payload) in [
+        (7, shape_with_path_rotation(4, &path, 0.0)),
+        (8, line(2, 8, &path)),
+    ] {
+        let parsed = sdocx::parse_bytes_detailed(&single(kind, &payload)).unwrap();
+        assert!(!has_shape_warning(&parsed));
+        let retained = match parsed.document.pages[0].elements().next().unwrap() {
+            PageElement::Shape(shape) => &shape.path_data,
+            PageElement::Line(line) => &line.path_data,
+            _ => unreachable!(),
+        };
+        assert_eq!(retained, &path);
+        #[cfg(feature = "render")]
+        {
+            let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+            assert!(rendered[0].geometry_diagnostics.is_empty());
+            assert_svg_path(&rendered[0].svg, "M 0.00 0.00 L 30.00 40.00");
+        }
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn drawing_path_after_close_starts_a_new_contour_at_the_closed_origin() {
+    // This matches the pinned Skia `close-then-{line,quad,cubic}` capture:
+    // after a nonempty contour is closed, the next draw verb gets an implicit
+    // Move to that contour's start point.
+    let path = native_path(&[
+        (1, &[-5.0, -6.0]),
+        (2, &[-7.0, -8.0]),
+        (6, &[]),
+        (2, &[30.0, 40.0]),
+    ]);
+    let parsed = sdocx::parse_bytes_detailed(&single(8, &line(2, 8, &path))).unwrap();
+    let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+    assert!(rendered[0].geometry_diagnostics.is_empty());
+    assert_svg_path(&rendered[0].svg, "M -5 -6 L -7 -8 Z M -5 -6 L 30 40");
+}
+
+#[test]
+fn native_arc_paths_render_as_independent_quadratic_contours() {
+    let path = native_path(&[
+        (1, &[3.0, 4.0]),
+        (2, &[8.0, 9.0]),
+        (5, &[0.0, 0.0, 40.0, 40.0, 0.0, 90.0]),
+    ]);
+    for (kind, payload) in [(7, shape_with_path(1, &path)), (8, line(2, 8, &path))] {
+        let parsed = sdocx::parse_bytes_detailed(&single(kind, &payload)).unwrap();
+        assert!(!has_shape_warning(&parsed));
+        let retained = match parsed.document.pages[0].elements().next().unwrap() {
+            PageElement::Shape(shape) => &shape.path_data,
+            PageElement::Line(line) => &line.path_data,
+            _ => unreachable!(),
+        };
+        assert_eq!(retained, &path);
+        #[cfg(feature = "render")]
+        {
+            let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+            assert!(rendered[0].geometry_diagnostics.is_empty());
+            let tree = roxmltree::Document::parse(&rendered[0].svg).unwrap();
+            let drawing = tree
+                .descendants()
+                .find(|node| node.has_tag_name("path"))
+                .unwrap();
+            let commands = drawing.attribute("d").unwrap();
+            assert_eq!(commands.matches('M').count(), 2, "{commands}");
+            assert_eq!(commands.matches('Q').count(), 2, "{commands}");
+            assert!(!commands.contains('A'), "{commands}");
+        }
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn saved_shape_arc_uses_model_load_while_line_keeps_drawing_path_consumer() {
+    let path = native_path(&[(5, &[5.0, 7.0, 190.0, 73.0, 37.0, 123.0])]);
+    let shape = sdocx::parse_bytes_detailed(&single(7, &shape_with_path(1, &path))).unwrap();
+    let line = sdocx::parse_bytes_detailed(&single(8, &line(2, 8, &path))).unwrap();
+    assert!(!has_shape_warning(&shape));
+    assert!(!has_shape_warning(&line));
+    assert_eq!(
+        as_shape(shape.document.pages[0].elements().next().unwrap()).path_data,
+        path
+    );
+    assert_eq!(
+        as_line(line.document.pages[0].elements().next().unwrap()).path_data,
+        path
+    );
+
+    let shape_svg = &sdocx::render_document_svg(&shape.document, &Default::default())[0].svg;
+    let line_svg = &sdocx::render_document_svg(&line.document, &Default::default())[0].svg;
+    let path_data = |svg: &str| {
+        let xml = roxmltree::Document::parse(svg).unwrap();
+        xml.descendants()
+            .find(|node| node.has_tag_name("path"))
+            .and_then(|node| node.attribute("d"))
+            .unwrap()
+            .to_owned()
+    };
+    assert_ne!(
+        path_data(shape_svg),
+        path_data(line_svg),
+        "ordinary saved shapes pass through Model normalization; lines consume their stored Drawing path"
+    );
+}
+
+#[test]
+fn native_oval_path_is_supported_for_lines() {
+    let path = native_path(&[(7, &[0.0, 0.0, 40.0, 40.0])]);
+    let parsed = sdocx::parse_bytes_detailed(&single(8, &line(2, 8, &path))).unwrap();
+    assert!(!has_shape_warning(&parsed));
+    assert_eq!(
+        as_line(parsed.document.pages[0].elements().next().unwrap()).path_data,
+        path
+    );
+    #[cfg(feature = "render")]
+    {
+        let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+        assert!(rendered[0].geometry_diagnostics.is_empty());
+        assert!(rendered[0].svg.contains("<path "));
+        assert!(!rendered[0].svg.contains("<line "));
+    }
+}
+
+#[test]
+fn native_oval_path_is_supported_for_shapes() {
+    let path = native_path(&[(7, &[0.0, 0.0, 40.0, 40.0])]);
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &shape_with_path(1, &path))).unwrap();
+    assert!(!has_shape_warning(&parsed));
+    assert_eq!(
+        as_shape(parsed.document.pages[0].elements().next().unwrap()).path_data,
+        path
+    );
+    #[cfg(feature = "render")]
+    {
+        let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+        assert!(rendered[0].geometry_diagnostics.is_empty());
+        assert!(rendered[0].svg.contains("<path "));
+    }
+}
+
+fn shape_with_path(kind: u32, path: &[u8]) -> Vec<u8> {
+    shape_with_path_rotation(kind, path, 30.0)
+}
+
+fn shape_with_path_rotation(kind: u32, path: &[u8], rotation: f32) -> Vec<u8> {
+    let mut fixed = shape_fixed(kind, rotation);
+    // Replace the empty sized path; retain one adjustment control point.
+    fixed.splice(
+        40..45,
+        [sized(path), vec![1], numbers(&[75.0, 42.0])].concat(),
+    );
+    [base(0.0), outline(), frame(7, 32, &fixed, &shape_fields())].concat()
+}
+
+fn captured_model_display_path(case_name: &str) -> String {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../conformance/shape-normalization.json"
+    ))
+    .unwrap();
+    let case = fixture["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|case| case["name"] == case_name)
+        .unwrap_or_else(|| panic!("missing native normalization case {case_name}"));
+    let mut output = String::new();
+    for (index, segment) in case["display_segments"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .enumerate()
+    {
+        let tag = segment[0].as_u64().unwrap();
+        let value = |index: usize| f32::from_bits(segment[index].as_u64().unwrap() as u32);
+        if index != 0 {
+            output.push(' ');
+        }
+        match tag {
+            1 => output.push_str(&format!("M {} {}", value(1), value(2))),
+            2 => output.push_str(&format!("L {} {}", value(1), value(2))),
+            3 => output.push_str(&format!(
+                "Q {} {} {} {}",
+                value(1),
+                value(2),
+                value(5),
+                value(6)
+            )),
+            4 => output.push_str(&format!(
+                "C {} {} {} {} {} {}",
+                value(1),
+                value(2),
+                value(3),
+                value(4),
+                value(5),
+                value(6)
+            )),
+            6 => output.push('Z'),
+            other => panic!("unexpected native display verb {other}"),
+        }
+    }
+    output
+}
+
+#[test]
+fn native_shape_paths_override_templates_and_follow_model_display_normalization() {
+    let path = native_path(&[
+        (1, &[10.0, 20.0]),
+        (2, &[90.0, 25.0]),
+        (3, &[110.0, 30.0, 80.0, 70.0]),
+        (4, &[60.0, 90.0, 20.0, 60.0, 10.0, 20.0]),
+        (6, &[]),
+    ]);
+    for kind in [1, 2, 4, 6, 11, 999] {
+        let parsed =
+            sdocx::parse_bytes_detailed(&single(7, &shape_with_path(kind, &path))).unwrap();
+        assert!(!has_shape_warning(&parsed));
+        let shape = as_shape(parsed.document.pages[0].elements().next().unwrap());
+        assert_eq!(shape.path_data, path);
+        assert_eq!(shape.control_points, [[75.0, 42.0]]);
+        assert_eq!(shape.shape_type, kind);
+        #[cfg(feature = "render")]
+        {
+            let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+            assert_svg_path(
+                svg,
+                &captured_model_display_path("shape-test-path-rotated-input-frame"),
+            );
+            assert!(svg.contains("fill=\"#ff0000\" fill-opacity=\"0.2510\""));
+            assert!(!svg.contains("rotate("));
+            assert!(!svg.contains("<ellipse "));
+            assert!(!svg.contains("<polygon "));
+        }
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn saved_vector_paths_keep_fractional_commands_and_source_bytes() {
+    let a = 1025.0 / 1024.0;
+    let b = 1026.0 / 1024.0;
+    let path = native_path(&[
+        (1, &[a, a]),
+        (2, &[b, b]),
+        (3, &[a, b, b, a]),
+        (4, &[b, a, a, b, b, b]),
+        (6, &[]),
+    ]);
+    for (kind, payload) in [
+        (7, shape_with_path_rotation(4, &path, 0.0)),
+        (8, line(2, 8, &path)),
+    ] {
+        let parsed = sdocx::parse_bytes_detailed(&single(kind, &payload)).unwrap();
+        let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+        assert!(rendered[0].geometry_diagnostics.is_empty());
+        let svg = &rendered[0].svg;
+        let xml = roxmltree::Document::parse(svg).unwrap();
+        let paths: Vec<_> = xml
+            .descendants()
+            .filter(|node| node.has_tag_name("path"))
+            .collect();
+        assert_eq!(paths.len(), 1);
+        let commands: Vec<_> = svgtypes::PathParser::from(paths[0].attribute("d").unwrap())
+            .map(|command| {
+                use svgtypes::PathSegment::*;
+                let (verb, values) = match command.unwrap() {
+                    MoveTo { abs: true, x, y } => ("M", vec![x, y]),
+                    LineTo { abs: true, x, y } => ("L", vec![x, y]),
+                    Quadratic {
+                        abs: true,
+                        x1,
+                        y1,
+                        x,
+                        y,
+                    } => ("Q", vec![x1, y1, x, y]),
+                    CurveTo {
+                        abs: true,
+                        x1,
+                        y1,
+                        x2,
+                        y2,
+                        x,
+                        y,
+                    } => ("C", vec![x1, y1, x2, y2, x, y]),
+                    ClosePath { .. } => ("Z", vec![]),
+                    command => panic!("unexpected emitted command {command:?}"),
+                };
+                (
+                    verb,
+                    values
+                        .into_iter()
+                        .map(|value| (value as f32).to_bits())
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect();
+        let (a_bits, b_bits) = (0x3f80_2000, 0x3f80_4000);
+        assert_eq!(
+            commands,
+            [
+                ("M", vec![a_bits, a_bits]),
+                ("L", vec![b_bits, b_bits]),
+                ("Q", vec![a_bits, b_bits, b_bits, a_bits]),
+                ("C", vec![b_bits, a_bits, a_bits, b_bits, b_bits, b_bits]),
+                ("Z", vec![]),
+            ]
+        );
+        let retained = match parsed.document.pages[0].elements().next().unwrap() {
+            PageElement::Shape(shape) => &shape.path_data,
+            PageElement::Line(line) => &line.path_data,
+            _ => panic!("expected saved vector"),
+        };
+        assert_eq!(retained, &path);
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn saved_vector_straight_line_attributes_keep_f64_endpoints() {
+    let bits = [
+        0x3ff0_0400_0000_0001,
+        0x4000_0400_0000_0001,
+        0x3ff0_1000_0000_0001,
+        0x4000_0600_0000_0001,
+    ];
+    let endpoints = bits.map(f64::from_bits);
+    let mut fixed = line_fixed(0);
+    fixed[3..35].copy_from_slice(&numbers(&endpoints));
+    let payload = [base(90.0), outline(), frame(8, 0, &fixed, &[])].concat();
+    let parsed = sdocx::parse_bytes_detailed(&single(8, &payload)).unwrap();
+    let svg = &sdocx::render_document_svg(&parsed.document, &Default::default())[0].svg;
+    let xml = roxmltree::Document::parse(svg).unwrap();
+    let node = xml
+        .descendants()
+        .find(|node| node.has_tag_name("line"))
+        .unwrap();
+    let actual = ["x1", "y1", "x2", "y2"].map(|attribute| {
+        node.attribute(attribute)
+            .unwrap()
+            .parse::<f64>()
+            .unwrap()
+            .to_bits()
+    });
+    assert_eq!(actual, bits);
+    let retained = as_line(parsed.document.pages[0].elements().next().unwrap());
+    assert_eq!(retained.begin.map(f64::to_bits), [bits[0], bits[1]]);
+    assert_eq!(retained.end.map(f64::to_bits), [bits[2], bits[3]]);
+    assert!(retained.path_data.is_empty());
+}
+
+#[test]
+fn unsupported_shape_paths_do_not_fall_back_to_plausible_geometry() {
+    let mut trailing = native_path(&[(1, &[1.0, 2.0]), (2, &[3.0, 4.0])]);
+    trailing.push(0xff);
+    for (index, path) in [
+        native_path(&[(1, &[1.0, 2.0]), (99, &[])]),
+        native_path(&[
+            (1, &[1.0, 2.0]),
+            (5, &[0.0, 0.0, f64::MAX, 40.0, 0.0, 90.0]),
+        ]),
+        trailing,
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let parsed = sdocx::parse_bytes_detailed(&single(7, &shape_with_path(4, &path))).unwrap();
+        assert!(has_shape_warning(&parsed));
+        assert_eq!(
+            as_shape(parsed.document.pages[0].elements().next().unwrap()).path_data,
+            path
+        );
+        #[cfg(feature = "render")]
+        {
+            let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+            assert!(!rendered[0].svg.contains("<path "));
+            assert!(!rendered[0].svg.contains("rotate("));
+            assert_geometry_issue(
+                &parsed,
+                &rendered[0],
+                if index == 2 {
+                    sdocx::GeometryDiagnosticKind::InvalidPath
+                } else if index == 1 {
+                    sdocx::GeometryDiagnosticKind::UnrepresentablePath
+                } else {
+                    sdocx::GeometryDiagnosticKind::UnsupportedPath
+                },
+            );
+        }
+        #[cfg(not(feature = "render"))]
+        let _ = index;
+    }
+    let path = native_path(&[(1, &[1.0, 2.0]), (2, &[3.0, 4.0])]);
+    for end in 1..path.len() {
+        assert_format(7, &shape_with_path(11, &path[..end]));
+    }
+    assert_format(
+        7,
+        &shape_with_path(6, &native_path(&[(1, &[f64::NAN, 0.0])])),
+    );
+    #[cfg(feature = "render")]
+    {
+        let path = native_path(&[(1, &[1.0, 2.0]), (2, &[f64::MAX, 4.0])]);
+        for (kind, payload) in [(7, shape_with_path(4, &path)), (8, line(0, 8, &path))] {
+            let parsed = sdocx::parse_bytes_detailed(&single(kind, &payload)).unwrap();
+            let rendered = sdocx::render_document_svg(&parsed.document, &Default::default());
+            assert!(!rendered[0].svg.contains("<path "));
+            assert!(!rendered[0].svg.contains("<line "));
+            assert!(!rendered[0].svg.contains("stroke=\"#0000ff\""));
+            assert_geometry_issue(
+                &parsed,
+                &rendered[0],
+                sdocx::GeometryDiagnosticKind::UnrepresentablePath,
+            );
+        }
+    }
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn geometry_reports_follow_admitted_roots_and_reset_for_cached_replay() {
+    use sdocx::{GeometryDiagnostic, GeometryDiagnosticKind, PageObject, PageObjectContent};
+
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &shape(900))).unwrap();
+    let mut document = parsed.document;
+    let mut child = document.pages[0].objects.remove(0);
+    child.render_layer = sdocx::ObjectRenderLayer::Top;
+    let mut excluded = child.clone();
+    excluded.source_offset = None;
+    let PageObjectContent::Element(PageElement::Shape(shape)) = &mut excluded.content else {
+        panic!("expected shape")
+    };
+    shape.metadata.uuid = "excluded".into();
+    document.pages[0].objects = vec![
+        excluded,
+        PageObject {
+            render_layer: sdocx::ObjectRenderLayer::Base,
+            source_offset: None,
+            content: PageObjectContent::Container(vec![child.clone()]),
+        },
+    ];
+    let layout = sdocx::layout_document(&document);
+    let fonts = sdocx::fonts::FontBook::default();
+    let mut cache = sdocx::DocumentTextCache::default();
+    for replay in [false, true, false] {
+        let rendered = if replay {
+            cache.render_layout_page_replay_svg(&document, &layout, 0, &Default::default(), &fonts)
+        } else {
+            cache.render_layout_page_svg(&document, &layout, 0, &Default::default(), &fonts)
+        }
+        .unwrap();
+        assert_eq!(
+            rendered.geometry_diagnostics,
+            [GeometryDiagnostic {
+                source_offset: child.source_offset,
+                object_uuid: "sh".into(),
+                kind: GeometryDiagnosticKind::UnsupportedShapeTemplate,
+            }]
+        );
+        assert!(rendered.object_diagnostics.is_empty());
+    }
+}
+
+#[cfg(feature = "pdf")]
+#[test]
+fn pdf_geometry_reports_retain_backing_identity_and_repeated_page_order() {
+    let mut document = sdocx::parse_bytes(&single(7, &shape(900))).unwrap();
+    document.pages.push(document.pages[0].clone());
+    let mut layout = sdocx::layout_document(&document);
+    layout.pages.swap(0, 1);
+    let fonts = sdocx::fonts::FontBook::default();
+    let options = sdocx::PdfOptions::from_font_book(&fonts);
+    let output = sdocx::render_layout_pages_pdf_detailed_with_fonts(
+        &document,
+        &layout,
+        &[1, 0, 1],
+        &Default::default(),
+        &options,
+        &fonts,
+    )
+    .unwrap();
+    assert_eq!(
+        output
+            .pages
+            .iter()
+            .map(|page| (page.page_index, page.source_page_index))
+            .collect::<Vec<_>>(),
+        [(1, 0), (0, 1), (1, 0)]
+    );
+    for page in &output.pages {
+        let rendered = sdocx::render_layout_page_svg_with_fonts(
+            &document,
+            &layout,
+            page.page_index,
+            &Default::default(),
+            &fonts,
+        )
+        .unwrap();
+        assert_eq!(page.geometry_diagnostics, rendered.geometry_diagnostics);
+        assert_eq!(page.geometry_diagnostics.len(), 1);
+        assert!(page.geometry_diagnostics[0].source_offset.is_some());
+        assert_eq!(page.geometry_diagnostics[0].object_uuid, "sh");
+        assert_eq!(
+            page.geometry_diagnostics[0].kind,
+            sdocx::GeometryDiagnosticKind::UnsupportedShapeTemplate
+        );
+    }
+    assert_eq!(
+        output.bytes,
+        sdocx::render_layout_pages_pdf_with_fonts(
+            &document,
+            &layout,
+            &[1, 0, 1],
+            &Default::default(),
+            &options,
+            &fonts,
+        )
+        .unwrap()
+    );
+}
+
+#[cfg(feature = "render")]
+#[test]
+fn mutated_geometry_reports_invalid_paths_and_bounds_without_changing_source() {
+    use sdocx::GeometryDiagnosticKind;
+
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &shape(4))).unwrap();
+    for (path, invalid_bounds, expected) in [
+        (vec![1, 0], false, GeometryDiagnosticKind::InvalidPath),
+        (
+            native_path(&[(1, &[f64::NAN, 0.0])]),
+            false,
+            GeometryDiagnosticKind::InvalidPath,
+        ),
+        (vec![], true, GeometryDiagnosticKind::InvalidGeometry),
+    ] {
+        let mut document = parsed.document.clone();
+        let PageElement::Shape(shape) = document.pages[0].elements_mut().next().unwrap() else {
+            panic!("expected shape")
+        };
+        shape.path_data = path.clone();
+        if invalid_bounds {
+            shape.geometry_bbox.x_max = shape.geometry_bbox.x_min;
+        }
+        let rendered = sdocx::render_document_svg(&document, &Default::default());
+        assert_geometry_issue(&parsed, &rendered[0], expected);
+        assert_eq!(
+            as_shape(document.pages[0].elements().next().unwrap()).path_data,
+            path
+        );
+    }
+}
+
+#[cfg(all(feature = "render", feature = "serde"))]
+#[test]
+fn rendered_pages_without_geometry_or_paint_reports_still_deserialize() {
+    let parsed = sdocx::parse_bytes_detailed(&single(7, &shape(4))).unwrap();
+    let rendered = sdocx::render_document_svg(&parsed.document, &Default::default()).remove(0);
+    let mut old = serde_json::to_value(&rendered).unwrap();
+    old.as_object_mut().unwrap().remove("geometry_diagnostics");
+    old.as_object_mut().unwrap().remove("paint_diagnostics");
+    assert_eq!(
+        serde_json::from_value::<sdocx::RenderedPage>(old).unwrap(),
+        rendered
+    );
+}
+
+#[cfg(feature = "render")]
+fn assert_svg_path(svg: &str, expected: &str) {
+    let document = roxmltree::Document::parse(svg).unwrap();
+    let commands = |data: &str| {
+        svgtypes::PathParser::from(data)
+            .map(|command| match command.unwrap() {
+                svgtypes::PathSegment::ClosePath { .. } => {
+                    svgtypes::PathSegment::ClosePath { abs: false }
+                }
+                command => command,
+            })
+            .collect::<Vec<_>>()
+    };
+    let expected = commands(expected);
+    assert!(
+        document
+            .descendants()
+            .filter_map(|node| node.attribute("d"))
+            .any(|data| commands(data) == expected),
+        "expected path {expected:?}; actual paths: {:?}",
+        document
+            .descendants()
+            .filter_map(|node| node.attribute("d"))
+            .collect::<Vec<_>>()
+    );
+}
+
+#[cfg(feature = "render")]
+mod gradient_transport_tests {
+    use super::*;
+    use PaintRole::{Fill, Outline};
+    use sdocx::{
+        PaintDiagnostic, PaintDiagnosticKind as Kind, PaintRole, ShapePaintSource,
+        parse_bytes as parse, render_document_svg as render,
+    };
+
+    fn effect(outline: bool) -> Vec<u8> {
+        let shift = usize::from(outline);
+        let mut bytes = color(outline, 1, 0);
+        bytes[1] = 1;
+        bytes[6 + shift] = u8::from(outline);
+        let position = if outline {
+            [0.25_f32.to_bits(), 0.75_f32.to_bits()]
+        } else {
+            [0x7fc12345, 0x80000000]
+        };
+        bytes[9 + shift..17 + shift].copy_from_slice(&position.map(u32::to_le_bytes).concat());
+        bytes[17 + shift] = 2;
+        let colors: [u32; 2] = if outline {
+            [0x4000ff00, 0xffffff00]
+        } else {
+            [0x80ff0000, 0xff0000ff]
+        };
+        for (argb, offset) in colors.into_iter().zip([0.0_f32, 1.0]) {
+            bytes.extend(argb.to_le_bytes());
+            bytes.extend(offset.to_le_bytes());
+        }
+        bytes
+    }
+    fn payload(fill: &[u8], outline: &[u8], path: &[u8], text: bool) -> Vec<u8> {
+        let mut fixed = shape_fixed(4, 37.25);
+        fixed[4..36].copy_from_slice(&numbers(&[10.2500000001, 20.5, 310.2500000001, 70.5]));
+        if !path.is_empty() {
+            fixed.splice(40..45, [sized(path), vec![0]].concat());
+        }
+        let mut fields = if text { text_common("kept") } else { vec![] };
+        let mut fill_field = sized(fill);
+        fill_field.insert(4, 1);
+        fields.extend(fill_field);
+        let mut outline_fields = sized(outline);
+        outline_fields.extend(sized(&style(3.5)));
+        [
+            base(0.0),
+            frame(6, 12, &base_fixed(), &outline_fields),
+            frame(7, if text { 33 } else { 32 }, &fixed, &fields),
+        ]
+        .concat()
+    }
+    fn gradient_line() -> Vec<u8> {
+        [
+            base(90.0),
+            frame(6, 4, &base_fixed(), &sized(&effect(true))),
+            frame(8, 0, &line_fixed(0), &[]),
+        ]
+        .concat()
+    }
+
+    #[test]
+    fn parsed_gradient_refs_alpha_frame_and_saved_source_survive_svg() {
+        for saved_path in [
+            vec![],
+            native_path(&[(1, &[10.25, 20.5]), (2, &[310.25, 70.5]), (6, &[])]),
+        ] {
+            let document = parse(&single(
+                7,
+                &payload(&effect(false), &effect(true), &saved_path, false),
+            ))
+            .unwrap();
+            let shape = as_shape(document.pages[0].elements().next().unwrap());
+            let before = (shape.fill_source.clone(), shape.style.paint_source.clone());
+            let Some(ShapePaintSource::Color(source)) = &shape.fill_source else {
+                panic!("color source");
+            };
+            assert_eq!(source.position.map(|p| p.bits()), [0x7fc12345, 0x80000000]);
+            assert_eq!(source.stops.len(), 2);
+            assert_eq!(source.stops[1].position.bits(), 0x3f800000);
+            let rendered = render(&document, &Default::default());
+            assert!(rendered[0].paint_diagnostics.is_empty());
+            assert!(rendered[0].geometry_diagnostics.is_empty());
+            let xml = roxmltree::Document::parse(&rendered[0].svg).unwrap();
+            let linear = xml
+                .descendants()
+                .find(|n| n.has_tag_name("linearGradient"))
+                .unwrap();
+            let radial = xml
+                .descendants()
+                .find(|n| n.has_tag_name("radialGradient"))
+                .unwrap();
+            let fill_ref = format!("url(#{})", linear.attribute("id").unwrap());
+            let outline_ref = format!("url(#{})", radial.attribute("id").unwrap());
+            let group = xml
+                .descendants()
+                .find(|n| n.attribute("fill") == Some(fill_ref.as_str()))
+                .unwrap();
+            assert_eq!(group.attribute("stroke"), Some(outline_ref.as_str()));
+            let geometry_tag = if saved_path.is_empty() {
+                "rect"
+            } else {
+                "path"
+            };
+            assert!(group.children().any(|node| node.has_tag_name(geometry_tag)));
+            for (node, opacity, color) in [
+                (linear, 128.0 / 255.0, "#ff0000"),
+                (radial, 64.0 / 255.0, "#00ff00"),
+            ] {
+                assert_eq!(node.attribute("gradientUnits"), Some("userSpaceOnUse"));
+                let stops = node
+                    .children()
+                    .filter(|n| n.has_tag_name("stop"))
+                    .collect::<Vec<_>>();
+                assert_eq!(stops.len(), 2);
+                assert_eq!(stops[0].attribute("stop-color"), Some(color));
+                assert_eq!(svg_number(stops[0], "stop-opacity"), opacity);
+                assert_eq!(
+                    node.attribute("gradientTransform"),
+                    if saved_path.is_empty() {
+                        Some("rotate(-37.25 160.2500000001 45.5)")
+                    } else {
+                        None
+                    }
+                );
+            }
+            assert_eq!(svg_number(group, "fill-opacity"), 1.0);
+            assert_eq!(svg_number(group, "stroke-opacity"), 1.0);
+            assert_eq!(
+                group.attribute("transform"),
+                if saved_path.is_empty() {
+                    Some("rotate(37.25 160.2500000001 45.5)")
+                } else {
+                    None
+                }
+            );
+            assert_eq!(
+                ["x1", "y1", "x2", "y2"].map(|name| svg_number(linear, name)),
+                [10.25, 45.5, 310.25, 45.5]
+            );
+            // Native dispatcher capture, hosted Linux libm, gradient-reviewed.json:
+            // SHA256 30c9be10e1657208277d7e6f2a3529e3b55003816896142de25ed6c8b670f222.
+            for (name, bits) in [("cx", 1119483812), ("cy", 1092671740), ("r", 1134039470)] {
+                assert!((svg_number(radial, name) as f32).to_bits().abs_diff(bits) <= 2);
+            }
+            assert_eq!(
+                (shape.fill_source.clone(), shape.style.paint_source.clone()),
+                before
+            );
+            assert_eq!(shape.path_data, saved_path);
+        }
+    }
+
+    #[test]
+    fn paint_rejection_keeps_other_component_text_and_exact_identity() {
+        for (case, (role, kind)) in [
+            (Fill, Kind::InvalidGradient),
+            (Outline, Kind::InvalidGradient),
+            (Fill, Kind::UnsupportedGradientFrame),
+            (Fill, Kind::MissingPaintSource),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let mut fill = effect(false);
+            let mut outline = effect(true);
+            if case == 0 {
+                fill[22..26].copy_from_slice(&0.8_f32.to_le_bytes());
+                fill[30..34].copy_from_slice(&0.2_f32.to_le_bytes());
+            }
+            if case == 1 {
+                outline[23..27].copy_from_slice(&f32::NAN.to_le_bytes());
+            }
+            if role == Fill {
+                outline = color(true, 0, 0xff0000ff);
+            } else {
+                fill = color(false, 0, 0xffff0000);
+            }
+            let mut document = parse(&single(7, &payload(&fill, &outline, &[], true))).unwrap();
+            let PageElement::Shape(shape) = document.pages[0].elements_mut().next().unwrap() else {
+                panic!("shape");
+            };
+            if case == 2 {
+                shape.metadata.bbox.x_min += 1.0;
+            }
+            if case == 3 {
+                shape.fill_source = None;
+            }
+            let expected = PaintDiagnostic {
+                source_offset: document.pages[0].objects[0].source_offset,
+                object_uuid: "sh".into(),
+                role,
+                kind,
+            };
+            let rendered = render(&document, &Default::default());
+            assert_eq!(rendered[0].paint_diagnostics, [expected]);
+            assert!(rendered[0].geometry_diagnostics.is_empty());
+            let xml = roxmltree::Document::parse(&rendered[0].svg).unwrap();
+            svg_support::assert_svg_element(
+                &rendered[0].svg,
+                "rect",
+                &[("x", "10.2500000001"), ("width", "300"), ("height", "50")],
+            );
+            let (attribute, color) = if role == Fill {
+                ("stroke", "#0000ff")
+            } else {
+                ("fill", "#ff0000")
+            };
+            assert!(
+                xml.descendants()
+                    .any(|n| n.attribute(attribute) == Some(color))
+            );
+            assert!(
+                xml.descendants()
+                    .any(|n| n.has_tag_name("tspan") && n.text() == Some("kept"))
+            );
+            assert!(
+                !xml.descendants()
+                    .any(|n| n.has_tag_name("linearGradient") || n.has_tag_name("radialGradient"))
+            );
+        }
+        let document = parse(&single(8, &gradient_line())).unwrap();
+        let rendered = render(&document, &Default::default());
+        assert_eq!(
+            rendered[0].paint_diagnostics,
+            [PaintDiagnostic {
+                source_offset: document.pages[0].objects[0].source_offset,
+                object_uuid: "sh".into(),
+                role: Outline,
+                kind: Kind::UnsupportedGradientFrame
+            }]
+        );
+        assert!(rendered[0].geometry_diagnostics.is_empty());
+        svg_support::assert_svg_element(&rendered[0].svg, "line", &[("x1", "90"), ("y1", "45")]);
+    }
+
+    #[cfg(feature = "pdf")]
+    #[test]
+    fn parsed_gradients_remain_pdf_shadings_and_repeat_paint_reports() {
+        let document = parse(&archive(&page(
+            &[vec![
+                object(7, &payload(&effect(false), &effect(true), &[], false), &[]),
+                object(8, &gradient_line(), &[]),
+            ]],
+            0,
+            &[],
+        )))
+        .unwrap();
+        let layout = sdocx::layout_document(&document);
+        let fonts = sdocx::fonts::FontBook::default();
+        let options = sdocx::PdfOptions::from_font_book(&fonts);
+        let output = sdocx::render_layout_pages_pdf_detailed_with_fonts(
+            &document,
+            &layout,
+            &[0, 0],
+            &Default::default(),
+            &options,
+            &fonts,
+        )
+        .unwrap();
+        let pdf = lopdf::Document::load_mem(&output.bytes).unwrap();
+        let dictionaries = pdf
+            .objects
+            .values()
+            .filter_map(|o| {
+                o.as_dict()
+                    .ok()
+                    .or_else(|| o.as_stream().ok().map(|s| &s.dict))
+            })
+            .collect::<Vec<_>>();
+        for kind in [2, 3] {
+            assert!(dictionaries.iter().any(|d| {
+                d.get(b"ShadingType")
+                    .is_ok_and(|v| v.as_i64().is_ok_and(|value| value == kind))
+            }));
+        }
+        assert!(!dictionaries.iter().any(|d| {
+            d.get(b"Subtype")
+                .is_ok_and(|v| v.as_name().is_ok_and(|name| name == b"Image"))
+        }));
+        assert_eq!(output.pages.len(), 2);
+        let svg = sdocx::render_layout_page_svg_with_fonts(
+            &document,
+            &layout,
+            0,
+            &Default::default(),
+            &fonts,
+        )
+        .unwrap();
+        assert_eq!(svg.paint_diagnostics.len(), 1);
+        for selected in output.pages {
+            assert_eq!((selected.page_index, selected.source_page_index), (0, 0));
+            assert_eq!(selected.paint_diagnostics, svg.paint_diagnostics);
+            assert!(selected.geometry_diagnostics.is_empty());
+        }
+    }
+}

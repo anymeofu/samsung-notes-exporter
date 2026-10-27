@@ -1,0 +1,263 @@
+{
+  "cases": [
+    {
+      "native_loaded_point_f32_bits": [
+        "40000000",
+        "40400000",
+        "40e00000",
+        "41100000",
+        "41100000",
+        "40800000"
+      ],
+      "native_payload_size": 183,
+      "native_points_before_write_f32_bits": [
+        "40000000",
+        "40400000",
+        "40e00000",
+        "41100000",
+        "41100000",
+        "40800000"
+      ],
+      "native_query_admitted": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "payload_hex": "6900000000000000000002bf010400000000a00f0000240030303030303030302d303030302d343030302d383030302d3030303030303030303030310000000000000000000000000000f03f00000000000000400000000000002440000000000000224000000000004e0000000100000000000205040400000000030000000000000000400000000000000840a000c0004000a0800000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd660266020200",
+      "payload_sha256": "414dab1c4489a2912e8a8a01a6e71dcce214695cddd1f695d8c9b9092483b289",
+      "rotation_f32_bits": "00000000"
+    },
+    {
+      "native_loaded_point_f32_bits": [
+        "41000000",
+        "40000000",
+        "40000000",
+        "40e00000",
+        "40e00000",
+        "41100000"
+      ],
+      "native_payload_size": 187,
+      "native_points_before_write_f32_bits": [
+        "41000000",
+        "40000000",
+        "40000000",
+        "40e00000",
+        "40e00000",
+        "41100000"
+      ],
+      "native_query_admitted": [
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "payload_hex": "6d00000000006900000002bf010401000000a00f0000240030303030303030302d303030302d343030302d383030302d3030303030303030303030310000000000000000000000000000f03f00000000000000400000000000002440000000000000224000000000000000b4424e0000000100000000000205040400000000030000000000000020400000000000000040c080a000a00040000000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd660266020200",
+      "payload_sha256": "2876f59490a42d2c7b4cc5ee493ca7c64545c338cbe4e377b7907867461c4d8a",
+      "rotation_f32_bits": "42b40000"
+    },
+    {
+      "native_loaded_point_f32_bits": [
+        "406e02a4",
+        "3fcadf32",
+        "40a20152",
+        "41145be6",
+        "411480a9",
+        "40beb7cc"
+      ],
+      "native_payload_size": 187,
+      "native_points_before_write_f32_bits": [
+        "406e02a4",
+        "3fcadf32",
+        "40a191b8",
+        "41147f57",
+        "41147f57",
+        "40be6e48"
+      ],
+      "native_query_admitted": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "payload_hex": "6d00000000006900000002bf010401000000a00f0000240030303030303030302d303030302d343030302d383030302d3030303030303030303030310000000000000000000000000000f03f00000000000000400000000000002440000000000000224000000000000000f0414e000000010000000000020504040000000003000000008054c00d4000000040e65bf93f2b00f60087006a800000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd660266020200",
+      "payload_sha256": "61873b1ca27a9ee7227f91b248be545d683836788c83ae050a6e4dec9d74aaa2",
+      "rotation_f32_bits": "41f00000"
+    },
+    {
+      "native_loaded_point_f32_bits": [
+        "3f9c0548",
+        "40a2b7cd",
+        "410900a9",
+        "40f8b7cd",
+        "40f90152",
+        "401d6f9a"
+      ],
+      "native_payload_size": 187,
+      "native_points_before_write_f32_bits": [
+        "3f9c0548",
+        "40a2b7cd",
+        "4108c8dc",
+        "40f8feae",
+        "40f8feae",
+        "401cdc8f"
+      ],
+      "native_query_admitted": [
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "payload_hex": "6d00000000006900000002bf010401000000a00f0000240030303030303030302d303030302d343030302d383030302d3030303030303030303030310000000000000000000000000000f03f00000000000000400000000000002440000000000000224000000000000000f0c14e0000000100000000000205040400000000030000000000a980f33f000000a0f9561440eb0056001980aa800000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd660266020200",
+      "payload_sha256": "005ad20abc5a6a4a83a559fd5777017b8ce2a96b4ea22cc36875f8abcb6ba800",
+      "rotation_f32_bits": "c1f00000"
+    }
+  ],
+  "model_library_sha256": "4fbcf6d4213e929f1535d32abb487743643fd5d0dfc366e50dfeb2e7d8015b7a",
+  "native_route": "ObjectStroke::SetRotation; ObjectStroke::NewGetBinary(DocumentType=2); fresh ObjectStroke::NewApplyBinary(orientation=0, owner_width=1812)",
+  "saved_bbox_f32_bits": [
+    "3f800000",
+    "40000000",
+    "41200000",
+    "41100000"
+  ],
+  "scope": "Constructed three-point stroke with raw size 0; native save/load roundtrip only. Query arrays compare native admission before and after reload. Fractional coordinates can be quantized by the compressed writer. Does not exercise WNote archive construction or nonzero-size style save state.",
+  "source_point_f32_bits": [
+    "40000000",
+    "40400000",
+    "40e00000",
+    "41100000",
+    "41100000",
+    "40800000"
+  ],
+  "raw_size_2_style_roundtrip": {
+    "model_library_sha256": "4fbcf6d4213e929f1535d32abb487743643fd5d0dfc366e50dfeb2e7d8015b7a",
+    "string_manager_binary_sha256": "d6cab93ec467550a6563b29d197e29f9e2fe9fa6f4d1d64e3e765444da4c68a0",
+    "source_style_payload_sha256": "c01022129e9a3a09ee95dc5935d5e177bd507e03d6d9dbd357a5278a64ab72b4",
+    "applied_style_payload_sha256": "2cd2b65686be91092fb96656ea8ed71344019007082ff0fe4b7f4d0d7e9870c3",
+    "style_pen_size_offset": 2631,
+    "source_pen_size_f32_bits": "4111de6a",
+    "applied_pen_size_f32_bits": "40000000",
+    "context_attachment": "Native StringIDManager::ApplyBinary; ModelContext::SetStringIDManager; ObjectStroke::OnAttach(context, 0).",
+    "native_route": "ObjectStroke::NewApplyBinary(applied archived style frame); SetPoint(asymmetric 3 samples); SetRotation; ObjectStroke::NewGetBinary(DocumentType=2); fresh ObjectStroke::NewApplyBinary(orientation=0, owner_width=1812).",
+    "scope": "Tiny native ObjectStroke and ModelContext roundtrip; not WNote save/archive serialization. Raw-size-0 cases remain in cases above.",
+    "cases": [
+      {
+        "native_payload_size": 231,
+        "payload_hex": "8100000000006900000002bf010400200400a00f0000240064313630613838652d623534642d313166312d613062392d396663373838333030663136f20edec9f25b0600000000000000f03f0000000000000040000000000000244000000000000022400000000000be7635c6f25b0600000000000000000000000000000000006600000001004e000000022504048a250000030000000000000000400000000000000840a000c0004000a0800000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd6602660202000100000000000040000000006ade114101000000127bcb3f",
+        "payload_sha256": "d220242a6590ac2f67b57baefc136864d5d828beeec279faa7e142963542db70",
+        "rotation_f32_bits": "00000000",
+        "raw_pen_size_f32_bits": "40000000",
+        "native_loaded_point_f32_bits": [
+          "40000000",
+          "40400000",
+          "40e00000",
+          "41100000",
+          "41100000",
+          "40800000"
+        ],
+        "native_query_admitted": [
+          0,
+          1,
+          1,
+          1,
+          0
+        ],
+        "saved_bbox_f32_bits": [
+          "3f800000",
+          "40000000",
+          "41200000",
+          "41100000"
+        ]
+      },
+      {
+        "native_payload_size": 235,
+        "payload_hex": "8500000000006900000002bf010401200400a00f0000240064313630613838652d623534642d313166312d613062392d396663373838333030663136f20edec9f25b0600000000000000f03f00000000000000400000000000002440000000000000224000000000000000b442be7635c6f25b0600000000000000000000000000000000006600000001004e000000022504048a250000030000000000000020400000000000000040c080a000a00040000000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd6602660202000100000000000040000000006ade114101000000127bcb3f",
+        "payload_sha256": "f3c4d3b080d324e9ff618c6b5fa1972799fa199e216654f044fb5a654ee256b8",
+        "rotation_f32_bits": "42b40000",
+        "raw_pen_size_f32_bits": "40000000",
+        "native_loaded_point_f32_bits": [
+          "41000000",
+          "40000000",
+          "40000000",
+          "40e00000",
+          "40e00000",
+          "41100000"
+        ],
+        "native_query_admitted": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "saved_bbox_f32_bits": [
+          "3f800000",
+          "40000000",
+          "41200000",
+          "41100000"
+        ]
+      },
+      {
+        "native_payload_size": 235,
+        "payload_hex": "8500000000006900000002bf010401200400a00f0000240064313630613838652d623534642d313166312d613062392d396663373838333030663136f20edec9f25b0600000000000000f03f00000000000000400000000000002440000000000000224000000000000000f041be7635c6f25b0600000000000000000000000000000000006600000001004e000000022504048a25000003000000008054c00d4000000040e65bf93f2b00f60087006a800000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd6602660202000100000000000040000000006ade114101000000127bcb3f",
+        "payload_sha256": "59a375214b40634e78e4813b7d64db019df39e51f812e3c9ffeef3b6639acd47",
+        "rotation_f32_bits": "41f00000",
+        "raw_pen_size_f32_bits": "40000000",
+        "native_loaded_point_f32_bits": [
+          "406e02a4",
+          "3fcadf32",
+          "40a20152",
+          "41145be6",
+          "411480a9",
+          "40beb7cc"
+        ],
+        "native_query_admitted": [
+          0,
+          1,
+          1,
+          1,
+          0
+        ],
+        "saved_bbox_f32_bits": [
+          "3f800000",
+          "40000000",
+          "41200000",
+          "41100000"
+        ]
+      },
+      {
+        "native_payload_size": 235,
+        "payload_hex": "8500000000006900000002bf010401200400a00f0000240064313630613838652d623534642d313166312d613062392d396663373838333030663136f20edec9f25b0600000000000000f03f00000000000000400000000000002440000000000000224000000000000000f0c1be7635c6f25b0600000000000000000000000000000000006600000001004e000000022504048a250000030000000000a980f33f000000a0f9561440eb0056001980aa800000803e000400040a0000000a000a00cdcccc3d99019901cdccccbd6602660202000100000000000040000000006ade114101000000127bcb3f",
+        "payload_sha256": "645cfe349be3659b6b81462ce951f09eb67918d93096732d3ceff409952f188a",
+        "rotation_f32_bits": "c1f00000",
+        "raw_pen_size_f32_bits": "40000000",
+        "native_loaded_point_f32_bits": [
+          "3f9c0548",
+          "40a2b7cd",
+          "410900a9",
+          "40f8b7cd",
+          "40f90152",
+          "401d6f9a"
+        ],
+        "native_query_admitted": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "saved_bbox_f32_bits": [
+          "3f800000",
+          "40000000",
+          "41200000",
+          "41100000"
+        ]
+      }
+    ]
+  }
+}

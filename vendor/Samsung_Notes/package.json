@@ -1,0 +1,64 @@
+{
+  "name": "samsung-notes-mcp",
+  "version": "0.1.5",
+  "description": "Let Claude read your Samsung Notes: typed text, handwriting pages, photos and PDFs. MCP server that never changes your notes.",
+  "mcpName": "io.github.Mhemd139/samsung-notes",
+  "type": "module",
+  "bin": {
+    "samsung-notes-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p web/tsconfig.json && tsc -p web/test/tsconfig.json",
+    "test": "vitest run",
+    "web:dev": "vite web",
+    "web:build": "vite build web",
+    "web:preview": "vite preview web",
+    "pack:mcpb": "node scripts/pack-mcpb.mjs",
+    "smoke": "node scripts/smoke-local.mjs",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "samsung-notes",
+    "sdocx",
+    "handwriting"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mhemd139/Samsung_Notes.git"
+  },
+  "homepage": "https://github.com/Mhemd139/Samsung_Notes#readme",
+  "bugs": {
+    "url": "https://github.com/Mhemd139/Samsung_Notes/issues"
+  },
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "@hyzyla/pdfium": "^2.1.13",
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@twango/sdocx": "1.1.0",
+    "fflate": "^0.8.3",
+    "jpeg-js": "^0.4.4",
+    "sql.js": "^1.14.2",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "@types/sql.js": "^1.4.11",
+    "fast-png": "^8.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.3"
+  }
+}

@@ -1,0 +1,17 @@
+# Your actual notes -- never commit these to a public repo.
+/output/
+/validation/
+/samsung_notes_export.zip
+/*.sdocx
+/*.sdoc
+
+# Keep vendored reference repos' own files, but not any build artifacts
+# someone might generate inside them locally.
+vendor/*/target/
+vendor/*/node_modules/
+vendor/*/dist/
+
+__pycache__/
+*.pyc
+.DS_Store
+*.log

@@ -1,0 +1,62 @@
+[package]
+name = "sdocx"
+version = "1.1.0"
+edition = "2024"
+rust-version = "1.92"
+description = "Reverse-engineered tooling and SDK for converting Samsung Notes (.sdocx) files"
+license = "GPL-3.0"
+repository = "https://github.com/twangodev/sdocx"
+readme = "../../README.md"
+
+[features]
+render = ["dep:base64", "dep:svg", "dep:fontdb", "dep:rustybuzz", "dep:write-fonts", "dep:cssparser", "dep:unicode-bidi", "dep:unicode-script", "dep:unicode-linebreak", "dep:unicode-segmentation", "dep:skrifa", "dep:read-fonts", "dep:bytemuck", "dep:bitflags", "dep:once_cell", "dep:smallvec", "dep:imagesize", "dep:png"]
+pdf = ["render", "dep:krilla", "dep:usvg", "dep:roxmltree", "dep:svgtypes", "dep:png", "dep:resvg", "dep:tiny-skia", "dep:lopdf", "dep:i_overlay", "dep:i_float"]
+serde = ["dep:serde"]
+
+[dependencies]
+sha2 = "0.10.9"
+# Shape oracles use a fixed math implementation across host platforms.
+libm = "=0.2.16"
+imagesize = { version = "0.14.0", optional = true }
+zip = { version = "8.2.0", default-features = false, features = ["deflate"] }
+thiserror = "2.0.18"
+cesu8 = "1.1.0"
+serde = { version = "1.0.228", features = ["derive"], optional = true }
+svg = { version = "0.18.0", optional = true }
+base64 = { version = "0.22", optional = true }
+fontdb = { version = "0.23.0", optional = true, default-features = false }
+rustybuzz = { version = "0.20.1", optional = true }
+read-fonts = { version = "=0.43.3", features = ["experimental_font_api", "std"], default-features = false, optional = true }
+bytemuck = { version = "1.22", features = ["extern_crate_alloc"], optional = true }
+bitflags = { version = "2.9", optional = true }
+once_cell = { version = "1.21.4", features = ["alloc", "race"], default-features = false, optional = true }
+write-fonts = { version = "0.48.1", optional = true }
+cssparser = { version = "0.38.0", optional = true }
+unicode-bidi = { version = "0.3.18", optional = true }
+unicode-script = { version = "0.5.8", optional = true }
+unicode-linebreak = { version = "0.1.5", optional = true }
+unicode-segmentation = { version = "1.13.3", optional = true }
+krilla = { version = "0.8.2", optional = true, default-features = false, features = ["raster-images"] }
+resvg = { version = "0.47.0", optional = true }
+skrifa = { version = "0.42.0", optional = true }
+smallvec = { version = "1.15.1", optional = true, features = ["union", "const_new", "write"] }
+tiny-skia = { version = "0.12.0", optional = true }
+usvg = { version = "0.47.0", optional = true }
+roxmltree = { version = "0.21.1", optional = true }
+svgtypes = { version = "0.16.1", optional = true }
+png = { version = "0.18.1", optional = true }
+lopdf = { version = "0.42.0", default-features = false, optional = true }
+i_overlay = { version = "=9.1.0", optional = true }
+i_float = { version = "=5.0.0", optional = true }
+
+[dev-dependencies]
+flate2 = "1.1.9"
+roxmltree = "0.21.1"
+svgtypes = "0.16.1"
+resvg = "0.47.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+
+[[example]]
+name = "ink_geometry"
+required-features = ["render", "serde"]

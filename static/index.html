@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Samsung Notes Archive Viewer</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="sidebar">
+    <div id="brand">Samsung Notes Archive</div>
+    <div id="search-row">
+      <input id="search" type="text" placeholder="Filter notes..." />
+    </div>
+    <div id="tree"></div>
+  </div>
+  <div id="main">
+    <div id="toolbar">
+      <span id="note-title">Select a note</span>
+      <div id="mode-toggle" class="hidden">
+        <button id="mode-light" class="mode-btn">Light</button>
+        <button id="mode-dark" class="mode-btn">Dark</button>
+        <span id="suggested-hint"></span>
+      </div>
+      <div id="export-actions" class="hidden">
+        <button id="export-current">Export this view</button>
+        <button id="export-both">Export both copies</button>
+      </div>
+    </div>
+    <div id="viewer-wrap">
+      <iframe id="viewer" class="hidden"></iframe>
+      <div id="placeholder">Pick a note from the sidebar to preview it.</div>
+    </div>
+    <div id="status"></div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

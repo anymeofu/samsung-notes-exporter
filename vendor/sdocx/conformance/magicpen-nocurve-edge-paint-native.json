@@ -1,0 +1,37 @@
+{
+  "captures": {
+    "duplicate_all_points_zero_pressure_alpha255-transparent-1x": {
+      "paint": {
+        "native_vector_hex": "00000441000004410000003f",
+        "readback": {
+          "changed_from_background_pixels": 1
+        },
+        "source_inputs": {
+          "argb": "0xff336699",
+          "id": "duplicate_all_points_zero_pressure_alpha255",
+          "points": [
+            [
+              8.25,
+              8.25
+            ],
+            [
+              8.25,
+              8.25
+            ],
+            [
+              8.25,
+              8.25
+            ]
+          ],
+          "pressure": [
+            0,
+            0,
+            0
+          ],
+          "size": 0.4
+        }
+      }
+    }
+  },
+  "schema": "magicpen-nocurve-edge-native-paint-v1"
+}

@@ -1,0 +1,146 @@
+# Samsung Notes UI Map
+
+UI observation started on 2026-06-30. Raw XML dumps are local-only under `ui_dumps/` and are ignored by git because they may contain private note titles, snippets, and folder names.
+
+## Known
+
+- Samsung Notes can be launched with package `com.samsung.android.app.notes`.
+- Main screen UI hierarchy dump succeeded with UIAutomator.
+- Main screen package in dump: `com.samsung.android.app.notes`.
+- Main screen dump includes Samsung Notes resource IDs for app bar, toolbar, note list, folder list items, search, PDF import, note style, note creation, and overflow menu.
+- Observed main screen resource IDs include:
+  - `com.samsung.android.app.notes:id/action_search`
+  - `com.samsung.android.app.notes:id/action_pdf`
+  - `com.samsung.android.app.notes:id/create_note_btn`
+  - `com.samsung.android.app.notes:id/noteslist_recyclerview`
+  - `com.samsung.android.app.notes:id/sub_folder_list_item_container`
+  - `com.samsung.android.app.notes:id/sub_header_title`
+  - `com.samsung.android.app.notes:id/title`
+  - `com.samsung.android.app.notes:id/text_content`
+  - `com.samsung.android.app.notes:id/sesl_action_bar_overflow_button`
+- Main screen accessibility descriptions include control labels such as search, navigation menu, note creation, note style, PDF import, and overflow menu.
+- Folder rows expose a pattern equivalent to `Folder, <folder name>, <count>` in accessibility descriptions.
+- Note cards can expose private title/body/date snippets in accessibility descriptions.
+- Navigation drawer / folder list screen was observed in `ui_dumps/current_check.xml`.
+- Folder drawer resource IDs observed:
+  - `com.samsung.android.app.notes:id/drawer_fragment_container`
+  - `com.samsung.android.app.notes:id/drawer_recyclerview`
+  - `com.samsung.android.app.notes:id/drawer_item_container`
+  - `com.samsung.android.app.notes:id/folder_item_layout`
+  - `com.samsung.android.app.notes:id/title_layout`
+  - `com.samsung.android.app.notes:id/count_layout`
+  - `com.samsung.android.app.notes:id/arrow_icon`
+  - `com.samsung.android.app.notes:id/drawer_setting_layout`
+- Folder-internal screen was observed in `ui_dumps/folder_inside.xml`.
+- Folder-internal screen exposes breadcrumb/path resource IDs:
+  - `com.samsung.android.app.notes:id/folderpath_home`
+  - `com.samsung.android.app.notes:id/folderpath_scrollview`
+  - `com.samsung.android.app.notes:id/folderpath_layout`
+  - `com.samsung.android.app.notes:id/folderpath_arrow`
+  - `com.samsung.android.app.notes:id/folderpath_folder`
+  - `com.samsung.android.app.notes:id/folderpath_text`
+- `folderpath_text` exposes the current folder name as a clickable button-like node.
+- The current folder screen exposes subfolders in grid rows using `sub_folder_list_item1` through `sub_folder_list_item4` plus `sub_folder_icon` and `title`.
+- Subfolder item accessibility descriptions expose a pattern equivalent to `Folder, <subfolder name>, <count>`.
+- Nested folder / note-list screen was observed in `ui_dumps/nested_or_note_list.xml`.
+- At deeper nesting, the breadcrumb contains multiple `folderpath_text` nodes in parent-to-child order, so full folder paths appear recoverable from the visible breadcrumb.
+- Note-list item resource IDs observed include `root_cardview`, `thumbnail_container`, `title`, `text_content`, `time`, and `extra`.
+- Selection mode was observed in `ui_dumps/selection_mode.xml`.
+- Selection mode exposes stable action resource IDs:
+  - `com.samsung.android.app.notes:id/action_share`
+  - `com.samsung.android.app.notes:id/action_move`
+  - `com.samsung.android.app.notes:id/action_delete`
+  - `com.samsung.android.app.notes:id/action_lock`
+  - `com.samsung.android.app.notes:id/action_done`
+  - `com.samsung.android.app.notes:id/bottom_overflow`
+- Selection state controls include `checkbox_all`, `checkbox_container`, `checkbox_withtext`, `check_all_text`, and `check_info`.
+- Share/export format chooser was observed in `ui_dumps/share_or_export_menu.xml`.
+- The chooser is still inside package `com.samsung.android.app.notes`, not the Android share sheet yet.
+- Share/export chooser resource IDs observed:
+  - `com.samsung.android.app.notes:id/text_menu_title`
+  - `com.samsung.android.app.notes:id/popup_menu_recycler_view`
+  - `com.samsung.android.app.notes:id/item_text`
+- Export/share format labels observed:
+  - Samsung Notes file
+  - PDF file
+  - Microsoft Word file
+  - Microsoft PowerPoint file
+  - Image file
+  - Text file
+- Post Samsung Notes file selection screen was observed in `ui_dumps/post_sdocx_choice.xml`.
+- After choosing Samsung Notes file, Samsung Notes hands off to Android intent resolver package `com.android.intentresolver`.
+- Android resolver resource IDs observed include:
+  - `com.android.intentresolver:id/content_preview_filename`
+  - `android:id/resolver_list`
+  - `com.android.intentresolver:id/sem_chooser_row_recycler_view`
+  - `com.android.intentresolver:id/item`
+- The resolver preview filename uses `.sdocx`, confirming that the Samsung Notes file export option creates an `.sdocx` share artifact.
+- Selection-mode overflow menu was observed in `ui_dumps/selection_more_menu.xml`.
+- Selection-mode overflow menu is still inside package `com.samsung.android.app.notes`.
+- Overflow menu resource IDs observed:
+  - `com.samsung.android.app.notes:id/content`
+  - `com.samsung.android.app.notes:id/title_parent`
+  - `com.samsung.android.app.notes:id/title`
+- Overflow menu labels observed:
+  - Save as file
+  - Make a copy
+  - Add to favorites
+  - Details
+  - Move to Secure Folder space
+- Save as file flow was observed in `ui_dumps/save_as_file_flow.xml`.
+- Save as file opens a Samsung Notes format chooser inside package `com.samsung.android.app.notes`.
+- Save as file chooser uses the same resource IDs as the share format chooser:
+  - `com.samsung.android.app.notes:id/text_menu_title`
+  - `com.samsung.android.app.notes:id/popup_menu_recycler_view`
+  - `com.samsung.android.app.notes:id/item_text`
+- Save as file chooser title is Save note format.
+- Save as file format labels observed:
+  - Samsung Notes file
+  - PDF file
+  - Microsoft Word file
+  - Microsoft PowerPoint file
+  - Image file
+  - Text file
+- Post Save as file / Samsung Notes file destination screen was observed in `ui_dumps/save_as_sdocx_destination.xml`.
+- The destination screen is Samsung My Files package `com.sec.android.app.myfiles`, indicating a local picker rather than Android resolver.
+- My Files picker resource IDs observed:
+  - `com.sec.android.app.myfiles:id/menu_done`
+  - `com.sec.android.app.myfiles:id/menu_cancel`
+  - `com.sec.android.app.myfiles:id/menu_create_folder`
+  - `com.sec.android.app.myfiles:id/recycler_view`
+  - `com.sec.android.app.myfiles:id/file_list_layout`
+  - `com.sec.android.app.myfiles:id/main_text`
+  - `com.sec.android.app.myfiles:id/sub_text_start`
+- My Files picker exposes local folders such as Download and Documents.
+
+## Unknown
+
+- Whether these resource IDs remain stable across Samsung Notes versions, languages, screen layouts, and themes.
+- Whether folder full paths are visible outside the current level.
+- Whether export/share menu entries are stable across language settings.
+- Whether subfolders are distinguishable from notes at all hierarchy depths.
+- Whether note selection mode exposes stable non-coordinate controls.
+- Whether `arrow_icon` reliably indicates expandable folders.
+- Whether drawer folder rows expose stable depth/indent information in bounds or hierarchy nesting.
+- Whether breadcrumb remains complete for very deep folder nesting or when horizontally scrolled.
+- Whether note item long-press selection exposes stable action IDs for share/export without coordinate taps.
+- Whether Android resolver targets can be used safely for local saving without uploading or sending data externally.
+- Whether pressing My Files picker Done/Save writes `.sdocx` to the current folder and what filename is used.
+
+## Risk
+
+- Selection, delete, move, and edit controls may appear near export controls.
+- Coordinate-based taps are unsafe until the UI is mapped.
+- UI dumps include private note titles, note body snippets, dates, and folder names.
+- Terminal summaries of `content-desc` can leak personal note snippets; prefer `SUMMARY_LINES=0` or resource-id-only inspection unless the user explicitly wants raw UI text reviewed.
+- Folder names and counts are present in the drawer dump, so raw drawer XML should remain local-only unless scrubbed.
+- Folder-internal dumps include current folder and subfolder names/counts; treat them as private.
+- Nested folder dumps include parent and child folder names in breadcrumb nodes; treat them as private.
+- Selection mode dumps include selected note snippets; treat them as private.
+- Share/export chooser dump appears less content-heavy, but still keep raw XML local-only.
+- Android resolver dumps include target app/contact names and generated export filenames; keep raw XML local-only.
+- Selection overflow includes potentially destructive or state-changing actions; only Save as file is a candidate for export investigation.
+- Save as file chooser is local to Samsung Notes, but the post-format destination is still unknown.
+- My Files destination picker is local-looking and is currently the preferred export route, but the final write behavior still needs a harmless test.
+- Large note-only selections can change the bottom toolbar affordances: in a large test folder, 407 selected notes showed move/lock/delete only and did not expose export overflow.
+- In selection mode, the floating bottom toolbar can cover the center of a partially visible bottom note card. Those card bounds are unsafe tap targets even if UIAutomator reports them as clickable.

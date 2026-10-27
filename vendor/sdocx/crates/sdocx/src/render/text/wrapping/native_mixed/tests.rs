@@ -1,0 +1,616 @@
+use super::super::super::{TextContext, TextSettings};
+use super::super::tests::{image, text};
+use super::*;
+use crate::ObjectSpanLayoutOption;
+use crate::fonts::FontBook;
+
+#[test]
+fn long_mixed_paragraph_retains_only_each_selected_line_and_later_source_offsets() {
+    for (repeats, selection_width) in [(32, 35.0), (128, 35.0), (32, 5000.0), (128, 5000.0)] {
+        let prefix = "😀\n";
+        let paragraph = "AV\u{fffc}x ".repeat(repeats);
+        let mut content = text(&format!("{prefix}{paragraph}"));
+        content.font_size = Some(17.0);
+        for index in 0..repeats {
+            content.object_spans.push(image(
+                (prefix.encode_utf16().count() + index * 5 + 2) as i32,
+                4.0,
+                ObjectSpanLayoutOption::Inline,
+            ));
+        }
+        let settings = TextSettings::resolved();
+        let styled = StyledText::new(&content, TextContext::Flow, settings);
+        let fonts = FontBook::default();
+        let renderer = TextRenderer::new(settings, &fonts);
+        let start = prefix.chars().count();
+        MIXED_CONSTRUCTIONS.with(|count| count.set(0));
+        use super::super::super::native_wrap::{
+            CURSOR_ENTRY_VISITS, SELECTED_ENTRY_VISITS, VALIDATED_ENTRY_VISITS,
+        };
+        VALIDATED_ENTRY_VISITS.with(|count| count.set(0));
+        SELECTED_ENTRY_VISITS.with(|count| count.set(0));
+        CURSOR_ENTRY_VISITS.with(|count| count.set(0));
+        let mut wrapper = ParagraphWrapper::new(
+            &styled,
+            start..styled.index.len(),
+            selection_width,
+            RenderTheme::for_canvas(false),
+            None,
+            &renderer,
+            ObjectMeasurementContext::Frame,
+        )
+        .unwrap();
+        let mut next = start;
+        let mut retained_entries = 0;
+        let mut retained_capacity = 0;
+        let mut lines = 0;
+        while let Some(mut line) = wrapper.candidate(selection_width, |_| {}).unwrap() {
+            assert_eq!(line.source.start, next);
+            let mixed = line.native_mixed.as_ref().unwrap();
+            let source = styled.index.source(line.source.clone()).unwrap();
+            let units = (source.utf16().end - source.utf16().start) as usize;
+            assert_eq!(mixed.slots.origin_utf16, source.utf16().start);
+            assert_eq!(mixed.slots.entries.len(), units);
+            assert_eq!(mixed.slots.entries.object_flags().unwrap().len(), units);
+            assert_eq!(mixed.slots.block_objects.len(), units);
+            assert_eq!(mixed.visual_scalars.len(), line.source.len());
+            retained_entries += units;
+            retained_capacity += mixed.slots.entries.capacity();
+            let logical = line.source.clone();
+            let origin = line
+                .place_native_cell(&styled, 2.0, 35.0, Some(crate::ParagraphAlignment::Center))
+                .unwrap()
+                .unwrap();
+            assert!(origin >= 2.0);
+            assert_eq!(line.source, logical);
+            for index in 0..line.objects.len() {
+                let position = line.object_position(index, true).unwrap();
+                assert!(origin + position.x >= origin);
+                assert_eq!(line.objects[index].object.source.len(), 1);
+                assert_eq!(
+                    styled
+                        .index
+                        .slice(line.objects[index].object.source.clone()),
+                    Some("\u{fffc}")
+                );
+            }
+            next = line.source.end;
+            wrapper.commit(next);
+            lines += 1;
+        }
+        if selection_width == 35.0 {
+            assert!(lines >= repeats);
+        } else {
+            assert_eq!(lines, 1);
+        }
+        assert_eq!(next, styled.index.len());
+        assert_eq!(retained_entries, paragraph.encode_utf16().count());
+        assert!(retained_capacity <= 2 * retained_entries);
+        MIXED_CONSTRUCTIONS.with(|count| assert_eq!(count.get(), 1));
+        // Source validation plus all retained line views must remain linear in
+        // paragraph size, regardless of the number of narrow output lines.
+        VALIDATED_ENTRY_VISITS.with(|count| {
+            assert!(
+                count.get() <= 4 * retained_entries,
+                "{} validations for {} entries",
+                count.get(),
+                retained_entries
+            );
+        });
+        let selected = SELECTED_ENTRY_VISITS.with(|count| count.get());
+        let positioned = CURSOR_ENTRY_VISITS.with(|count| count.get());
+        assert!(
+            selected + positioned <= 24 * retained_entries,
+            "{selected} selected and {positioned} positioned entries for {retained_entries} source entries"
+        );
+    }
+}
+
+#[test]
+fn supplied_feedback_capture_drives_sdk_objects_with_exact_source_translation() {
+    let capture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../../../../conformance/table-text-object-feedback.json"
+    ))
+    .unwrap();
+    let fonts = FontBook::default();
+    let settings = TextSettings::resolved();
+    let mut checked = 0;
+    for case in capture["cases"].as_array().unwrap().iter().filter(|case| {
+        case["route"] == "GetBlockInfo"
+            && case["entry_before"]["over_pages"] == true
+            && case["supplied_kinds"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|kind| matches!(kind.as_u64(), Some(0 | 1 | 2 | 5)))
+    }) {
+        let object = case["object_utf16"].as_u64().unwrap() as usize;
+        let advances = case["supplied_advances_bits"].as_array().unwrap();
+        let local = advances
+            .iter()
+            .enumerate()
+            .map(|(index, _)| {
+                if index == object {
+                    '\u{fffc}'
+                } else {
+                    char::from_u32('A' as u32 + index as u32).unwrap()
+                }
+            })
+            .collect::<String>();
+        for prefix in ["", "😀\n"] {
+            let start = prefix.chars().count();
+            let mut content = text(&format!("{prefix}{local}"));
+            content.font_size = Some(17.0);
+            let anchor = prefix.encode_utf16().count() + object;
+            content
+                .object_spans
+                .push(image(anchor as i32, 1.0, ObjectSpanLayoutOption::Inline));
+            let styled = StyledText::new(&content, TextContext::Flow, settings);
+            let renderer = TextRenderer::new(settings, &fonts);
+            let end = styled.index.len();
+            let full = f64::from(f32::from_bits(
+                case["paragraph_full_width_bits"].as_u64().unwrap() as u32,
+            ));
+            let budget = f64::from(f32::from_bits(case["budget_bits"].as_u64().unwrap() as u32));
+            let mut wrapper = ParagraphWrapper::new(
+                &styled,
+                start..end,
+                full,
+                RenderTheme::for_canvas(false),
+                None,
+                &renderer,
+                ObjectMeasurementContext::Frame,
+            )
+            .unwrap();
+            let mut slots =
+                NativeMixedSlots::new(&styled, start..end, &wrapper.items, &wrapper.allowed)
+                    .unwrap()
+                    .unwrap();
+            assert_eq!(slots.entries.len(), advances.len());
+            let mut supplied = slots.entries.to_vec();
+            for (index, entry) in supplied.iter_mut().enumerate() {
+                entry.advance = f32::from_bits(advances[index].as_u64().unwrap() as u32);
+                entry.break_end_utf16 =
+                    Some(case["supplied_break_ends_utf16"][index].as_u64().unwrap() as usize);
+            }
+            slots.entries = NativeWrapEntries::new(
+                supplied,
+                slots.entries.object_flags().map(<[bool]>::to_vec),
+            )
+            .unwrap();
+            let MeasuredItem::Object { placement, .. } = &mut wrapper.items[object] else {
+                panic!("expected independent SDK object anchor")
+            };
+            placement.object.advance = f64::from(slots.entries[object].advance);
+            for stage in case["stages"].as_array().unwrap() {
+                let mut calls = Vec::new();
+                let new =
+                    f32::from_bits(stage["entry_after"]["advance_bits"].as_u64().unwrap() as u32);
+                let selected = slots
+                    .select(
+                        &styled,
+                        start..end,
+                        [budget, full],
+                        &mut wrapper.items,
+                        &mut |placement| {
+                            calls.push(
+                                styled
+                                    .index
+                                    .char_to_utf16(placement.object.source.start)
+                                    .unwrap() as usize,
+                            );
+                            placement.object.advance = f64::from(new);
+                        },
+                    )
+                    .unwrap();
+                let captured_end = stage["selection"]["range_utf16_inclusive"][1]
+                    .as_i64()
+                    .unwrap();
+                assert_eq!(
+                    selected.as_ref().map(|selection| selection.end),
+                    (captured_end >= 0).then(|| start + captured_end as usize + 1),
+                    "{} {} {prefix:?}",
+                    case["name"],
+                    stage["stage"]
+                );
+                if let Some(selection) = &selected {
+                    assert_eq!(
+                        selection.encountered_object_metric,
+                        stage["selection"]["flags"][1] == 1,
+                        "{} {} {prefix:?}",
+                        case["name"],
+                        stage["stage"]
+                    );
+                }
+                assert_eq!(
+                    calls.len(),
+                    stage["callback_calls"].as_u64().unwrap() as usize
+                );
+                assert!(calls.iter().all(|&call| call == anchor));
+                slots.entries.update_advance(object, new).unwrap();
+                if let Some(selected) = selected {
+                    assert_eq!(
+                        (slots.block_width(&styled, start..selected.end).unwrap() as f32).to_bits(),
+                        stage["selection"]["layout_bits"][2].as_u64().unwrap() as u32
+                    );
+                }
+                checked += 1;
+            }
+        }
+    }
+    assert_eq!(checked, 54);
+}
+
+#[test]
+fn production_mixed_slots_retain_combining_zeros_and_sdk_callback_state() {
+    let mut content = text("x\u{327}\u{301}\u{fffc}A");
+    content.font_size = Some(17.0);
+    content
+        .object_spans
+        .push(image(3, 3.25, ObjectSpanLayoutOption::Inline));
+    let settings = TextSettings::resolved();
+    let styled = StyledText::new(&content, TextContext::Flow, settings);
+    let fonts = FontBook::default();
+    let renderer = TextRenderer::new(settings, &fonts);
+    let mut wrapper = ParagraphWrapper::new(
+        &styled,
+        0..5,
+        100.0,
+        RenderTheme::for_canvas(false),
+        None,
+        &renderer,
+        ObjectMeasurementContext::Frame,
+    )
+    .unwrap();
+    let slots = NativeMixedSlots::new(&styled, 0..5, &wrapper.items, &wrapper.allowed)
+        .unwrap()
+        .unwrap();
+    assert_eq!(slots.entries.len(), 5);
+    assert_eq!(slots.entries[1].advance.to_bits(), 0);
+    assert_eq!(slots.entries[2].advance.to_bits(), 0);
+    let mut calls = 0;
+    let line = wrapper
+        .candidate(100.0, |placement| {
+            calls += 1;
+            placement.object.advance = 12.5;
+        })
+        .unwrap()
+        .unwrap();
+    assert_eq!(calls, 1);
+    assert_eq!(line.source, 0..5);
+    assert!(line.native_mixed.is_some());
+    assert_eq!(line.objects[0].x, f64::from(slots.entries[0].advance));
+    assert_eq!(
+        line.placements[1].x,
+        f64::from(slots.entries[0].advance + 12.5)
+    );
+    wrapper.restore(line);
+    assert_eq!(wrapper.items[1].advance(), 12.5);
+}
+
+#[test]
+fn narrowed_object_no_block_preserves_source_without_preparing_it() {
+    let mut content = text("\u{fffc}");
+    content.font_size = Some(17.0);
+    content
+        .object_spans
+        .push(image(0, 40.0, ObjectSpanLayoutOption::Inline));
+    let settings = TextSettings::resolved();
+    let styled = StyledText::new(&content, TextContext::Flow, settings);
+    let fonts = FontBook::default();
+    let renderer = TextRenderer::new(settings, &fonts);
+    let mut wrapper = ParagraphWrapper::new(
+        &styled,
+        0..1,
+        100.0,
+        RenderTheme::for_canvas(false),
+        None,
+        &renderer,
+        ObjectMeasurementContext::Frame,
+    )
+    .unwrap();
+    let line = wrapper
+        .candidate(10.0, |_| {
+            panic!("a narrowed available region suppresses first-object preparation")
+        })
+        .unwrap()
+        .unwrap();
+    assert_eq!(line.source, 0..1);
+    assert_eq!(line.advance, 40.0);
+    assert!(line.unsupported_native_wrapping());
+    wrapper.commit(line.source.end);
+    assert!(wrapper.candidate(10.0, |_| {}).unwrap().is_none());
+}
+
+#[test]
+fn two_sdk_objects_keep_warm_mutations_and_separate_grouped_width_from_cursor() {
+    let settings = TextSettings::resolved();
+    let fonts = FontBook::default();
+    for prefix in ["", "😀\n"] {
+        let start = prefix.chars().count();
+        let origin = prefix.encode_utf16().count();
+        let mut content = text(&format!("{prefix}A\u{fffc}BC\u{fffc}"));
+        content.font_size = Some(17.0);
+        content.object_spans = vec![
+            image((origin + 1) as i32, 1.0, ObjectSpanLayoutOption::Inline),
+            image((origin + 4) as i32, 1.0, ObjectSpanLayoutOption::Inline),
+        ];
+        let styled = StyledText::new(&content, TextContext::Flow, settings);
+        let renderer = TextRenderer::new(settings, &fonts);
+        let base = 16_777_216.0_f32;
+        let budget = f64::from(base + 6.0);
+        let end = start + 5;
+        let mut wrapper = ParagraphWrapper::new(
+            &styled,
+            start..end,
+            budget,
+            RenderTheme::for_canvas(false),
+            None,
+            &renderer,
+            ObjectMeasurementContext::Frame,
+        )
+        .unwrap();
+        for item in &mut wrapper.items {
+            if let MeasuredItem::Object { placement, .. } = item {
+                placement.object.advance = 0.0;
+            }
+        }
+        let supplied_slots = |items: &[MeasuredItem]| {
+            let mut slots = NativeMixedSlots::new(&styled, start..end, items, &wrapper.allowed)
+                .unwrap()
+                .unwrap();
+            // Numeric entry inputs and placement are SDK policy, not captured native object output.
+            let mut supplied = slots.entries.to_vec();
+            for (slot, advance) in [(0, base), (2, 1.0), (3, 1.0)] {
+                supplied[slot].advance = advance;
+            }
+            for (entry, end) in supplied.iter_mut().zip([1, 4, 4, 4, 5]) {
+                entry.break_end_utf16 = Some(end);
+            }
+            slots.entries = NativeWrapEntries::new(
+                supplied,
+                slots.entries.object_flags().map(<[bool]>::to_vec),
+            )
+            .unwrap();
+            slots
+        };
+        let mut slots = supplied_slots(&wrapper.items);
+        let mut callbacks = Vec::new();
+        let selected = slots
+            .select(
+                &styled,
+                start..end,
+                [budget, budget],
+                &mut wrapper.items,
+                &mut |placement| {
+                    callbacks.push((
+                        placement.object.span_index,
+                        styled
+                            .index
+                            .char_to_utf16(placement.object.source.start)
+                            .unwrap() as usize,
+                        placement.x,
+                    ));
+                    placement.object.advance = if placement.object.span_index == 0 {
+                        4.0
+                    } else {
+                        1.0
+                    };
+                },
+            )
+            .unwrap();
+        assert_eq!(selected.map(|selection| selection.end), Some(end));
+        assert_eq!(
+            callbacks,
+            [
+                (0, origin + 1, f64::from(base)),
+                (1, origin + 4, f64::from(base + 4.0))
+            ]
+        );
+        let prepared = supplied_slots(&wrapper.items);
+        let grouped = prepared.block_width(&styled, start..end).unwrap();
+        assert_eq!(grouped, f64::from(base + 8.0));
+        assert!(grouped > budget);
+
+        let mut line = WrappedLine::unmeasured(start..end, 17.0);
+        for item in &wrapper.items {
+            match item {
+                MeasuredItem::TextCluster(cluster) => {
+                    line.visual_order
+                        .push(LineEntry::Text(line.placements.len()));
+                    line.placements.push(PositionedCluster {
+                        cluster: cluster.clone(),
+                        x: 0.0,
+                        extra_advance: 0.0,
+                        visual_rank: line.visual_order.len() - 1,
+                    });
+                }
+                MeasuredItem::Object { placement, .. } => {
+                    line.visual_order
+                        .push(LineEntry::Object(line.objects.len()));
+                    line.objects.push(PositionedObject {
+                        object: placement.object.clone(),
+                        x: 0.0,
+                        visual_rank: line.visual_order.len() - 1,
+                        prepared: None,
+                    });
+                }
+            }
+        }
+        let geometry = prepared
+            .positions(&styled, &line, &[0, 1, 2, 3, 4], &line.visual_order)
+            .unwrap();
+        let LineGeometry::Positioned {
+            advance,
+            ref objects,
+            ..
+        } = geometry
+        else {
+            panic!("expected physical slot positions")
+        };
+        assert_eq!(advance, f64::from(base + 4.0));
+        assert_eq!(objects[1].x, f64::from(base + 4.0));
+        assert_ne!(grouped, advance);
+        line.advance = grouped;
+        line.geometry = geometry;
+        line.native_mixed = Some(
+            NativeMixedLine::new(&prepared, &styled, line.source.clone(), vec![0, 1, 2, 3, 4])
+                .unwrap(),
+        );
+        assert_eq!(line.advance_for_paint(true), Some(grouped));
+
+        let mut warm = supplied_slots(&wrapper.items);
+        let mut warm_callbacks = Vec::new();
+        assert_eq!(
+            warm.select(
+                &styled,
+                start..end,
+                [budget, budget],
+                &mut wrapper.items,
+                &mut |placement| {
+                    warm_callbacks.push(placement.object.span_index);
+                }
+            )
+            .unwrap()
+            .map(|selection| selection.end),
+            Some(start + 4)
+        );
+        assert_eq!(warm_callbacks, [0]);
+        assert_eq!(
+            supplied_slots(&wrapper.items)
+                .block_width(&styled, start..start + 4)
+                .unwrap(),
+            f64::from(base + 6.0)
+        );
+        assert_eq!(wrapper.items[4].advance(), 1.0);
+    }
+}
+
+#[test]
+fn out_of_native_domain_feedback_recovers_through_fallback_before_line_geometry_is_built() {
+    let mut content = text("\u{fffc}B");
+    content.font_size = Some(17.0);
+    content
+        .object_spans
+        .push(image(0, 4.0, ObjectSpanLayoutOption::Inline));
+    let settings = TextSettings::resolved();
+    let styled = StyledText::new(&content, TextContext::Flow, settings);
+    let fonts = FontBook::default();
+    let renderer = TextRenderer::new(settings, &fonts);
+    let mut wrapper = ParagraphWrapper::new(
+        &styled,
+        0..2,
+        100.0,
+        RenderTheme::for_canvas(false),
+        None,
+        &renderer,
+        ObjectMeasurementContext::Frame,
+    )
+    .unwrap();
+    let mut failed_calls = 0;
+    let oversized = wrapper
+        .candidate(100.0, |placement| {
+            failed_calls += 1;
+            placement.object.advance = f64::from(f32::MAX) * 2.0;
+        })
+        .unwrap()
+        .unwrap();
+    assert_eq!(oversized.source, 0..1);
+    assert!(oversized.unsupported_native_wrapping());
+    assert!(oversized.native_mixed.is_none());
+    assert_eq!(failed_calls, 1);
+    let mut recovered_calls = 0;
+    let line = wrapper
+        .candidate(100.0, |placement| {
+            recovered_calls += 1;
+            placement.object.advance = 12.5;
+        })
+        .unwrap()
+        .unwrap();
+    assert_eq!(recovered_calls, 1);
+    // Fallback admission still uses the oversized pre-callback snapshot.
+    assert_eq!(line.source, 0..1);
+    assert!(line.unsupported_native_wrapping());
+    assert!(line.native_mixed.is_some());
+    assert_eq!(line.advance_for_paint(true), Some(12.5));
+    wrapper.restore(line);
+    let retried = wrapper.candidate(100.0, |_| {}).unwrap().unwrap();
+    assert_eq!(retried.source, 0..2);
+    assert!(!retried.unsupported_native_wrapping());
+    assert_eq!(retried.text_position(0, true).unwrap().x, 12.5);
+}
+
+#[test]
+fn invalid_callback_feedback_preserves_whole_paragraph_rejection_before_and_after_its_source() {
+    use super::super::super::{SourceOwner, TextDiagnosticKind};
+    for prefix in ["", "A"] {
+        let mut content = text(&format!("{prefix}\u{fffc}B\u{fffc}C"));
+        content.font_size = Some(17.0);
+        content.object_spans.push(image(
+            prefix.len() as i32,
+            4.0,
+            ObjectSpanLayoutOption::Inline,
+        ));
+        content.object_spans.push(image(
+            (prefix.len() + 2) as i32,
+            4.0,
+            ObjectSpanLayoutOption::Block,
+        ));
+        let settings = TextSettings::resolved();
+        let styled = StyledText::new(&content, TextContext::Flow, settings);
+        let fonts = FontBook::default();
+        let renderer = TextRenderer::new(settings, &fonts);
+        let mut wrapper = ParagraphWrapper::new(
+            &styled,
+            0..styled.index.len(),
+            100.0,
+            RenderTheme::for_canvas(false),
+            None,
+            &renderer,
+            ObjectMeasurementContext::Frame,
+        )
+        .unwrap();
+        assert!(wrapper.native_mixed.is_some());
+        let mut callbacks = 0;
+        let first = wrapper
+            .candidate(100.0, |placement| {
+                callbacks += 1;
+                placement.object.advance = f64::from(f32::MAX) * 2.0;
+            })
+            .unwrap()
+            .unwrap();
+        assert_eq!(callbacks, 1);
+        assert_eq!(first.source, 0..1);
+        assert!(
+            first.native_mixed.is_none(),
+            "invalid future feedback cannot admit prefix geometry"
+        );
+        wrapper.commit(first.source.end);
+        if !prefix.is_empty() {
+            let object = wrapper.candidate(100.0, |_| {}).unwrap().unwrap();
+            assert_eq!(object.source, 1..2);
+            assert!(object.native_mixed.is_none());
+            wrapper.commit(object.source.end);
+        }
+        let start = prefix.len() + 1;
+        let continuation = wrapper
+            .candidate(100.0, |_| {
+                panic!("the invalid object is before this source")
+            })
+            .unwrap()
+            .unwrap();
+        assert_eq!(continuation.source, start..start + 1);
+        assert!(continuation.unsupported_native_wrapping());
+        assert!(
+            continuation.native_mixed.is_none(),
+            "past invalid feedback keeps whole-paragraph admission rejected"
+        );
+        assert!(
+            renderer.scoped_diagnostics().iter().any(|issue| {
+                issue.owner == Some(SourceOwner::Text(start..styled.index.len()))
+                    && issue.diagnostic.kind == TextDiagnosticKind::UnsupportedNativeWrapping
+            }),
+            "global rejection diagnoses through paragraph end, beyond the next mandatory break"
+        );
+    }
+}

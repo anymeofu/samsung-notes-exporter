@@ -1,0 +1,611 @@
+#![cfg(all(feature = "render", feature = "serde"))]
+
+use sdocx::{
+    BoundingBox, Document, DocumentMetadata, ObjectSpanLayoutConstraint, ObjectSpanLayoutOption,
+    ObjectType, Page, PageElement, RichTextBox, RichTextObjectContent, RichTextObjectSpan,
+    RichTextTable, RichTextTableCell, RichTextTableRow, TableBorder, TableEdgeStyle,
+};
+
+fn bounds(left: f64, top: f64, width: f64, height: f64) -> BoundingBox {
+    BoundingBox {
+        x_min: left,
+        y_min: top,
+        x_max: left + width,
+        y_max: top + height,
+    }
+}
+
+fn text(source: &str) -> RichTextBox {
+    RichTextBox {
+        text_area_type: None,
+        bbox: BoundingBox::default(),
+        rotation_degrees: None,
+        text: source.into(),
+        color: None,
+        highlight_color: None,
+        underline: false,
+        font_size: Some(10.0),
+        runs: Vec::new(),
+        spans: Vec::new(),
+        paragraphs: Vec::new(),
+        object_spans: Vec::new(),
+        text_sections: Vec::new(),
+        margins: None,
+        gravity: None,
+    }
+}
+
+fn document(left: f64, top: f64, constraint: ObjectSpanLayoutConstraint) -> Document {
+    let mut row_metadata = sdocx::TableRecordMetadata::default();
+    row_metadata.fixed_trailing_data = vec![41, 42];
+    let mut cell_metadata = sdocx::TableRecordMetadata::default();
+    cell_metadata.flexible_trailing_data = vec![51, 52];
+    let table = RichTextTable {
+        style: serde_json::from_str(
+            r#"{
+            "heading_column_enabled": false, "heading_row_enabled": false,
+            "max_height_enabled": false,
+            "metadata": {"property_mask": [], "field_mask": [],
+                "fixed_trailing_data": [31], "flexible_trailing_data": [32]}
+        }"#,
+        )
+        .unwrap(),
+        bbox: bounds(5.25, 7.75, 100.0, 54.0),
+        rotation_degrees: None,
+        column_widths: vec![100.0],
+        rows: vec![RichTextTableRow {
+            max_height: None,
+            min_height: None,
+            metadata: row_metadata,
+            index: 0,
+            height: 54.0,
+            cells: vec![RichTextTableCell {
+                border: None,
+                metadata: cell_metadata,
+                column_index: 0,
+                row_span: 1,
+                column_span: 1,
+                background_color: 0xffabcdef,
+                has_own_background_color: true,
+                bbox: bounds(700.0, 700.0, 100.0, 54.0),
+                editable: false,
+                content: text("A\nB"),
+            }],
+        }],
+    };
+    let mut parent = text("\u{fffc}\nEnd");
+    parent.bbox = bounds(left, top, 300.0, 200.0);
+    parent.object_spans.push(RichTextObjectSpan {
+        object_type: ObjectType::Table,
+        object_data: Vec::new(),
+        content: Some(RichTextObjectContent::Table(Box::new(table))),
+        text_index_utf16: 0,
+        layout_option: ObjectSpanLayoutOption::Inline,
+        layout_constraint: constraint,
+    });
+    Document {
+        pages: vec![Page {
+            uuid: "table-drawing-origin".into(),
+            width: 360,
+            height: 300,
+            content_bbox: bounds(0.0, 0.0, 360.0, 300.0),
+            background_color: None,
+            template: None,
+            background: Default::default(),
+            objects: vec![PageElement::TextBox(parent).into()],
+        }],
+        metadata: DocumentMetadata {
+            default_page_dimensions: Some((360, 300)),
+            orientation: Some(0),
+            ..Default::default()
+        },
+    }
+}
+
+fn render(doc: &Document, replay: bool) -> sdocx::RenderedPage {
+    let layout = sdocx::layout_document(doc);
+    if replay {
+        sdocx::render_layout_page_replay_svg(doc, &layout, 0, &Default::default()).unwrap()
+    } else {
+        sdocx::render_layout_page_svg(doc, &layout, 0, &Default::default()).unwrap()
+    }
+}
+
+fn embedded_table(doc: &mut Document) -> &mut RichTextTable {
+    let sdocx::PageObjectContent::Element(PageElement::TextBox(body)) =
+        &mut doc.pages[0].objects[0].content
+    else {
+        panic!("text fixture");
+    };
+    let Some(RichTextObjectContent::Table(table)) = &mut body.object_spans[0].content else {
+        panic!("table fixture");
+    };
+    table
+}
+
+fn point(node: roxmltree::Node<'_, '_>) -> (f64, f64) {
+    let coordinate = |attribute| {
+        node.attribute(attribute)
+            .or_else(|| node.parent().unwrap().attribute(attribute))
+            .unwrap()
+            .split_whitespace()
+            .next()
+            .unwrap()
+            .parse::<f64>()
+            .unwrap()
+    };
+    let mut point = (coordinate("x"), coordinate("y"));
+    for ancestor in node.ancestors() {
+        if let Some(transform) = ancestor.attribute("transform") {
+            let transform: svgtypes::Transform = transform.parse().unwrap();
+            point = (
+                transform.a * point.0 + transform.c * point.1 + transform.e,
+                transform.b * point.0 + transform.d * point.1 + transform.f,
+            );
+        }
+    }
+    point
+}
+
+fn assert_page(
+    page: &sdocx::RenderedPage,
+    expected: &[(&str, f64, f64)],
+    table: [f64; 4],
+    cell: [f64; 4],
+) {
+    assert!(
+        page.text_diagnostics.is_empty(),
+        "{:?}",
+        page.text_diagnostics
+    );
+    assert!(
+        page.object_diagnostics.is_empty(),
+        "{:?}",
+        page.object_diagnostics
+    );
+    let xml = roxmltree::Document::parse(&page.svg).unwrap();
+    assert!(!xml.descendants().any(|node| node.has_tag_name("image")));
+    let lines: Vec<_> = xml
+        .descendants()
+        .filter(|node| node.has_tag_name("text"))
+        .collect();
+    assert_eq!(lines.len(), expected.len());
+    for (line, &(source, x, y)) in lines.into_iter().zip(expected) {
+        let actual: String = line
+            .descendants()
+            .filter(|node| node.has_tag_name("tspan"))
+            .filter_map(|node| node.text())
+            .collect();
+        assert_eq!(actual, source);
+        let position = point(
+            line.descendants()
+                .find(|node| node.has_tag_name("tspan"))
+                .unwrap(),
+        );
+        assert!((position.0 - x).abs() <= 1e-4, "{source}: {position:?}");
+        assert!((position.1 - y).abs() <= 1e-4, "{source}: {position:?}");
+    }
+    let panel = xml
+        .descendants()
+        .find(|node| {
+            node.has_tag_name("rect")
+                && node
+                    .parent()
+                    .is_some_and(|parent| parent.has_tag_name("clipPath"))
+                && node
+                    .ancestors()
+                    .any(|ancestor| ancestor.attribute("data-sdocx-object") == Some("table"))
+        })
+        .unwrap();
+    let background = xml
+        .descendants()
+        .find(|node| node.has_tag_name("rect") && node.attribute("fill") == Some("#abcdef"))
+        .unwrap();
+    for (node, expected) in [(panel, table), (background, cell)] {
+        let (x, y) = point(node);
+        let width: f64 = node.attribute("width").unwrap().parse().unwrap();
+        let height: f64 = node.attribute("height").unwrap().parse().unwrap();
+        assert_eq!([x, y, x + width, y + height], expected);
+    }
+}
+
+#[test]
+fn fresh_table_drawing_rounds_world_bounds_without_changing_parent_reservation() {
+    // Native Composer 0x37e4dc–0x37e4f4 rounds world table endpoints, then
+    // 0x37ee14–0x37ee94 rounds each cached cell against that rounded origin.
+    // Cold row 54 shrinks on fresh warm layout to two F10 lines: 27, plus border 1.
+    // The parent retains its separate 55px callback/saved reservation. Native
+    // SpanRunFunctor 0x77674 and GetBlockInfo 0x6aef8 retain the anchor's F10:
+    // End follows height 55 + leading 3.5 + object epsilon .001 + next font 10.
+    for constraint in [
+        ObjectSpanLayoutConstraint::Normal,
+        ObjectSpanLayoutConstraint::OverPagesOverlapPadding,
+        ObjectSpanLayoutConstraint::OverPages,
+    ] {
+        for (left, top, expected, table, cell, saved_cell) in [
+            (
+                -0.25,
+                -1.751,
+                [("A", -1.0, 8.0), ("B", -1.0, 21.5), ("End", -0.25, 66.75)],
+                [-1.0, -2.0, 101.0, 27.0],
+                [-1.0, -2.0, 100.0, 26.0],
+                [695.0, 691.0, 795.0, 745.0],
+            ),
+            (
+                20.25,
+                20.249,
+                [("A", 20.0, 30.0), ("B", 20.0, 43.5), ("End", 20.25, 88.75)],
+                [20.0, 20.0, 122.0, 49.0],
+                [20.0, 20.0, 121.0, 48.0],
+                [715.5, 713.0, 815.5, 767.0],
+            ),
+        ] {
+            let doc = document(left, top, constraint);
+            let source = serde_json::to_value(&doc).unwrap();
+            for replay in [false, true] {
+                let page = render(&doc, replay);
+                // The independent native cell-drawing capture retains the saved
+                // rectangle's dimensions in Normal, regardless of text preparation.
+                let cell = if constraint == ObjectSpanLayoutConstraint::Normal {
+                    saved_cell
+                } else {
+                    cell
+                };
+                assert_page(&page, &expected, table, cell);
+                assert_eq!(render(&doc, replay), page);
+            }
+            assert_eq!(serde_json::to_value(&doc).unwrap(), source);
+        }
+    }
+}
+
+#[test]
+fn normal_artwork_retains_saved_rectangles_and_model_border_segments() {
+    for (saved_cell, normal_background) in [
+        (bounds(10.5, 16.25, 80.0, 40.0), [5.75, 9.001, 80.0, 40.0]),
+        (
+            bounds(700.0, 700.0, 80.0, 40.0),
+            [695.25, 692.75098, 80.0, 40.0],
+        ),
+    ] {
+        for constraint in [
+            ObjectSpanLayoutConstraint::Normal,
+            ObjectSpanLayoutConstraint::OverPages,
+            ObjectSpanLayoutConstraint::OverPagesOverlapPadding,
+        ] {
+            let mut doc = document(0.0, 0.0, constraint);
+            let table = embedded_table(&mut doc);
+            let transparent: TableEdgeStyle =
+                serde_json::from_str(r#"{"color":0,"width":0,"start_radius":0,"end_radius":0}"#)
+                    .unwrap();
+            let border = |edge: TableEdgeStyle| -> TableBorder {
+                serde_json::from_value(serde_json::json!({
+                "left":edge,"top":edge,"right":edge,"bottom":edge,
+                "metadata":{"property_mask":[],"field_mask":[],"fixed_trailing_data":[],"flexible_trailing_data":[]}
+            })).unwrap()
+            };
+            table.style.border = Some(border(transparent));
+            let mut cell_edge = transparent;
+            cell_edge.color = 0xff123456;
+            cell_edge.width = 1.0;
+            table.style.default_cell_border = Some(border(cell_edge));
+            table.rows[0].cells[0].bbox = saved_cell;
+            let source = serde_json::to_value(&doc).unwrap();
+            for replay in [false, true] {
+                let page = render(&doc, replay);
+                assert!(page.text_diagnostics.is_empty());
+                assert!(page.object_diagnostics.is_empty());
+                let xml = roxmltree::Document::parse(&page.svg).unwrap();
+                let fill = xml
+                    .descendants()
+                    .find(|node| {
+                        node.has_tag_name("rect") && node.attribute("fill") == Some("#abcdef")
+                    })
+                    .unwrap();
+                let (x, y) = point(fill);
+                let width: f64 = fill.attribute("width").unwrap().parse().unwrap();
+                let height: f64 = fill.attribute("height").unwrap().parse().unwrap();
+                let normal = constraint == ObjectSpanLayoutConstraint::Normal;
+                assert_eq!(
+                    [x, y, width, height],
+                    if normal {
+                        normal_background
+                    } else {
+                        [0.0, 0.0, 100.0, 27.0]
+                    }
+                );
+                let lines: Vec<_> = xml
+                    .descendants()
+                    .filter(|node| {
+                        node.has_tag_name("line") && node.attribute("stroke") == Some("#123456")
+                    })
+                    .map(|node| {
+                        ["x1", "y1", "x2", "y2"]
+                            .map(|name| node.attribute(name).unwrap().parse::<f64>().unwrap())
+                    })
+                    .collect();
+                let origin_y = (54.0_f32 + 0.001) - 54.0;
+                let offset_y = 7.25_f32 - origin_y;
+                let (top, bottom) = if normal {
+                    (
+                        f64::from(7.75_f32 - offset_y),
+                        f64::from(61.75_f32 - offset_y),
+                    )
+                } else {
+                    (0.0, 27.0)
+                };
+                let (left, right) = if normal { (0.5, 100.5) } else { (0.0, 100.0) };
+                assert_eq!(
+                    lines,
+                    [
+                        [left, top, left, bottom],
+                        [left, top, right, top],
+                        [right, top, right, bottom],
+                        [left, bottom, right, bottom]
+                    ]
+                );
+                assert!(!xml.descendants().any(|node| node.has_tag_name("image")));
+                assert_eq!(render(&doc, !replay), page);
+                #[cfg(feature = "pdf")]
+                {
+                    let bytes = sdocx::render_svg_pages_pdf(&[page], &Default::default()).unwrap();
+                    let pdf = lopdf::Document::load_mem(&bytes).unwrap();
+                    assert_eq!(
+                        pdf.extract_text(&[1]).unwrap().replace(['\n', ' '], ""),
+                        "ABEnd"
+                    );
+                    assert!(
+                        !pdf.objects
+                            .values()
+                            .any(|object| object.as_stream().is_ok_and(|stream| stream
+                                .dict
+                                .get(b"Subtype")
+                                .is_ok_and(|value| value
+                                    .as_name()
+                                    .is_ok_and(|name| name == b"Image"))))
+                    );
+                }
+            }
+            assert_eq!(serde_json::to_value(&doc).unwrap(), source);
+        }
+    }
+}
+
+#[test]
+fn malformed_saved_artwork_is_diagnosed_without_nonfinite_vector_coordinates() {
+    for invalid in [f64::NAN, f64::INFINITY, f64::MAX] {
+        for constraint in [
+            ObjectSpanLayoutConstraint::Normal,
+            ObjectSpanLayoutConstraint::OverPages,
+            ObjectSpanLayoutConstraint::OverPagesOverlapPadding,
+        ] {
+            let mut doc = document(0.0, 0.0, constraint);
+            embedded_table(&mut doc).rows[0].cells[0].bbox.x_min = invalid;
+            let source = serde_json::to_value(&doc).unwrap();
+            for replay in [false, true] {
+                let page = render(&doc, replay);
+                let normal = constraint == ObjectSpanLayoutConstraint::Normal;
+                assert_eq!(
+                    page.object_diagnostics,
+                    if normal {
+                        vec![sdocx::ObjectDiagnostic {
+                            anchor_utf16: 0,
+                            kind: sdocx::ObjectDiagnosticKind::InvalidBounds,
+                        }]
+                    } else {
+                        vec![]
+                    }
+                );
+                let xml = roxmltree::Document::parse(&page.svg).unwrap();
+                let visible_source = xml
+                    .descendants()
+                    .filter(|node| node.has_tag_name("tspan"))
+                    .filter_map(|node| node.text())
+                    .collect::<String>();
+                assert_eq!(visible_source, if normal { "End" } else { "ABEnd" });
+                for node in xml.descendants().filter(|node| node.is_element()) {
+                    for name in ["x", "y", "width", "height", "x1", "y1", "x2", "y2"] {
+                        if let Some(value) = node.attribute(name) {
+                            assert!(
+                                value
+                                    .split_whitespace()
+                                    .all(|value| value.parse::<f64>().is_ok_and(f64::is_finite)),
+                                "{name}={value}"
+                            );
+                        }
+                    }
+                }
+                assert_eq!(render(&doc, !replay), page);
+            }
+            assert_eq!(serde_json::to_value(&doc).unwrap(), source);
+        }
+    }
+}
+
+#[test]
+fn hidden_covered_saved_rectangles_do_not_poison_normal_artwork() {
+    let mut doc = document(0.0, 0.0, ObjectSpanLayoutConstraint::Normal);
+    let table = embedded_table(&mut doc);
+    table.column_widths = vec![50.0, 50.0];
+    table.rows[0].cells[0].column_span = 2;
+    let mut covered = table.rows[0].cells[0].clone();
+    covered.column_index = 1;
+    covered.column_span = 1;
+    covered.bbox.x_min = f64::MAX;
+    covered.content.text = "hidden".into();
+    table.rows[0].cells.push(covered);
+    let source = serde_json::to_value(&doc).unwrap();
+    for replay in [false, true] {
+        let page = render(&doc, replay);
+        assert!(page.object_diagnostics.is_empty());
+        let xml = roxmltree::Document::parse(&page.svg).unwrap();
+        let visible_source = xml
+            .descendants()
+            .filter(|node| node.has_tag_name("tspan"))
+            .filter_map(|node| node.text())
+            .collect::<String>();
+        assert_eq!(visible_source, "ABEnd");
+    }
+    assert_eq!(serde_json::to_value(&doc).unwrap(), source);
+}
+
+#[test]
+fn finite_saved_endpoints_with_overflowing_native_translation_are_diagnosed() {
+    let mut doc = document(0.0, 0.0, ObjectSpanLayoutConstraint::Normal);
+    let table = embedded_table(&mut doc);
+    table.bbox.x_min = -f64::from(f32::MAX);
+    table.bbox.x_max = -f64::from(f32::from_bits(f32::MAX.to_bits() - 1));
+    table.rows[0].cells[0].bbox.x_min = f64::from(f32::MAX);
+    table.rows[0].cells[0].bbox.x_max = f64::from(f32::MAX);
+    let source = serde_json::to_value(&doc).unwrap();
+    for replay in [false, true] {
+        let page = render(&doc, replay);
+        assert!(
+            page.object_diagnostics
+                .iter()
+                .any(|issue| issue.anchor_utf16 == 0
+                    && issue.kind == sdocx::ObjectDiagnosticKind::InvalidBounds)
+        );
+        let xml = roxmltree::Document::parse(&page.svg).unwrap();
+        for node in xml.descendants().filter(|node| node.is_element()) {
+            for name in ["x", "y", "width", "height", "x1", "y1", "x2", "y2"] {
+                if let Some(value) = node.attribute(name) {
+                    assert!(
+                        value
+                            .split_whitespace()
+                            .all(|value| value.parse::<f64>().is_ok_and(f64::is_finite)),
+                        "{name}={value}"
+                    );
+                }
+            }
+        }
+        assert!(
+            xml.descendants()
+                .any(|node| node.has_tag_name("tspan") && node.text() == Some("End"))
+        );
+    }
+    assert_eq!(serde_json::to_value(&doc).unwrap(), source);
+}
+
+fn nearest_clip<'a>(node: roxmltree::Node<'a, '_>) -> Option<&'a str> {
+    node.ancestors()
+        .find_map(|ancestor| ancestor.attribute("clip-path"))
+}
+
+#[test]
+fn export_artwork_crop_uses_page_body_margins_without_cropping_text_to_them() {
+    for (mode, density_width, expected) in [
+        (Some(0), 360, [-1.0, 1.0, 101.0, 18.0]),
+        (Some(0), 1080, [-1.0, 5.0, 101.0, 12.0]),
+        (Some(1), 360, [-1.0, -1.0, 101.0, 21.0]),
+        (None, 360, [-1.0, -1.0, 101.0, 21.0]),
+    ] {
+        let mut doc = document(-0.25, -1.751, ObjectSpanLayoutConstraint::Normal);
+        doc.pages[0].width = 100;
+        doc.pages[0].height = 20;
+        doc.metadata.page_mode = mode;
+        doc.metadata.default_page_dimensions = Some((density_width, 300));
+        let mut body = text("unused body");
+        body.margins = Some([77.0, 2.0, 88.0, 3.0]);
+        doc.metadata.note_text = Some(body);
+        let source = serde_json::to_value(&doc).unwrap();
+        for replay in [false, true] {
+            let page = render(&doc, replay);
+            assert!(
+                page.object_diagnostics.is_empty(),
+                "{:?}",
+                page.object_diagnostics
+            );
+            let xml = roxmltree::Document::parse(&page.svg).unwrap();
+            let fill = xml
+                .descendants()
+                .find(|node| node.has_tag_name("rect") && node.attribute("fill") == Some("#abcdef"))
+                .unwrap();
+            let clip = nearest_clip(fill).unwrap();
+            let id = clip
+                .strip_prefix("url(#")
+                .unwrap()
+                .strip_suffix(')')
+                .unwrap();
+            let rectangle = xml
+                .descendants()
+                .find(|node| node.attribute("id") == Some(id))
+                .unwrap()
+                .children()
+                .find(|node| node.has_tag_name("rect"))
+                .unwrap();
+            let number = |name| rectangle.attribute(name).unwrap().parse::<f64>().unwrap();
+            assert_eq!(
+                [
+                    number("x"),
+                    number("y"),
+                    number("x") + number("width"),
+                    number("y") + number("height")
+                ],
+                expected
+            );
+            let table = fill
+                .ancestors()
+                .find(|node| node.attribute("data-sdocx-object") == Some("table"))
+                .unwrap();
+            let mut borders = 0;
+            for border in table
+                .descendants()
+                .filter(|node| node.attribute("stroke").is_some())
+            {
+                assert_eq!(nearest_clip(border), Some(clip));
+                borders += 1;
+            }
+            assert!(borders > 0);
+            let glyph = table
+                .descendants()
+                .find(|node| node.has_tag_name("text"))
+                .unwrap();
+            assert_ne!(nearest_clip(glyph), Some(clip));
+            assert!(!xml.descendants().any(|node| node.has_tag_name("image")));
+            assert!(
+                table
+                    .descendants()
+                    .filter_map(|node| node.text())
+                    .any(|text| text == "A")
+            );
+        }
+        assert_eq!(serde_json::to_value(&doc).unwrap(), source);
+    }
+}
+
+#[cfg(feature = "pdf")]
+#[test]
+fn rounded_table_pdf_keeps_selectable_text_and_embedded_vector_fonts() {
+    for replay in [false, true] {
+        let page = render(
+            &document(20.25, 20.249, ObjectSpanLayoutConstraint::OverPages),
+            replay,
+        );
+        assert_page(
+            &page,
+            &[("A", 20.0, 30.0), ("B", 20.0, 43.5), ("End", 20.25, 88.75)],
+            [20.0, 20.0, 122.0, 49.0],
+            [20.0, 20.0, 121.0, 48.0],
+        );
+        let bytes = sdocx::render_svg_pages_pdf(&[page], &Default::default()).unwrap();
+        let pdf = lopdf::Document::load_mem(&bytes).unwrap();
+        assert_eq!(
+            pdf.extract_text(&[1]).unwrap().replace(['\n', ' '], ""),
+            "ABEnd"
+        );
+        assert!(
+            !pdf.objects
+                .values()
+                .any(|object| object.as_stream().is_ok_and(|stream| stream
+                    .dict
+                    .get(b"Subtype")
+                    .is_ok_and(|value| value.as_name().is_ok_and(|name| name == b"Image"))))
+        );
+        assert!(pdf.objects.values().any(|object| {
+            object
+                .as_dict()
+                .is_ok_and(|dict| dict.has(b"FontFile2") || dict.has(b"FontFile3"))
+        }));
+    }
+}

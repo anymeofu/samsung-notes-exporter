@@ -1,0 +1,377 @@
+# InkPen2 V9 saved-stroke source authority
+
+## Evidence and selected profile
+
+These independently reviewed static ARM64 traces establish the explicitly
+selected InkPen2 V9 ordinary single saved-stroke consumer. They do not establish
+native execution, geometry equality or rendered appearance parity. Addresses
+are ELF virtual addresses in Samsung Notes 4.4.45.37 APK SHA-256
+`daed1eff8c8ee9dfb8afe2771e39e893a8808f3230d6d522a8aa647db09b8667`.
+
+| Source | SHA-256 |
+| --- | --- |
+| `libSPenInkPen2.so` | `61806b1a7b11c89d0b9c8fa620ac7407d21eda9ac7555c280dbeb38076501c7c` |
+| `libSPenPenCommon.so` | `afd39c0d55ec5cf47153be48222c8a9ddc0057fc772dd870af9ced74a59ec33d` |
+| `libSPenModel.so` | `4fbcf6d4213e929f1535d32abb487743643fd5d0dfc366e50dfeb2e7d8015b7a` |
+| `libSPenDrawing.so` | `788bf413ddeb0b9d352062c5f1b7b8ed11babca911df72691da58ff1a0a5a4bd` |
+
+The InkPen2 ELF matches its APK entry. The [registry](pen-selection-findings.md)
+and [Drawing adapter](inkpen-v4-findings.md#evidence-and-admission) resolve and
+configure the selected pen from saved name/settings/size. Count 1 and
+StrokeType != 1 invokes drawable secondary-interface slot 40
+(`0x82b54–0x82b70`). InkPen2 V9 secondary relocation `0x68db0` reaches thunk
+`0x4e8d0` (this-8), then `RedrawPen(ObjectStroke*,RectF*)`, `0x4e1d0`.
+
+InkPen2 constructor builds `9;` (`0x3ad28–0x3ad4c`), but construction defaults
+are not authority for absent saved settings. The signed selector
+`0x3b130–0x3b368` clamps to 1–9; table `0x70848` selects drawing 9 / outline 6
+for explicit `9;`. Only drawing V9 is traced. Curve byte +8, fixed-width byte
++9, fixed width +12, line type +16 and rainbow byte +64 have actual setters
+at `0x3b670`, `0x3b6a8`, `0x3b6e0`, `0x3b718`, `0x3b7c8`.
+
+The plain numerical profile requires positive count and usable saved arrays,
+fixed-width disabled, line type 0, rainbow disabled, finite positive size,
+spacing and inverse scales, finite intermediate geometry and a representable
+i32 sampling count. Rainbow distance must be finite and positive: the terminal
+dot still evaluates its color helper. Curve on/off is explicit below; dash,
+rainbow and fixed-width substitutions are separate branches. This saved path
+does not reapply the [live beautifier](inkpen2-input-findings.md).
+
+## Derived cache and initial state
+
+Saved entry `0x4e1d0–0x4e614` selects original runtime handle unless -1,
+otherwise current handle. Existing point data bypasses recomputation only if
+inverse scale matches and redrawing-dirty is clear (`0x4e320–0x4e334`);
+that branch supplies cached float geometry and pen bounds, not saved samples.
+Dirty or scale-mismatched data is unreferenced before reconstruction.
+
+Reconstruction installs the callback vector, assigns RT inverse scales
++296/+300, and obtains saved initial tolerance, rainbow offset and size level
+(`0x4e430–0x4e480`). Successful redraw can copy generated floats into point
+cache, store inverse scales/bounds and conditionally clear dirty after
+SetPointData succeeds. Original handle resets -1 when strokeData exists,
+even if SetPointData fails (`0x4e4f4–0x4e558`). Redraw success does not guarantee
+cache publication. No saved sample-array writes occur in this adapter.
+
+V9 constructor `0x4cbc8` initializes spacing +88=1.0f32, residual +92=0,
+tool threshold +96=20, alternation byte +100=0, cached identity matrix and
+inverse scales 1. `getInverseScale`, `0x4db58–0x4dca8`, compares 36 matrix
+bytes; a changed matrix derives reciprocal f32 column norms and sets spacing
+to f32(f64(min(inverseX,inverseY))*0.82), using f64 bits
+`0x3fea3d70a3d70a3d`. An unchanged initial identity can retain spacing 1;
+it does not universally select recomputed 0.82. Perspective/nonfinite matrix
+behavior is outside the finite contract.
+
+Lower saved redraw `0x4e614–0x4e8d0` seeds control/midpoint/last-emitted XY,
+no-emission byte +376=1, radius=f32(size/2.2f32), residual=current spacing,
+and dash offset=-spacing. Divisor 2.2 has f32 bits `0x400ccccd`. First signed
+i32 time seeds working i64 times; speed, five history slots and index reset.
+Saved IsShape seeds byte +48, separately from curve. The complete saved reset
+sequence does **not** reset alternation +100. Cache recomputation can reuse a
+version-matched drawable; constructor-zero alternation applies only to a new
+V9. Reused incoming state may affect its first tool-1 decision.
+
+Saved `IsShape` comes from common ExtraData integer key
+`extra_key_stroke_shape` equal to 1. Model `IsShape` (`0x2e2754`) reads
+implementation byte +380; `SetAsShape` (`0x2e2604`) sets it and writes the key,
+or removes the key when disabling (`0x2e26d8–0x2e26f0`). A Unicorn setter/getter
+probe executes those branches with host String/ExtraData recording stubs.
+Disassembly of `ApplyBinary` (`0x2e4d8c`) and `NewApplyBinary` (`0x2e57a0`)
+shows exact integer 1 sets the byte; other integers remove the key, and missing
+keys skip mutation. Constructor-zero (`0x2e8788`) makes fresh instances false,
+but those loader branches do not clear previously true reused instances.
+Wrong-type behavior is inferred from typed lookup calls, not dynamically loaded.
+These offsets refer to pinned Model SHA-256
+`4fbcf6d4213e929f1535d32abb487743643fd5d0dfc366e50dfeb2e7d8015b7a`.
+Rust retains the typed Bundle through
+`Stroke.rendering.metadata.flexible_metadata().extra_data`; curve and straighten
+flags are separate. Synthetic caller getter values of zero do not establish
+that arbitrary saved strokes are non-shape.
+
+## Interior movement and radius
+
+Indices 1..count-1 forward XY, sign-extended saved i32 time, bounds, tool==1
+and emission=true to `drawLine`, `0x4dcb8–0x4e1c8`. Pressure/tilt/orientation
+are not interior operands. Distance from retained control is
+sqrt(fma(dx,dx,f32(dy*dy))); a separate double overflow branch is present.
+Except IsShape+fixed-width bypass, distance below saved tolerance skips
+geometry and ordinary control/time commit. Tool 1 with distance<20 toggles
++100: old nonzero skips, old zero proceeds. Other tools or distance>=20
+proceed and set +100=1 (`0x4dda8–0x4ddd8`). Skipped points are not
+unconditional speed-history samples.
+
+Curve-on constructs a quadratic from prior midpoint through control to
+f32 midpoint(control,input); curve-off constructs a line control→input.
+SmPath reset/getLength/getPosTan supplies length and sampled XY
+(`0x4dd54–0x4de0c`). Those helper internals are not reconstructed here.
+Speed uses measured path length, separately from the admission chord.
+At `0x4de10–0x4dedc`, denominator candidate is f32(f32(time-priorTime)*1000),
+or 1000 for zero delta. Denominator is **min(candidate,65535)**, with no
+positive lower clamp; negative deltas remain negative. Resolution factor is
+1 for signed minimum configured dimension zero, otherwise f32(1440/minDim);
+see [size and configuration provenance](pen-size-findings.md).
+Instantaneous speed=f32(f32(f32(length/denominator)*factor)*1000).
+It enters a five-slot ring, whose ascending f32 sum is divided by 5.
+Startup includes the other four zero slots.
+
+Arithmetic below uses f32 operations unless f64 is stated. With old radius W,
+configured size S and f32 average speed v, target follows:
+
+| Ordered finite v | Target radius |
+| --- | --- |
+| v>5 | max(S/3.75,W*0.96f32) |
+| 3<v<=5 | max(S/3.75,W*0.975f32) |
+| f64(v)>0.8 and v<=3 | max(S/3.75,W*0.99f32) |
+| f64(v)<0.2 | min(S*0.5,W*1.05f32) |
+| f64(v)>=0.2 and v<0.5 | min(S*0.5,W*1.02f32) |
+| remaining finite interval | W |
+
+Fast branches use MAX (`0x4df6c–0x4df70`); slow branches use MIN
+(`0x4e158–0x4e1a0`). Thresholds 0.2/0.8 are f64; 0.5/3/5 are f32.
+Multiplier bits are 0.96=`0x3f75c28f`, 0.975=`0x3f79999a`,
+0.99=`0x3f7d70a4`, 1.05=`0x3f866666`, 1.02=`0x3f828f5c`.
+Sampling starts at residual; radius increment is
+(target-W)/f32(trunc_i32(f32((length-residual)/spacing))+1).
+While distance<=length, successful getPosTan emits a point and increments
+radius; failed lookup still advances spacing. Completion commits residual,
+new control, target radius, instantaneous speed and time (`0x4e0ac–0x4e108`).
+
+## Terminal and callback geometry
+
+The adapter materializes last XY/time/pressure plus optional tilt/orientation
+or zero in a terminal MotionEvent (`0x4e7c8–0x4e840`). Complete `endPen`,
+`0x4d1f8–0x4d51c`, reads **only X/Y**, narrowing to f32. Curve-on ends its
+quadratic at actual end XY; curve-off ends its line there. No fresh speed or
+radius update occurs. If no point emitted (+376=1), one control-position dot
+uses half current radius (`0x4d3b4–0x4d3c0`): a single-sample dot starts with
+size/2.2 then halves it before the radius floor. Otherwise terminal sampling
+uses current radius while distance<=length; failed lookup still advances
+spacing. Plain type 0 independently emits an exact endpoint and grows bounds
+by 1; saved caller separately unions and grows by 1 (`0x4e844–0x4e858`).
+The special dot branch skips the ordinary endpoint/grow branch.
+
+`drawPoint`, `0x4ea94–0x4ecc0`, substitutes fixedWidth*0.5 when enabled,
+then fmaxnm(radius,0.1f32), bits `0x3dcccccd`, and clears +376. Saved
+emission=true extends bounds by point±radius and calls RTV3 AddPoint.
+PenCommon GetBuffer `0x50640–0x50678` returns callback+40's float vector;
+SetBuffer `0x4a5b8–0x4a5c4` installs that pointer at RT+80. RTV3 wrapper
+`0x54210` invokes virtual slot 64, relocation `0x690b0`→`0x53cc8`.
+It appends six geometry floats, followed by wrapper RGB floats:
+
+- a=f32(r/sx), b=f32(r/sy), t=min(a,b), for positive inverse scales sx/sy.
+- k=t<0.5 ? f32(0.5/t) : 1; coverage=f32(1/k); k=fmaxnm(k,1).
+- ux=f32(f32(a*k)+0.5), uy likewise; m=max(ux,uy).
+- Extents=f32(sx*ux),f32(sy*uy); edge=f32(f32(f32(m-1)/m)*0.5).
+- Stored order: X,Y,extentX,extentY,edge,coverage,R,G,B.
+
+These nine derived floats include scale-dependent half-pixel support; they
+are not raw XY/radius triples. The emission=false branch stores 12-byte
+XY/radius triples, but it is not this saved callback route. Shader coverage,
+alpha composition, final vector outlines and SVG/PDF appearance are unproved.
+
+## Saved dash offset and fresh working phase
+
+The [stroke field table](stroke-metadata-findings.md) already identifies field
+15 as a saved f32 dash offset: Model member 388 is serialized/restored at
+`0x2eca30–0x2eca5c` / `0x2edbd4–0x2edbe4`. Drawing gets pen slot 304's dash
+interface and forwards saved line type to slot 16 and `GetDashOffset` to
+slot 32 (`0x81fb0–0x8201c`). InkPen2's plugin+104 interface thunks
+`0x3b728/0x3b760` store these in PenData members 16/20. That configured offset
+is distinct from PenData 52's subsequently reconstructed current position.
+
+On the fresh V9 branch, lower redraw instead negates drawable spacing 88 and
+passes that float to `initDashStrokeEffect` (`0x4e6f4–0x4e708`). The complete
+InkPen2 wrapper `0x3d520–0x3d5bc` carries this supplied phase, size, line type
+and actual slot 144 interval factors into PenCommon init `0x520d0`. It does
+not read PenData 20. V9 relocation `0x68d60` resolves the factor getter to
+`0x4ed2c`, rather than the inherited empty-vector getter. The saved adapter
+first writes `GetSizeLevel()` into shared setting 56 (`0x4e45c–0x4e46c`).
+The getter selects two factors from native threshold records at `0x71230`
+using that signed level converted to f32, and copies the second factor vector
+from `0x71248`. Its reached vector-copy helpers do not dispatch an offset
+getter. These are native runtime vectors, not universally immutable constants.
+
+Common init resets **drawable** accumulated distance 52 and stores supplied
+phase in **effect implementation** member 12 (`0x46f98`). Factor-copy
+`0x47040–0x470d8` installs two vectors; `CalculatePenDashIntervals`,
+`0x470ec–0x47570`, chooses them for line types 1/2 and builds cumulative
+boundaries beginning at zero. Each append is f32
+`fmadd(factor, configured_width, previous_boundary)` (`0x47474`); this
+calculation does not read phase. Its boolean return alone does not certify
+usable factors or a positive period.
+
+For usable boundaries and finite ordered arithmetic with a positive period,
+`SkipPoint`, `0x475e0–0x4770c`, computes f32 local distance + drawable
+accumulated distance + phase in that order, then calls `fmodf` with the last
+boundary. Ordered negative remainders or remainders above the period become
+zero (`0x47638–0x47644`); it does not add a period to negative remainders.
+The result becomes effect current position 16. Its half-open interval search
+returns false for even intervals. An odd interval returns true and advances
+the caller's local distance by `max(next_boundary-position, 0.01f32)`;
+the minimum has bits `0x3c23d70a` (`0x2c1c4`).
+
+Interior V9 line types 1/2 call this effect, copy its current position into
+**PenData** 52, and on true recheck the mutated distance without getPosTan or
+emission (`0x4dfb4–0x4dff4`). This PenData position is distinct from drawable
+52's accumulated measured path length (`0x4e0c4–0x4e108`). Terminal sampling
+uses the same skip/copy gate (`0x4d3c8–0x4d480`). Only line type 0 receives
+the unconditional final endpoint dot (`0x4d494–0x4d4cc`). However, the
+no-emission-byte-376 shortcut draws the retained control-position dot before
+that gate (`0x4d358–0x4d3c4`), so dashed taps are not universally suppressed.
+Saved redraw ignores endPen's boolean before returning true (`0x4e840/0x4e864`).
+
+These static findings supplement the plain line-type-0 profile above. Clean
+cache reuse, other versions/line types, incoming state, native factor-vector
+lifecycle and degenerate arithmetic remain separate boundaries; no numerical
+or appearance parity follows. Current Rust retains the complete
+`StrokeStyle`, including `dash_offset`, and boxed common metadata in
+`StrokeRendering`; the selected geometry consumer remains Approximate.
+Keep saved offset/presence and pen identity separate from negative spacing or
+working position. This selected fresh phase substitution does not establish
+global offset inertness or justify treating the saved value directly as SVG
+`stroke-dashoffset`.
+
+## Saved channels and current Rust boundary
+
+XY and interior saved time affect this plain path; size/resolution, saved
+tolerance/tool/IsShape, incoming alternation and inverse scale also matter.
+Pressure/tilt/orientation are fetched and terminal-materialized but are not
+numerical operands of the reached geometry chain. A usable pressure array is
+still required because terminal construction dereferences it. This does not
+justify discarding channels or generalizing to live input, other versions or
+effects; [recording](stroke-recording-findings.md) remains separate authority.
+
+Context-free [prepare_stroke](../../crates/sdocx/src/ink.rs) retains original
+InkPen2 points and the generic pressure-width approximation. The explicit
+`RenderOptions::inkpen2_profile` route reconstructs ordinary solid-color tool-2 `9;` strokes
+with zero tolerance and complete channels. It selects fresh state, identity
+inverse scale and an explicit `enhanced_antialias` policy; screen dimensions are
+supplied rather than inferred from the page. Saved channels remain the source.
+Native color mode 1 forwards its palette but retains saved RGB when rainbow
+is disabled, including the pointer-enabled control. InkPen2's `GetPatternable`
+returns null (PenCommon `0x46480`), so Drawing skips type-2 pattern setup.
+Joined type-0/type-2 controls with different pattern index/scale retain identical
+25-record geometry and RGBA paint. The constant-RGB route admits known color
+modes 0–2 while rejecting rainbow and unsupported color modes.
+Native gradient probes recover palette interpolation at `0x4e9dc`/`0x4ecc0`:
+segment-local distance plus carried offset selects RGB; palette alpha and the
+separate rainbow-time control do not affect the captured streams. Terminal
+color is recalculated only while drawable+376 remains set (no prior stamp);
+a two-point 0.5-unit stroke reaches that branch, unlike the 25-record control.
+Drawing context-converts base ARGB (`0x81c1c`–`0x81c4c`) but forwards the
+palette separately (`0x821f4`–`0x82258`). Identity/inverting host callbacks
+change the base color while retaining the palette and complete 900-byte
+gradient stream. This establishes separate inputs, not actual app dark-mode
+values; a solid-color theme policy must not be applied to palette stops.
+Gradient output still needs the normalized source-over color canvas as well as
+the enhanced-AA MAX mask; the constant-color projection alone is insufficient.
+Twelve joined native gradient draws (1×/2×/4×, AA off/on, alpha 128/255)
+regenerate the same 900-byte VBO. Reconstructing the six enhanced final frames
+from their captured M/C stage bytes matches alpha exactly and RGB within one
+byte; this verifies the stage law, not public vector transport or a general bound.
+An internal Rust PDF route retains the nine-float records and uses Type 1 RGB
+shading with Type 4 calculator functions with a separate q/MAX luminosity mask, without images. Its staged limit
+is 512 records and 1 MiB of calculator code; enhanced active-gradient admission stays off.
+Rust tests execute the generated programs against the source-over/normalization
+law and check retained vector export of the native 900-byte stream at three
+scales and zero/partial/opaque alpha. This does not establish pixel parity.
+A test-only per-draw RGBA8 color recurrence was compared through the same marker/Form
+path against all six enhanced native gradient frames in MuPDF and PDFium. The paired
+PDFs preserve caller-owned saved alpha and map the captured GL-up coordinates into
+SVG page coordinates. Full-frame premultiplied RGBA MAE changes are small and mixed
+(absolute changes below 0.002 byte); alpha is identical between each pair. This does
+not justify enabling quantization: continuous production output and gradient admission
+remain unchanged. The Rust opt-in writer and calculator controls retain the experiment;
+PDF shading/soft-mask coverage sampling remains the larger unresolved residual.
+For PDFium 126, the source-defined integer shading grid predicts all 12,288
+opaque-alpha pixels exactly at each of the three scales, using the emitted PDF
+records and transform without fitting a phase. This explains that reader's
+coverage difference from the native GL pixel-center grid; it does not establish
+cross-reader or device parity. The partial-alpha opaque-mask control reaches
+127 rather than 128: PDFium's decimal parser reads `/ca 0.5019608` below 128/255,
+then group-opacity conversion truncates its product with 255. Source revision
+`7b7c83fba6d0af8d8847ee606569c35880512995` and hashed comparison receipts are
+retained in the ignored integer-grid audit; production geometry and opacity stay unchanged.
+Applying `floor(mask_gray8 * 127 / 255)` predicts every partial-alpha pixel at
+all three scales too; this resolves that output-rounding residual, not the
+mask-sampling difference against native R8.
+Two-/three-stamp scratch controls match the analytic reference within 1–2 bytes
+in PDFium. Across the twelve 25-record exports, direct MuPDF evaluation of the
+emitted mask functions matches the analytic field within 0.005 alpha byte;
+rasterized shading/soft-mask output still differs materially at low scales.
+The staged SVG mask packs independent stamp fields, explicitly crops each
+offset input and MAX-combines them with filter primitives. Rust tests cover
+packing, low coverage, replay removal and resource rejection. In the six
+enhanced 25-record exports, Chromium/Firefox support-union RGBA MAE is
+0.216–1.551 bytes and support IoU is 0.9944–1. These are bounded host controls.
+The reflected page transform fails in resvg 0.45.1; an independent 0.47.0
+library replay reproduces the 14-versus-93-pixel support failure. Its offset
+scaling discards reflection signs. A positive-Y diagnostic restores support
+but changing only the transform is not a valid correction. A later test-only
+Rust pair reflects the records and rebuilds all atlas/marker/sidecar geometry,
+then conjugates the scene transform to preserve page placement. Across the six
+native host controls, resvg 0.45.1 support IoU becomes 1 at all three scales;
+full-frame premultiplied RGBA MAE drops from 0.44–13.15 to 0.005–0.044 byte.
+Chromium/Firefox changes stay below 0.002 byte; PDF residuals remain. This
+validates the bounded chart change, not production integration or device parity.
+A filter-free quantized level-set MAX-mask experiment also improves the reflected
+resvg baseline, but loses faint support and increases Chromium/Firefox error
+across the same six controls. Ordinary antialiasing adds excess support; the
+crisp-edge variant also regresses browser output. Neither warrants admission.
+The Rust mask oracle matches every native R8 red-channel byte in those six
+captures at 1×/2×/4×; this isolates that experiment's loss to SVG rasterization
+and compositing rather than its analytic MAX field.
+Enhanced active-gradient admission remains off: transform-aware integration,
+fractional consumer zoom, PDF appearance and real-document evidence remain open.
+Audit artifacts stay in ignored `tmp/vector-parity-plan/`.
+The public active-gradient route is limited to explicit AA-off profiles with
+minimum screen dimension 1080, type 1, positive distance, nonnegative offset,
+2–256 palette entries, at most 512 records and unit coverage in every record.
+It uses direct source-over radial gradients without the enhanced MAX mask.
+A parsed 126-byte active hybrid frame produces the same 25-record/900-byte
+native Drawing stream (SHA-256 `570044bb059690f865cfa6f4f99c8ba7801573144242ee0913654973b0d0e987`);
+Rust tests exercise public SVG/PDF dispatch and retain zero image objects.
+The unchanged public exports improve shared-support RGB error and support IoU
+against the no-profile fallback in all fifteen 1×/2×/4× comparisons across
+Chromium, Firefox, resvg, MuPDF and PDFium. Browser/resvg MAE is 0.51–2.55 bytes;
+PDF MAE remains 8.15–33.88 (maximum 46–139), so PDF pixel parity is unresolved.
+Native premultiplied readback is row-flipped once and composited over the same
+export paper; each renderer uses a shared native/candidate/fallback support union.
+Model construction initializes the separate effect type to zero. Runtime tracing
+also resolves Drawing's `GetLaserable` guard to the null PenCommon stub
+(`0x46488`), skipping the apparent effect-type forwarding block. Omitting an
+explicit type-zero setter preserves the complete VBO. These are host-built
+source controls, not evidence of app defaults or real-document parity.
+The [native saved capture](../../conformance/inkpen2-saved.json) executes three
+configured redraw cases and reads the final nine-float RTV3 records separately
+from callback inputs. All 144 dependency initializers run; single-thread locale,
+platform services and supplied stroke interfaces remain host boundaries. This
+does not establish device display context, arbitrary incoming state, other
+effects/versions, arbitrary enhanced-AA canvas setup or native PDF equality.
+The explicit profile is bounded admission, not a device-default reconstruction.
+
+A hybrid control combines a borrowed type-0 prefix with a host-built 106-byte
+type-1 frame. Native apply/attach restores InkPen2/`9;`, size 4 and `ff123456`;
+source tolerance and all three redraw thresholds are zero. Omitted line/stroke
+types default to zero: the model constructor initializes members 384/464,
+read by getters at `0x2e2a28`/`0x2e16b0`. Rust parses and resolves the same style
+IDs, then matches all 225 native output words at 1920×1080. This is generated
+source evidence, not a native full-source writer or a real InkPen2 document.
+
+When drawable+16/+32 are present, V9 queues enhanced AA from
+`InkPen2Data[0] + 52` at `0x4e274–0x4e294`; helper `0x3e590` copies it into
+task+40. Native manager AA controls 0/1 propagate through `GetPen` into
+`Pen::SetEnhancedAntiAlias` (`0x460a4`, return PC `0x4dce8`), then the queued
+RT setter (`0x4a5b0`) writes RT+68. Draw reads that byte at `0x5458c` and
+reaches default/enhanced continuations `0x54844`/`0x54594`. The enabled control
+produces a MAX mask, source-over color canvas and final RGBA8 composite.
+This verifies configured native handoff, not device policy. With mask M and
+premultiplied source-over canvas C, the final shader emits alpha `M * ARGB.a`
+and straight RGB `C.rgb / C.a`. For admitted constant RGB, the vector route uses
+MAX coverage and opacity once, omitting intermediate RGBA8 color quantization
+(up to one RGB byte in the opaque 25-record witness, not a general error bound).
+Actual native 1×/2×/4× controls with alpha 0/128/255 preserve the same 900-byte
+upload. Public SVG active-union RGB MAE is 0.55–0.87 for half alpha; MuPDF is
+4.21–12.30, improving over the direct route but leaving substantial sampling error.
+Opaque SVG also improves; opaque PDF regresses at 1×/2× and improves at 4×.
+All alpha-zero controls match blank; exported PDFs contain no image objects.

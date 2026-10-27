@@ -1,0 +1,806 @@
+use crate::binary::Reader;
+use crate::frame::{Frame, Mask};
+use crate::note::parse_shape_text;
+use crate::object::read_bbox;
+use crate::shape_paint_source::{
+    ColorPaintSource, ImagePaintSource, PatternPaintSource, ShapePaintSource,
+};
+use crate::{BoundingBox, Error, ObjectMetadata, ParseLimits, Result, RichTextBox, TextAreaType};
+
+mod model_arc;
+mod model_quad_arc;
+mod native_arc;
+#[cfg(test)]
+mod native_normalize;
+pub(crate) mod native_path;
+mod outline;
+
+/// Paint supported by the shape renderer, or an uninterpreted native effect.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum ShapePaint {
+    /// No visible paint.
+    None,
+    /// Solid color, including alpha, in native ARGB order.
+    Solid(u32),
+    /// Linear or radial color gradient, described by the accompanying saved color source.
+    Gradient,
+    /// An effect whose rendering semantics are not yet supported.
+    Unsupported {
+        /// Native effect/color kind, depending on the containing field.
+        kind: u8,
+        /// Bounded native effect bytes.
+        data: Vec<u8>,
+    },
+}
+
+/// Outline settings shared by native shapes and lines.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub struct ShapeStyle {
+    /// Outline color effect.
+    pub paint: ShapePaint,
+    /// Saved color source; independent of paint rendering support.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub paint_source: Option<ShapePaintSource>,
+    /// Width in document coordinates; native default is 2.0.
+    pub width: f32,
+    /// Native compound-line enum (0 means simple).
+    pub compound: u8,
+    /// Native dash enum (0 means solid).
+    pub dash: u8,
+    /// Native cap enum (0 butt, 1 round, 2 square).
+    pub cap: u8,
+    /// Native join enum (0 miter, 1 round, 2 bevel).
+    pub join: u8,
+    /// Native begin-arrow type and size.
+    pub begin_arrow: [u8; 2],
+    /// Native end-arrow type and size.
+    pub end_arrow: [u8; 2],
+}
+
+impl Default for ShapeStyle {
+    fn default() -> Self {
+        Self {
+            paint: ShapePaint::Solid(0xff000000),
+            paint_source: None,
+            width: 2.0,
+            compound: 0,
+            dash: 0,
+            cap: 0,
+            join: 0,
+            begin_arrow: [0; 2],
+            end_arrow: [0; 2],
+        }
+    }
+}
+
+/// Source relationships from the native type-6 shape-base frame, before resolution.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub struct ShapeBaseSource {
+    pub magnetic_points: Vec<[f64; 2]>,
+    /// Sized connection payload, including its record count and any opaque remainder.
+    pub connection_data: Vec<u8>,
+}
+
+/// Geometry and styles decoded from the native `0 + 6 + 7` shape chain.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub struct NativeShape {
+    /// Actual horizontal orientation (type-7 property bit 0), independent of flip capability.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub horizontal_flip: bool,
+    /// Actual vertical orientation (type-7 property bit 1), independent of flip capability.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub vertical_flip: bool,
+    /// Whether Samsung Notes permits editing the shape text (type-7 property bit 2).
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub text_editable: bool,
+    pub text_area_type: Option<TextAreaType>,
+    /// Stored type-0 metadata. Normal shape writers put drawn bounds here.
+    pub metadata: ObjectMetadata,
+    /// Parsed type-6 source; absent in older serialized model data.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub base_source: Option<Box<ShapeBaseSource>>,
+    /// Native shape-template ID; unfamiliar values are preserved.
+    pub shape_type: u32,
+    /// Unrotated geometry rectangle from type 7.
+    pub geometry_bbox: BoundingBox,
+    /// Drawn-bounds snapshot stored after control points.
+    pub drawn_bbox: BoundingBox,
+    /// Geometry rotation from type 7; the normal writer clears type-0 rotation.
+    pub rotation_degrees: f32,
+    /// Native control points, retained for template-specific interpretation.
+    pub control_points: Vec<[f64; 2]>,
+    /// Native custom path bytes, retained without guessing path semantics.
+    pub path_data: Vec<u8>,
+    /// Outline settings.
+    pub style: ShapeStyle,
+    /// Interior paint.
+    pub fill: ShapePaint,
+    /// Saved interior source; unsupported paint still retains its original bytes.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub fill_source: Option<ShapePaintSource>,
+    /// Optional string-resource ID for the native pen name.
+    pub pen_name_id: Option<i32>,
+    /// Uninterpreted four-byte type-7 pen-data field 3.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub pen_data_field_3_raw: Option<[u8; 4]>,
+    /// Optional string-resource ID for advanced native pen settings.
+    pub pen_settings_id: Option<i32>,
+    /// Embedded shape text, decoded with the rich-text limits.
+    pub text: Option<Box<RichTextBox>>,
+}
+
+/// Saved type-8 field-0 pen source, independent of the modern pen-name field.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub struct LineLegacyPenSource {
+    pub pen_name_id: i32,
+    /// Uninterpreted bytes following the legacy pen-name ID.
+    pub remainder: [u8; 4],
+}
+
+/// Geometry and styles decoded from the native `0 + 6 + 8` line chain.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub struct NativeLine {
+    /// Stored common identity and placement.
+    pub metadata: ObjectMetadata,
+    /// Parsed type-6 source; absent in older serialized model data.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub base_source: Option<Box<ShapeBaseSource>>,
+    /// Native line kind: 0 straight, 1 elbow, 2 curve.
+    pub line_type: u8,
+    /// Native routing setting, retained without interpretation.
+    pub routing: u8,
+    /// Control points in page coordinates.
+    pub control_points: Vec<[f64; 2]>,
+    /// Start point in page coordinates, already including native rotation.
+    pub begin: [f64; 2],
+    /// End point in page coordinates, already including native rotation.
+    pub end: [f64; 2],
+    /// First native geometry rectangle.
+    pub geometry_bbox: BoundingBox,
+    /// Second native geometry rectangle.
+    pub reference_bbox: BoundingBox,
+    /// Remaining fixed setting, preserved without assigning a semantic name.
+    pub raw_setting: u32,
+    /// Optional string-resource ID for the native pen name.
+    pub pen_name_id: Option<i32>,
+    /// Legacy pen source, retained separately from the modern pen-name ID.
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub legacy_pen_source: Option<LineLegacyPenSource>,
+    /// Optional string-resource ID for advanced native pen settings.
+    pub pen_settings_id: Option<i32>,
+    /// Native custom path bytes, when present.
+    pub path_data: Vec<u8>,
+    /// Outline settings.
+    pub style: ShapeStyle,
+}
+
+pub(crate) struct Decoded<T> {
+    pub(crate) value: T,
+    pub(crate) unsupported: Vec<&'static str>,
+}
+
+pub(crate) struct DecodedShapeBase {
+    pub(crate) style: ShapeStyle,
+    pub(crate) source: ShapeBaseSource,
+}
+
+pub(crate) fn decode_shape(data: &[u8], limits: &ParseLimits) -> Result<Decoded<NativeShape>> {
+    let mut reader = Reader::new(data, "shape object");
+    let metadata = ObjectMetadata::read(&mut reader)?;
+    let mut unsupported = Vec::new();
+    let shape_base = read_shape_base(&Frame::read(&mut reader)?, &mut unsupported)?;
+    let frame = Frame::read(&mut reader)?;
+    frame.expect_kind(7)?;
+    let mut fixed = Reader::new(frame.fixed, "shape geometry");
+    let shape_type = fixed.read_u32("shape type")?;
+    let geometry_bbox = read_bbox(&mut fixed)?;
+    let rotation_degrees = finite_f32(&mut fixed, "shape rotation")?;
+    let path_data = sized(&mut fixed, "shape path")?.to_vec();
+    let horizontal_flip = frame.properties.contains(0);
+    let vertical_flip = frame.properties.contains(1);
+    let supported_path = if path_data.is_empty() {
+        false
+    } else {
+        let normalized = native_path::normalize_model_path(
+            &path_data,
+            [
+                geometry_bbox.x_min,
+                geometry_bbox.y_min,
+                geometry_bbox.x_max,
+                geometry_bbox.y_max,
+            ],
+            rotation_degrees,
+            horizontal_flip,
+            vertical_flip,
+            true,
+        )?;
+        match normalized {
+            Some(_) => true,
+            None => {
+                unsupported.push("unsupported native path commands or trailing data");
+                false
+            }
+        }
+    };
+    let control_points = read_points(&mut fixed)?;
+    let drawn_bbox = read_bbox(&mut fixed)?;
+    let text_editable = frame.properties.contains(2);
+    if fixed.remaining() != 0 {
+        unsupported.push("shape geometry extensions");
+    }
+    if frame.properties.has_other_bits(0x07) {
+        unsupported.push("unknown shape geometry properties");
+    }
+    if !supported_path && !control_points.is_empty() {
+        unsupported.push("custom paths or template control points");
+    }
+    if !supported_path && !matches!(shape_type, 1..=4 | 8) {
+        unsupported.push("shape template");
+    }
+    if metadata.rotation_degrees.is_some_and(|angle| angle != 0.0)
+        || !same_bbox(metadata.bbox, drawn_bbox)
+    {
+        unsupported.push("additional base placement transform");
+    }
+    let mut fields = Reader::new(frame.flexible, "shape fields");
+    let mut text = if frame.fields.contains(0) {
+        let mut text_metadata = metadata.clone();
+        text_metadata.bbox = geometry_bbox;
+        text_metadata.rotation_degrees = Some(f64::from(rotation_degrees));
+        let decoded = parse_shape_text(&mut fields, limits, text_metadata)?;
+        unsupported.extend(decoded.unsupported);
+        Some(Box::new(decoded.text_box))
+    } else {
+        None
+    };
+    let text_area_type = frame
+        .fields
+        .contains(1)
+        .then(|| fields.read_u8("text area type").map(TextAreaType::from))
+        .transpose()?;
+    if let Some(text) = &mut text {
+        text.text_area_type = text_area_type;
+    }
+    if text_area_type.is_some_and(|area| area != TextAreaType::Margin) {
+        unsupported.push("text area layout");
+    }
+    let pen_name_id = frame
+        .fields
+        .contains(2)
+        .then(|| fields.read_i32("pen name ID"))
+        .transpose()?;
+    let pen_data_field_3_raw = if frame.fields.contains(3) {
+        let mut raw = [0; 4];
+        raw.copy_from_slice(fields.read_bytes(4, "shape pen field 3")?);
+        unsupported.push("uninterpreted shape pen field 3");
+        Some(raw)
+    } else {
+        None
+    };
+    let pen_settings_id = frame
+        .fields
+        .contains(4)
+        .then(|| fields.read_i32("pen settings ID"))
+        .transpose()?;
+    let mut fill = ShapePaint::None;
+    let mut fill_source = None;
+    if frame.fields.contains(5) {
+        let size = fields.read_u32("fill size")? as usize;
+        let kind = fields.read_u8("fill kind")?;
+        let data = fields.read_bytes(size, "fill effect")?;
+        fill = if kind == 1 {
+            let (paint, source) = read_paint(data, false, &mut unsupported)?;
+            fill_source = source;
+            paint
+        } else {
+            fill_source = match kind {
+                2 => ImagePaintSource::read(data, metadata.format_version)
+                    .ok()
+                    .flatten()
+                    .map(ShapePaintSource::Image),
+                3 => PatternPaintSource::read(data)
+                    .ok()
+                    .map(ShapePaintSource::Pattern),
+                _ => None,
+            };
+            unsupported.push("non-color shape fill");
+            ShapePaint::Unsupported {
+                kind,
+                data: data.to_vec(),
+            }
+        };
+    }
+    if pen_name_id.is_some() || pen_settings_id.is_some() {
+        unsupported.push("native pen rendering");
+    }
+    if fields.remaining() != 0 || frame.fields.has_other_bits(0x3f) {
+        unsupported.push("additional shape fields");
+    }
+    read_extensions(&mut reader, &mut unsupported)?;
+    Ok(Decoded {
+        value: NativeShape {
+            horizontal_flip,
+            vertical_flip,
+            text_editable,
+            text_area_type,
+            metadata,
+            base_source: Some(Box::new(shape_base.source)),
+            shape_type,
+            geometry_bbox,
+            drawn_bbox,
+            rotation_degrees,
+            control_points,
+            path_data,
+            style: shape_base.style,
+            fill,
+            fill_source,
+            pen_name_id,
+            pen_data_field_3_raw,
+            pen_settings_id,
+            text,
+        },
+        unsupported,
+    })
+}
+
+pub(crate) fn decode_line(data: &[u8]) -> Result<Decoded<NativeLine>> {
+    let mut reader = Reader::new(data, "line object");
+    let metadata = ObjectMetadata::read(&mut reader)?;
+    let mut unsupported = Vec::new();
+    let shape_base = read_shape_base(&Frame::read(&mut reader)?, &mut unsupported)?;
+    let frame = Frame::read(&mut reader)?;
+    frame.expect_kind(8)?;
+    let mut fixed = Reader::new(frame.fixed, "line geometry");
+    let line_type = fixed.read_u8("line type")?;
+    let routing = fixed.read_u8("line routing")?;
+    let control_points = read_points(&mut fixed)?;
+    let begin = read_point(&mut fixed)?;
+    let end = read_point(&mut fixed)?;
+    let geometry_bbox = read_bbox(&mut fixed)?;
+    let reference_bbox = read_bbox(&mut fixed)?;
+    let raw_setting = fixed.read_u32("line setting")?;
+    if line_type > 2 || routing != 0 || raw_setting != 0 {
+        unsupported.push("line routing, control points or settings");
+    }
+    if fixed.remaining() != 0 || frame.properties.has_other_bits(0) {
+        unsupported.push("line geometry extensions or properties");
+    }
+    let mut fields = Reader::new(frame.flexible, "line fields");
+    let legacy_pen_source = if frame.fields.contains(0) {
+        let pen_name_id = fields.read_i32("legacy pen name ID")?;
+        let mut remainder = [0; 4];
+        remainder.copy_from_slice(fields.read_bytes(4, "legacy pen remainder")?);
+        Some(LineLegacyPenSource {
+            pen_name_id,
+            remainder,
+        })
+    } else {
+        None
+    };
+    let pen_settings_id = frame
+        .fields
+        .contains(1)
+        .then(|| fields.read_i32("pen settings ID"))
+        .transpose()?;
+    let pen_name_id = frame
+        .fields
+        .contains(2)
+        .then(|| fields.read_i32("pen name ID"))
+        .transpose()?;
+    let mut path_data = Vec::new();
+    if frame.fields.contains(3) {
+        let bytes = &frame.flexible[fields.position()..];
+        let (size, supported) = native_path::visit_drawing_path(bytes, |_| {})?;
+        path_data = fields.read_bytes(size, "line path")?.to_vec();
+        if !supported {
+            unsupported.push("unsupported native path commands");
+        }
+    }
+    if legacy_pen_source.is_some() || pen_name_id.is_some() || pen_settings_id.is_some() {
+        unsupported.push("native pen rendering");
+    }
+    if fields.remaining() != 0 || frame.fields.has_other_bits(0x0f) {
+        unsupported.push("additional line fields");
+    }
+    if line_type != 0 && path_data.is_empty() {
+        unsupported.push("non-straight line without a supported path");
+    }
+    read_extensions(&mut reader, &mut unsupported)?;
+    Ok(Decoded {
+        value: NativeLine {
+            metadata,
+            base_source: Some(Box::new(shape_base.source)),
+            line_type,
+            routing,
+            control_points,
+            begin,
+            end,
+            geometry_bbox,
+            reference_bbox,
+            raw_setting,
+            pen_name_id,
+            legacy_pen_source,
+            pen_settings_id,
+            path_data,
+            style: shape_base.style,
+        },
+        unsupported,
+    })
+}
+
+pub(crate) fn read_shape_base(
+    frame: &Frame<'_>,
+    unsupported: &mut Vec<&'static str>,
+) -> Result<DecodedShapeBase> {
+    frame.expect_kind(6)?;
+    let mut fixed = Reader::new(frame.fixed, "shape base");
+    let magnetic_count = fixed.read_u32("magnetic point count")? as usize;
+    let point_bytes = magnetic_count
+        .checked_mul(16)
+        .ok_or_else(|| Error::Format("magnetic point size overflow".into()))?;
+    let mut points = Reader::new(
+        fixed.read_bytes(point_bytes, "magnetic points")?,
+        "magnetic points",
+    );
+    let mut magnetic_points = Vec::with_capacity(magnetic_count);
+    for _ in 0..magnetic_count {
+        magnetic_points.push(read_point(&mut points)?);
+    }
+    let connection_data = sized(&mut fixed, "connection block")?;
+    let mut connections = Reader::new(connection_data, "shape connections");
+    let connection_count = connections.read_u32("connection count")?;
+    let reserved = fixed.read_u8("reserved shape byte")?;
+    if connection_count != 0
+        || connections.remaining() != 0
+        || reserved != 0
+        || fixed.remaining() != 0
+        || frame.properties.has_other_bits(0)
+    {
+        unsupported.push("shape connections or base extensions");
+    }
+    let mut style = ShapeStyle::default();
+    let mut fields = Reader::new(frame.flexible, "shape outline");
+    if frame.fields.contains(0) || frame.fields.contains(1) {
+        unsupported.push("unknown field before outline effects");
+    } else {
+        if frame.fields.contains(2) {
+            (style.paint, style.paint_source) =
+                read_paint(sized(&mut fields, "line color effect")?, true, unsupported)?;
+        }
+        if frame.fields.contains(3) {
+            let mut effect = Reader::new(sized(&mut fields, "line style effect")?, "line style");
+            style.width = finite_f32(&mut effect, "line width")?;
+            if style.width < 0.0 {
+                return Err(Error::Format("negative line width".into()));
+            }
+            style.compound = effect.read_u8("compound type")?;
+            style.dash = effect.read_u8("dash type")?;
+            style.cap = effect.read_u8("cap type")?;
+            style.join = effect.read_u8("join type")?;
+            style.begin_arrow = [
+                effect.read_u8("begin arrow type")?,
+                effect.read_u8("begin arrow size")?,
+            ];
+            style.end_arrow = [
+                effect.read_u8("end arrow type")?,
+                effect.read_u8("end arrow size")?,
+            ];
+            if style.compound != 0
+                || style.dash_pattern().is_err()
+                || style.cap > 2
+                || style.join > 2
+                || !style.has_supported_arrow_settings()
+                || effect.remaining() != 0
+            {
+                unsupported
+                    .push("compound/unsupported dashed outlines, arrows or style extensions");
+            }
+        }
+    }
+    if fields.remaining() != 0 || frame.fields.has_other_bits(0x0c) {
+        unsupported.push("additional outline fields");
+    }
+    Ok(DecodedShapeBase {
+        style,
+        source: ShapeBaseSource {
+            magnetic_points,
+            connection_data: connection_data.to_vec(),
+        },
+    })
+}
+
+fn read_paint(
+    data: &[u8],
+    outline: bool,
+    unsupported: &mut Vec<&'static str>,
+) -> Result<(ShapePaint, Option<ShapePaintSource>)> {
+    let mut reader = Reader::new(data, "shape color effect");
+    let properties = Mask::read(&mut reader)?;
+    let mut source = ColorPaintSource::read_body(
+        &mut reader,
+        outline,
+        properties.bytes().first().copied().unwrap_or(0),
+    )?;
+    let kind = source
+        .outline_color_type
+        .unwrap_or_else(|| u8::from(properties.contains(0)));
+    if properties.has_other_bits(if outline { 1 } else { 3 }) || reader.remaining() != 0 {
+        unsupported.push("color effect extensions");
+    }
+    let paint = match kind {
+        0 => ShapePaint::Solid(source.solid_argb),
+        2 if outline => ShapePaint::None,
+        1 if data.first() == Some(&1)
+            && matches!(source.gradient_type, 0 | 1)
+            && !source.stops.is_empty() =>
+        {
+            ShapePaint::Gradient
+        }
+        _ => {
+            unsupported.push("gradient or unknown color effect");
+            ShapePaint::Unsupported {
+                kind,
+                data: data.to_vec(),
+            }
+        }
+    };
+    let source = if data.first() == Some(&1) {
+        source.trailing_data = reader
+            .read_bytes(reader.remaining(), "color effect trailing data")?
+            .to_vec();
+        Some(ShapePaintSource::Color(source))
+    } else if matches!(paint, ShapePaint::Unsupported { .. }) {
+        None
+    } else {
+        Some(ShapePaintSource::Opaque {
+            data: data.to_vec(),
+        })
+    };
+    Ok((paint, source))
+}
+
+fn read_points(reader: &mut Reader<'_>) -> Result<Vec<[f64; 2]>> {
+    let count = usize::from(reader.read_u8("control point count")?);
+    let mut points = Reader::new(
+        reader.read_bytes(count * 16, "control points")?,
+        "control points",
+    );
+    (0..count).map(|_| read_point(&mut points)).collect()
+}
+
+fn read_point(reader: &mut Reader<'_>) -> Result<[f64; 2]> {
+    let point = [reader.read_f64("point x")?, reader.read_f64("point y")?];
+    if point.iter().any(|value| !value.is_finite()) {
+        return Err(Error::Format("non-finite shape/line point".into()));
+    }
+    Ok(point)
+}
+
+fn finite_f32(reader: &mut Reader<'_>, field: &'static str) -> Result<f32> {
+    let value = reader.read_f32(field)?;
+    if !value.is_finite() {
+        return Err(Error::Format(format!("non-finite {field}")));
+    }
+    Ok(value)
+}
+
+fn sized<'a>(reader: &mut Reader<'a>, field: &'static str) -> Result<&'a [u8]> {
+    let size = reader.read_u32(field)? as usize;
+    reader.read_bytes(size, field)
+}
+
+fn same_bbox(a: BoundingBox, b: BoundingBox) -> bool {
+    a.x_min == b.x_min && a.y_min == b.y_min && a.x_max == b.x_max && a.y_max == b.y_max
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) enum NativePathCommand<T = f64> {
+    Move([T; 2]),
+    Line([T; 2]),
+    Quadratic([[T; 2]; 2]),
+    Cubic([[T; 2]; 3]),
+    Arc([T; 6]),
+    Close,
+    Oval([T; 4]),
+}
+
+/// Visit native WDoc path commands without allocating from the untrusted count.
+/// Unknown verbs have unknown widths; their bounded remainder stays opaque.
+pub(crate) fn visit_path(
+    data: &[u8],
+    mut visitor: impl FnMut(NativePathCommand),
+) -> Result<(usize, bool)> {
+    fn coordinates<const N: usize>(reader: &mut Reader<'_>) -> Result<[f64; N]> {
+        let mut values = [0.0; N];
+        for value in &mut values {
+            *value = reader.read_f64("path coordinate")?;
+            if !value.is_finite() {
+                return Err(Error::Format("non-finite path coordinate".into()));
+            }
+        }
+        Ok(values)
+    }
+
+    let mut reader = Reader::new(data, "native shape path");
+    let count = reader.read_u32("path command count")? as usize;
+    if count > reader.remaining() {
+        return Err(Error::Format(
+            "path command count exceeds its bounded payload".into(),
+        ));
+    }
+    let mut supported = count != 0;
+    for index in 0..count {
+        let verb = reader.read_u8("path verb")?;
+        let command = match verb {
+            1 => NativePathCommand::Move(coordinates(&mut reader)?),
+            2 => NativePathCommand::Line(coordinates(&mut reader)?),
+            3 => {
+                let [x1, y1, x2, y2] = coordinates(&mut reader)?;
+                NativePathCommand::Quadratic([[x1, y1], [x2, y2]])
+            }
+            4 => {
+                let [x1, y1, x2, y2, x3, y3] = coordinates(&mut reader)?;
+                NativePathCommand::Cubic([[x1, y1], [x2, y2], [x3, y3]])
+            }
+            5 => NativePathCommand::Arc(coordinates(&mut reader)?),
+            6 => NativePathCommand::Close,
+            7 => NativePathCommand::Oval(coordinates(&mut reader)?),
+            _ => return Ok((data.len(), false)),
+        };
+        supported &= !matches!(
+            command,
+            NativePathCommand::Arc(_) | NativePathCommand::Oval(_)
+        ) && (index != 0 || matches!(command, NativePathCommand::Move(_)));
+        visitor(command);
+    }
+    Ok((reader.position(), supported))
+}
+
+fn read_extensions(reader: &mut Reader<'_>, unsupported: &mut Vec<&'static str>) -> Result<()> {
+    if reader.remaining() != 0 {
+        while reader.remaining() != 0 {
+            Frame::read(reader)?;
+        }
+        unsupported.push("additional shape/line frames");
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{NativePathCommand, visit_path};
+
+    fn path(commands: &[(u8, &[f64])]) -> Vec<u8> {
+        let mut bytes = (commands.len() as u32).to_le_bytes().to_vec();
+        for (verb, coordinates) in commands {
+            bytes.push(*verb);
+            for value in *coordinates {
+                bytes.extend(value.to_le_bytes());
+            }
+        }
+        bytes
+    }
+
+    #[test]
+    fn path_commands_preserve_typed_points_and_control_point_order() {
+        let bytes = path(&[
+            (1, &[1.25, -2.5]),
+            (2, &[3.0, 4.0]),
+            (3, &[5.0, 6.0, 7.0, 8.0]),
+            (4, &[9.0, 10.0, 11.0, 12.0, 13.0, 14.0]),
+            (6, &[]),
+        ]);
+        let mut commands = Vec::new();
+        assert_eq!(
+            visit_path(&bytes, |command| commands.push(command)).unwrap(),
+            (bytes.len(), true)
+        );
+        assert_eq!(
+            commands,
+            [
+                NativePathCommand::Move([1.25, -2.5]),
+                NativePathCommand::Line([3.0, 4.0]),
+                NativePathCommand::Quadratic([[5.0, 6.0], [7.0, 8.0]]),
+                NativePathCommand::Cubic([[9.0, 10.0], [11.0, 12.0], [13.0, 14.0]]),
+                NativePathCommand::Close,
+            ]
+        );
+    }
+
+    #[test]
+    fn opaque_arc_and_oval_keep_known_widths_without_enabling_rendering() {
+        let bytes = path(&[
+            (1, &[1.0, 2.0]),
+            (5, &[3.0, 4.0, 5.0, 6.0, 7.0, 8.0]),
+            (7, &[9.0, 10.0, 11.0, 12.0]),
+            (2, &[13.0, 14.0]),
+        ]);
+        let mut commands = Vec::new();
+        assert_eq!(
+            visit_path(&bytes, |command| commands.push(command)).unwrap(),
+            (bytes.len(), false)
+        );
+        assert_eq!(
+            commands,
+            [
+                NativePathCommand::Move([1.0, 2.0]),
+                NativePathCommand::Arc([3.0, 4.0, 5.0, 6.0, 7.0, 8.0]),
+                NativePathCommand::Oval([9.0, 10.0, 11.0, 12.0]),
+                NativePathCommand::Line([13.0, 14.0]),
+            ]
+        );
+    }
+
+    #[test]
+    fn malformed_commands_never_visit_partial_coordinates() {
+        for (verb, coordinates) in [
+            (2, &[3.0, 4.0][..]),
+            (3, &[3.0, 4.0, 5.0, 6.0][..]),
+            (4, &[3.0, 4.0, 5.0, 6.0, 7.0, 8.0][..]),
+            (5, &[3.0, 4.0, 5.0, 6.0, 7.0, 8.0][..]),
+            (7, &[3.0, 4.0, 5.0, 6.0][..]),
+        ] {
+            let bytes = path(&[(1, &[1.0, 2.0]), (verb, coordinates)]);
+            for end in 22..bytes.len() {
+                let mut visited = Vec::new();
+                assert!(visit_path(&bytes[..end], |command| visited.push(command)).is_err());
+                assert_eq!(visited, [NativePathCommand::Move([1.0, 2.0])]);
+            }
+        }
+        for bytes in [&[][..], &[1, 0, 0][..], &u32::MAX.to_le_bytes()[..]] {
+            let mut visited = 0;
+            assert!(visit_path(bytes, |_| visited += 1).is_err());
+            assert_eq!(visited, 0);
+        }
+    }
+
+    #[test]
+    fn nonfinite_commands_reject_the_path_after_only_complete_prefix_visits() {
+        for value in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+            let bytes = path(&[(1, &[1.0, 2.0]), (2, &[value, 4.0])]);
+            let mut visited = Vec::new();
+            assert!(visit_path(&bytes, |command| visited.push(command)).is_err());
+            assert_eq!(visited, [NativePathCommand::Move([1.0, 2.0])]);
+        }
+    }
+
+    #[test]
+    fn unknown_verbs_preserve_only_the_complete_prefix_and_opaque_remainder() {
+        let mut bytes = path(&[(1, &[1.0, 2.0]), (99, &[])]);
+        bytes.extend(f64::NAN.to_le_bytes());
+        bytes.push(4);
+        let mut visited = Vec::new();
+        assert_eq!(
+            visit_path(&bytes, |command| visited.push(command)).unwrap(),
+            (bytes.len(), false)
+        );
+        assert_eq!(visited, [NativePathCommand::Move([1.0, 2.0])]);
+    }
+
+    #[test]
+    fn complete_support_requires_a_move_and_exact_payload_extent() {
+        for bytes in [path(&[]), path(&[(2, &[1.0, 2.0])]), path(&[(6, &[])])] {
+            assert_eq!(visit_path(&bytes, |_| {}).unwrap(), (bytes.len(), false));
+        }
+        let mut trailing = path(&[(1, &[1.0, 2.0]), (6, &[])]);
+        let command_extent = trailing.len();
+        trailing.push(0xff);
+        assert_eq!(
+            visit_path(&trailing, |_| {}).unwrap(),
+            (command_extent, true)
+        );
+        assert_ne!(command_extent, trailing.len());
+    }
+}

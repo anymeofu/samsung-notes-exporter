@@ -1,0 +1,4015 @@
+{
+  "schema": "chinesebrush-source-native-v1",
+  "cases": {
+    "curve-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f6e56553f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f6e56553ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f6e564d3f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f6e564d3f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff21406e56453f00004040",
+            "delta_bytes": "fcbf8d40fbff21406e56453fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f406e563d3f00008040",
+            "delta_bytes": "fcffbb40faff5f406e563d3fc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff90406e56353f0000a040",
+            "delta_bytes": "fbbfe940fcff90406e56353f1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3406e562d3f0000c040",
+            "delta_bytes": "fc7f0b41faffb3406e562d3f77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd8406e56253f00000000",
+            "delta_bytes": "fcdf2141f9ffd8406e56253fb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000416e561d3f0000803f",
+            "delta_bytes": "00003841000000416e561d3fae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000843",
+            "vector4_arg_bytes": "f07b51419359164154e42a3f00000040",
+            "delta_bytes": "f07b51419359164154e42a3f39b40840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000943",
+            "vector4_arg_bytes": "4ac468416d2d29413a72383f00004040",
+            "delta_bytes": "4ac468416d2d29413a72383f9cc44840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "b7e48041576e3b412000463f00008040",
+            "delta_bytes": "b7e48041576e3b412000463f7f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000b43",
+            "vector4_arg_bytes": "d7bd8d4150bc4b41068e533f0000a040",
+            "delta_bytes": "d7bd8d4150bc4b41068e533fb072a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "ca2c9c41b5d65a41ec1b613f0000c040",
+            "delta_bytes": "ca2c9c41b5d65a41ec1b613fe17ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "5979aa4101a86641d2a96e3f00000000",
+            "delta_bytes": "5979aa4101a86641d2a96e3f4e62103e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "fdffb74100007041b8377c3f0000803f",
+            "delta_bytes": "fdffb74100007041b8377c3f0e2d923f"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfcffbe3ffcff473f6e56553ffa7e8a3ffcff3d40fbffcf3f6e564d3f2db20540fcbf8d40fbff21406e56453fdd244640fcffbb40faff5f406e563d3fc74b8340fbbfe940fcff90406e56353f1f85a340fc7f0b41faffb3406e562d3f77bec340fcdf2141f9ffd8406e56253fb6f3fd3d00003841000000416e561d3fae47913ff07b51419359164154e42a3f39b408404ac468416d2d29413a72383f9cc44840b7e48041576e3b412000463f7f6a8440d7bd8d4150bc4b41068e533fb072a440ca2c9c41b5d65a41ec1b613fe17ac4405979aa4101a86641d2a96e3f4e62103efdffb74100007041b8377c3f0e2d923f"
+      }
+    },
+    "curve-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f6e56553f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f6e56553ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f6e564d3f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f6e564d3f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff21406e56453f00004040",
+            "delta_bytes": "fcbf8d40fbff21406e56453fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f406e563d3f00008040",
+            "delta_bytes": "fcffbb40faff5f406e563d3fc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff90406e56353f0000a040",
+            "delta_bytes": "fbbfe940fcff90406e56353f1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3406e562d3f0000c040",
+            "delta_bytes": "fc7f0b41faffb3406e562d3f77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd8406e56253f00000000",
+            "delta_bytes": "fcdf2141f9ffd8406e56253fb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000416e561d3f0000803f",
+            "delta_bytes": "00003841000000416e561d3fae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000843",
+            "vector4_arg_bytes": "f07b51419359164138682d3f00000040",
+            "delta_bytes": "f07b51419359164138682d3f39b40840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000943",
+            "vector4_arg_bytes": "4ac468416d2d2941027a3d3f00004040",
+            "delta_bytes": "4ac468416d2d2941027a3d3f9cc44840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "b7e48041576e3b41cc8b4d3f00008040",
+            "delta_bytes": "b7e48041576e3b41cc8b4d3f7f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000b43",
+            "vector4_arg_bytes": "d7bd8d4150bc4b41969d5d3f0000a040",
+            "delta_bytes": "d7bd8d4150bc4b41969d5d3fb072a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "ca2c9c41b5d65a4160af6d3f0000c040",
+            "delta_bytes": "ca2c9c41b5d65a4160af6d3fe17ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "5979aa4101a866412ac17d3f00000000",
+            "delta_bytes": "5979aa4101a866412ac17d3f4e62103e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "fdffb741000070417ae9863f0000803f",
+            "delta_bytes": "fdffb741000070417ae9863f0e2d923f"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfcffbe3ffcff473f6e56553ffa7e8a3ffcff3d40fbffcf3f6e564d3f2db20540fcbf8d40fbff21406e56453fdd244640fcffbb40faff5f406e563d3fc74b8340fbbfe940fcff90406e56353f1f85a340fc7f0b41faffb3406e562d3f77bec340fcdf2141f9ffd8406e56253fb6f3fd3d00003841000000416e561d3fae47913ff07b51419359164138682d3f39b408404ac468416d2d2941027a3d3f9cc44840b7e48041576e3b41cc8b4d3f7f6a8440d7bd8d4150bc4b41969d5d3fb072a440ca2c9c41b5d65a4160af6d3fe17ac4405979aa4101a866412ac17d3f4e62103efdffb741000070417ae9863f0e2d923f"
+      }
+    },
+    "curve-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f6e56553f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f6e56553ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f6e564d3f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f6e564d3f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff21406e56453f00004040",
+            "delta_bytes": "fcbf8d40fbff21406e56453fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f406e563d3f00008040",
+            "delta_bytes": "fcffbb40faff5f406e563d3fc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff90406e56353f0000a040",
+            "delta_bytes": "fbbfe940fcff90406e56353f1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3406e562d3f0000c040",
+            "delta_bytes": "fc7f0b41faffb3406e562d3f77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd8406e56253f00000000",
+            "delta_bytes": "fcdf2141f9ffd8406e56253fb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000416e561d3f0000803f",
+            "delta_bytes": "00003841000000416e561d3fae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000843",
+            "vector4_arg_bytes": "f07b51419359164138682d3f00000040",
+            "delta_bytes": "f07b51419359164138682d3f39b40840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000943",
+            "vector4_arg_bytes": "4ac468416d2d2941027a3d3f00004040",
+            "delta_bytes": "4ac468416d2d2941027a3d3f9cc44840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "b7e48041576e3b41cc8b4d3f00008040",
+            "delta_bytes": "b7e48041576e3b41cc8b4d3f7f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000b43",
+            "vector4_arg_bytes": "d7bd8d4150bc4b41969d5d3f0000a040",
+            "delta_bytes": "d7bd8d4150bc4b41969d5d3fb072a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "ca2c9c41b5d65a4160af6d3f0000c040",
+            "delta_bytes": "ca2c9c41b5d65a4160af6d3fe17ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "5979aa4101a866412ac17d3f00000000",
+            "delta_bytes": "5979aa4101a866412ac17d3f4e62103e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "fdffb741000070417ae9863f0000803f",
+            "delta_bytes": "fdffb741000070417ae9863f0e2d923f"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfcffbe3ffcff473f6e56553ffa7e8a3ffcff3d40fbffcf3f6e564d3f2db20540fcbf8d40fbff21406e56453fdd244640fcffbb40faff5f406e563d3fc74b8340fbbfe940fcff90406e56353f1f85a340fc7f0b41faffb3406e562d3f77bec340fcdf2141f9ffd8406e56253fb6f3fd3d00003841000000416e561d3fae47913ff07b51419359164138682d3f39b408404ac468416d2d2941027a3d3f9cc44840b7e48041576e3b41cc8b4d3f7f6a8440d7bd8d4150bc4b41969d5d3fb072a440ca2c9c41b5d65a4160af6d3fe17ac4405979aa4101a866412ac17d3f4e62103efdffb741000070417ae9863f0e2d923f"
+      }
+    },
+    "curveoff5-v2": {
+      "input": {
+        "curve_enabled": false,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcffbf3ffcff3f3f6e565d3f0000803f",
+            "delta_bytes": "fcffbf3ffcff3f3f6e565d3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff3f40fcffbf3f6e565d3f00000040",
+            "delta_bytes": "fcff3f40fcffbf3f6e565d3f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff8f40fcff0f406e565d3f00004040",
+            "delta_bytes": "fcff8f40fcff0f406e565d3f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000c040000040406e565d3f00008040",
+            "delta_bytes": "0000c040000040406e565d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3333d34098999940556f6d3f0000a040",
+            "delta_bytes": "3333d34098999940556f6d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "6666e6403033d3403c887d3f0000c040",
+            "delta_bytes": "6666e6403033d3403c887d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "9899f9406466064192d0863f00000000",
+            "delta_bytes": "9899f9406466064192d0863f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "666606413033234106dd8e3f0000803f",
+            "delta_bytes": "666606413033234106dd8e3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "000010410000404179e9963f00000040",
+            "delta_bytes": "000010410000404179e9963f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "999929413333434192d0863f00004040",
+            "delta_bytes": "999929413333434192d0863f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3233434166664641556f6d3f00008040",
+            "delta_bytes": "3233434166664641556f6d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "cbcc5c4199994941863d4d3f0000a040",
+            "delta_bytes": "cbcc5c4199994941863d4d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "64667641cccc4c41b70b2d3f0000c040",
+            "delta_bytes": "64667641cccc4c41b70b2d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000884100005041e8d90c3f00000000",
+            "delta_bytes": "0000884100005041e8d90c3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00009441000058414c37493f0000803f",
+            "delta_bytes": "00009441000058414c37493f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffff9f410000604158ca823f00000040",
+            "delta_bytes": "ffff9f410000604158ca823f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffffab41000068410af9a03f00004040",
+            "delta_bytes": "ffffab41000068410af9a03f85eb4940"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f52b81e3efcffbf3ffcff3f3f6e565d3f0ad7933ffcff3f40fcffbf3f6e565d3f85eb0940fcff8f40fcff0f406e565d3f85eb49400000c040000040406e565d3fc3f584403333d34098999940556f6d3fc3f5a4406666e6403033d3403c887d3fc3f5c4409899f9406466064192d0863f52b81e3e666606413033234106dd8e3f0ad7933f000010410000404179e9963f85eb0940999929413333434192d0863f85eb49403233434166664641556f6d3fc3f58440cbcc5c4199994941863d4d3fc3f5a44064667641cccc4c41b70b2d3fc3f5c4400000884100005041e8d90c3f52b81e3e00009441000058414c37493f0ad7933fffff9f410000604158ca823f85eb0940ffffab41000068410af9a03f85eb4940"
+      }
+    },
+    "curveoff5-v3": {
+      "input": {
+        "curve_enabled": false,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcffbf3ffcff3f3f6e565d3f0000803f",
+            "delta_bytes": "fcffbf3ffcff3f3f6e565d3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff3f40fcffbf3f6e565d3f00000040",
+            "delta_bytes": "fcff3f40fcffbf3f6e565d3f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff8f40fcff0f406e565d3f00004040",
+            "delta_bytes": "fcff8f40fcff0f406e565d3f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000c040000040406e565d3f00008040",
+            "delta_bytes": "0000c040000040406e565d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3333d34098999940556f6d3f0000a040",
+            "delta_bytes": "3333d34098999940556f6d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "6666e6403033d3403c887d3f0000c040",
+            "delta_bytes": "6666e6403033d3403c887d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "9899f9406466064192d0863f00000000",
+            "delta_bytes": "9899f9406466064192d0863f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "666606413033234106dd8e3f0000803f",
+            "delta_bytes": "666606413033234106dd8e3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "000010410000404179e9963f00000040",
+            "delta_bytes": "000010410000404179e9963f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "999929413333434192d0863f00004040",
+            "delta_bytes": "999929413333434192d0863f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3233434166664641556f6d3f00008040",
+            "delta_bytes": "3233434166664641556f6d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "cbcc5c4199994941863d4d3f0000a040",
+            "delta_bytes": "cbcc5c4199994941863d4d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "64667641cccc4c41b70b2d3f0000c040",
+            "delta_bytes": "64667641cccc4c41b70b2d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000884100005041e8d90c3f00000000",
+            "delta_bytes": "0000884100005041e8d90c3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00009441000058414c37493f0000803f",
+            "delta_bytes": "00009441000058414c37493f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffff9f410000604158ca823f00000040",
+            "delta_bytes": "ffff9f410000604158ca823f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffffab41000068410af9a03f00004040",
+            "delta_bytes": "ffffab41000068410af9a03f85eb4940"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f52b81e3efcffbf3ffcff3f3f6e565d3f0ad7933ffcff3f40fcffbf3f6e565d3f85eb0940fcff8f40fcff0f406e565d3f85eb49400000c040000040406e565d3fc3f584403333d34098999940556f6d3fc3f5a4406666e6403033d3403c887d3fc3f5c4409899f9406466064192d0863f52b81e3e666606413033234106dd8e3f0ad7933f000010410000404179e9963f85eb0940999929413333434192d0863f85eb49403233434166664641556f6d3fc3f58440cbcc5c4199994941863d4d3fc3f5a44064667641cccc4c41b70b2d3fc3f5c4400000884100005041e8d90c3f52b81e3e00009441000058414c37493f0ad7933fffff9f410000604158ca823f85eb0940ffffab41000068410af9a03f85eb4940"
+      }
+    },
+    "line-v2": {
+      "input": {
+        "curve_enabled": false,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcffbf3ffcff3f3f6e565d3f0000803f",
+            "delta_bytes": "fcffbf3ffcff3f3f6e565d3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff3f40fcffbf3f6e565d3f00000040",
+            "delta_bytes": "fcff3f40fcffbf3f6e565d3f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff8f40fcff0f406e565d3f00004040",
+            "delta_bytes": "fcff8f40fcff0f406e565d3f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000c040000040406e565d3f00008040",
+            "delta_bytes": "0000c040000040406e565d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3333d34098999940556f6d3f0000a040",
+            "delta_bytes": "3333d34098999940556f6d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "6666e6403033d3403c887d3f0000c040",
+            "delta_bytes": "6666e6403033d3403c887d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "9899f9406466064192d0863f00000000",
+            "delta_bytes": "9899f9406466064192d0863f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "666606413033234106dd8e3f0000803f",
+            "delta_bytes": "666606413033234106dd8e3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "000010410000404179e9963f00000040",
+            "delta_bytes": "000010410000404179e9963f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "999929413333434192d0863f00004040",
+            "delta_bytes": "999929413333434192d0863f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3233434166664641556f6d3f00008040",
+            "delta_bytes": "3233434166664641556f6d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "cbcc5c4199994941863d4d3f0000a040",
+            "delta_bytes": "cbcc5c4199994941863d4d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "64667641cccc4c41b70b2d3f0000c040",
+            "delta_bytes": "64667641cccc4c41b70b2d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000884100005041e8d90c3f00000000",
+            "delta_bytes": "0000884100005041e8d90c3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00009441000058414c37493f0000803f",
+            "delta_bytes": "00009441000058414c37493f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffff9f410000604158ca823f00000040",
+            "delta_bytes": "ffff9f410000604158ca823f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffffab41000068410af9a03f00004040",
+            "delta_bytes": "ffffab41000068410af9a03f85eb4940"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f52b81e3efcffbf3ffcff3f3f6e565d3f0ad7933ffcff3f40fcffbf3f6e565d3f85eb0940fcff8f40fcff0f406e565d3f85eb49400000c040000040406e565d3fc3f584403333d34098999940556f6d3fc3f5a4406666e6403033d3403c887d3fc3f5c4409899f9406466064192d0863f52b81e3e666606413033234106dd8e3f0ad7933f000010410000404179e9963f85eb0940999929413333434192d0863f85eb49403233434166664641556f6d3fc3f58440cbcc5c4199994941863d4d3fc3f5a44064667641cccc4c41b70b2d3fc3f5c4400000884100005041e8d90c3f52b81e3e00009441000058414c37493f0ad7933fffff9f410000604158ca823f85eb0940ffffab41000068410af9a03f85eb4940"
+      }
+    },
+    "line-v3": {
+      "input": {
+        "curve_enabled": false,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcffbf3ffcff3f3f6e565d3f0000803f",
+            "delta_bytes": "fcffbf3ffcff3f3f6e565d3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff3f40fcffbf3f6e565d3f00000040",
+            "delta_bytes": "fcff3f40fcffbf3f6e565d3f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "fcff8f40fcff0f406e565d3f00004040",
+            "delta_bytes": "fcff8f40fcff0f406e565d3f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000c040000040406e565d3f00008040",
+            "delta_bytes": "0000c040000040406e565d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3333d34098999940556f6d3f0000a040",
+            "delta_bytes": "3333d34098999940556f6d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "6666e6403033d3403c887d3f0000c040",
+            "delta_bytes": "6666e6403033d3403c887d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "9899f9406466064192d0863f00000000",
+            "delta_bytes": "9899f9406466064192d0863f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "666606413033234106dd8e3f0000803f",
+            "delta_bytes": "666606413033234106dd8e3f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "000010410000404179e9963f00000040",
+            "delta_bytes": "000010410000404179e9963f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "999929413333434192d0863f00004040",
+            "delta_bytes": "999929413333434192d0863f85eb4940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "3233434166664641556f6d3f00008040",
+            "delta_bytes": "3233434166664641556f6d3fc3f58440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "cbcc5c4199994941863d4d3f0000a040",
+            "delta_bytes": "cbcc5c4199994941863d4d3fc3f5a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "64667641cccc4c41b70b2d3f0000c040",
+            "delta_bytes": "64667641cccc4c41b70b2d3fc3f5c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "0000884100005041e8d90c3f00000000",
+            "delta_bytes": "0000884100005041e8d90c3f52b81e3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "00009441000058414c37493f0000803f",
+            "delta_bytes": "00009441000058414c37493f0ad7933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffff9f410000604158ca823f00000040",
+            "delta_bytes": "ffff9f410000604158ca823f85eb0940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001b43",
+            "vector4_arg_bytes": "ffffab41000068410af9a03f00004040",
+            "delta_bytes": "ffffab41000068410af9a03f85eb4940"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f52b81e3efcffbf3ffcff3f3f6e565d3f0ad7933ffcff3f40fcffbf3f6e565d3f85eb0940fcff8f40fcff0f406e565d3f85eb49400000c040000040406e565d3fc3f584403333d34098999940556f6d3fc3f5a4406666e6403033d3403c887d3fc3f5c4409899f9406466064192d0863f52b81e3e666606413033234106dd8e3f0ad7933f000010410000404179e9963f85eb0940999929413333434192d0863f85eb49403233434166664641556f6d3fc3f58440cbcc5c4199994941863d4d3fc3f5a44064667641cccc4c41b70b2d3fc3f5c4400000884100005041e8d90c3f52b81e3e00009441000058414c37493f0ad7933fffff9f410000604158ca823f85eb0940ffffab41000068410af9a03f85eb4940"
+      }
+    },
+    "long-tool1-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b841000070410000f84100009041000010420000e0410000344200000842"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f0000003f3333333fcdcccc3e"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000780100008601000097010000"
+          }
+        },
+        "tool_type": 1
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00008c42",
+            "vector4_arg_bytes": "00000000000000004c37493f00000000",
+            "delta_bytes": "00000000000000004c37493f295c8f3d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "fcffbe3ffcff473f4c37493f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f4c37493f713d8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b442",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f4c37493f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f4c37493f8fc20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c842",
+            "vector4_arg_bytes": "fcbf8d40fbff21404c37493f00004040",
+            "delta_bytes": "fcbf8d40fbff21404c37493f66664640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fcffbb40faff5f404c37493f00008040",
+            "delta_bytes": "fcffbb40faff5f404c37493f1f858340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f042",
+            "vector4_arg_bytes": "fbbfe940fcff90404c37493f0000a040",
+            "delta_bytes": "fbbfe940fcff90404c37493f0ad7a340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000243",
+            "vector4_arg_bytes": "fc7f0b41faffb3404c37493f0000c040",
+            "delta_bytes": "fc7f0b41faffb3404c37493ff628c440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "fcdf2141f9ffd8404c37493f00000000",
+            "delta_bytes": "fcdf2141f9ffd8404c37493f295c0f3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "00003841000000414c37493f0000803f",
+            "delta_bytes": "00003841000000414c37493f3333933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "d25f4e41da5f13414c37493f00000040",
+            "delta_bytes": "d25f4e41da5f13414c37493f9a990940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "a17f6541ba7f25414c37493f00004040",
+            "delta_bytes": "a17f6541ba7f25414c37493f9a994940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "6c5f7d419d5f36414c37493f00008040",
+            "delta_bytes": "6c5f7d419d5f36414c37493fcdcc8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "9bff8a4187ff45414c37493f0000a040",
+            "delta_bytes": "9bff8a4187ff45414c37493fcdcca440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "b1af9741ac5f54414c37493f0000c040",
+            "delta_bytes": "b1af9741ac5f54414c37493fcdccc440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "c9bfa441cc7f61414c37493f00000000",
+            "delta_bytes": "c9bfa441cc7f61414c37493f9a99193e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "e22fb241e75f6d414c37493f0000803f",
+            "delta_bytes": "e22fb241e75f6d414c37493f3333933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "0000c041000078414c37493f00000040",
+            "delta_bytes": "0000c041000078414c37493f9a990940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "94b7cd41188f81414c37493f00004040",
+            "delta_bytes": "94b7cd41188f81414c37493f9a994940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "266fdb411a7088414c37493f00008040",
+            "delta_bytes": "266fdb411a7088414c37493fcdcc8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "b926e94107a390414c37493f0000a040",
+            "delta_bytes": "b926e94107a390414c37493fcdcca440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "4cdef641df279a414c37493f0000c040",
+            "delta_bytes": "4cdef641df279a414c37493fcdccc440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "5d3901421238a3414c37493f00000000",
+            "delta_bytes": "5d3901421238a3414c37493f9a99193e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "06eb0642b20cad414c37493f0000803f",
+            "delta_bytes": "06eb0642b20cad414c37493f3333933f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "ae9c0c4238cab7414c37493f00000040",
+            "delta_bytes": "ae9c0c4238cab7414c37493f9a990940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "564e1242a770c3414c37493f00004040",
+            "delta_bytes": "564e1242a770c3414c37493f9a994940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "000018420000d0414c37493f00008040",
+            "delta_bytes": "000018420000d0414c37493fcdcc8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "5ae01d42846edd414c37493f0000a040",
+            "delta_bytes": "5ae01d42846edd414c37493f448ba440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000643",
+            "vector4_arg_bytes": "ba0f23428448e9414c37493f0000c040",
+            "delta_bytes": "ba0f23428448e9414c37493fba49c440"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "1f8e2742ff8df3414c37493f00000000",
+            "delta_bytes": "1f8e2742ff8df3414c37493f2506013e"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ec42",
+            "vector4_arg_bytes": "8c5b2b42f63efc414c37493f0000803f",
+            "delta_bytes": "8c5b2b42f63efc414c37493fa01a8f3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "81e33042b97104424c37493f00000040",
+            "delta_bytes": "81e33042b97104424c37493f3d0a0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000cc42",
+            "vector4_arg_bytes": "00003442000008424c37493f00004040",
+            "delta_bytes": "00003442000008424c37493f2b874640"
+          }
+        ],
+        "buffer_hex": "00000000000000004c37493f295c8f3dfcffbe3ffcff473f4c37493f713d8a3ffcff3d40fbffcf3f4c37493f8fc20540fcbf8d40fbff21404c37493f66664640fcffbb40faff5f404c37493f1f858340fbbfe940fcff90404c37493f0ad7a340fc7f0b41faffb3404c37493ff628c440fcdf2141f9ffd8404c37493f295c0f3e00003841000000414c37493f3333933fd25f4e41da5f13414c37493f9a990940a17f6541ba7f25414c37493f9a9949406c5f7d419d5f36414c37493fcdcc84409bff8a4187ff45414c37493fcdcca440b1af9741ac5f54414c37493fcdccc440c9bfa441cc7f61414c37493f9a99193ee22fb241e75f6d414c37493f3333933f0000c041000078414c37493f9a99094094b7cd41188f81414c37493f9a994940266fdb411a7088414c37493fcdcc8440b926e94107a390414c37493fcdcca4404cdef641df279a414c37493fcdccc4405d3901421238a3414c37493f9a99193e06eb0642b20cad414c37493f3333933fae9c0c4238cab7414c37493f9a990940564e1242a770c3414c37493f9a994940000018420000d0414c37493fcdcc84405ae01d42846edd414c37493f448ba440ba0f23428448e9414c37493fba49c4401f8e2742ff8df3414c37493f2506013e8c5b2b42f63efc414c37493fa01a8f3f81e33042b97104424c37493f3d0a074000003442000008424c37493f2b874640"
+      }
+    },
+    "proto2-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fca8ea3ffca86a3ff0a7683f0000803f",
+            "delta_bytes": "fca8ea3ffca86a3ff0a7683ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fc535540fc53d53f72f9733f00000040",
+            "delta_bytes": "fc535540fc53d53f72f9733f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "3eff8f403eff0f40f44a7f3f00004040",
+            "delta_bytes": "3eff8f403eff0f40f44a7f3fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "0000c040000040403b4e853f00008040",
+            "delta_bytes": "0000c040000040403b4e853fc74b8340"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfca8ea3ffca86a3ff0a7683ffa7e8a3ffc535540fc53d53f72f9733f2db205403eff8f403eff0f40f44a7f3fdd2446400000c040000040403b4e853fc74b8340"
+      }
+    },
+    "proto4-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c0400000404000001041000040410000884100005041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e"
+          },
+          "timestamps": {
+            "data_hex": "2c010000370100004401000052010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f6e56553f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f6e56553ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f6e564d3f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f6e564d3f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff21406e56453f00004040",
+            "delta_bytes": "fcbf8d40fbff21406e56453fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f406e563d3f00008040",
+            "delta_bytes": "fcffbb40faff5f406e563d3fc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff90406e56353f0000a040",
+            "delta_bytes": "fbbfe940fcff90406e56353f1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3406e562d3f0000c040",
+            "delta_bytes": "fc7f0b41faffb3406e562d3f77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd8406e56253f00000000",
+            "delta_bytes": "fcdf2141f9ffd8406e56253fb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000416e561d3f0000803f",
+            "delta_bytes": "00003841000000416e561d3fae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f642",
+            "vector4_arg_bytes": "5de352419a7118416e560d3f00000040",
+            "delta_bytes": "5de352419a7118416e560d3f3bdf0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000de42",
+            "vector4_arg_bytes": "3fe368417f712c41dcacfa3e00004040",
+            "delta_bytes": "3fe368417f712c41dcacfa3ea01a4740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c642",
+            "vector4_arg_bytes": "a7ff7941afff3b41dcacda3e00008040",
+            "delta_bytes": "a7ff7941afff3b41dcacda3e022b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "0000884100005041dcacba3e0000a040",
+            "delta_bytes": "0000884100005041dcacba3eb4c8a240"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfcffbe3ffcff473f6e56553ffa7e8a3ffcff3d40fbffcf3f6e564d3f2db20540fcbf8d40fbff21406e56453fdd244640fcffbb40faff5f406e563d3fc74b8340fbbfe940fcff90406e56353f1f85a340fc7f0b41faffb3406e562d3f77bec340fcdf2141f9ffd8406e56253fb6f3fd3d00003841000000416e561d3fae47913f5de352419a7118416e560d3f3bdf07403fe368417f712c41dcacfa3ea01a4740a7ff7941afff3b41dcacda3e022b83400000884100005041dcacba3eb4c8a240"
+      }
+    },
+    "proto6-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b841000070410000f84100009041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f0000003f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003701000044010000520100006301000078010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f6e56553f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f6e56553ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f6e564d3f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f6e564d3f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff21406e56453f00004040",
+            "delta_bytes": "fcbf8d40fbff21406e56453fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f406e563d3f00008040",
+            "delta_bytes": "fcffbb40faff5f406e563d3fc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff90406e56353f0000a040",
+            "delta_bytes": "fbbfe940fcff90406e56353f1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3406e562d3f0000c040",
+            "delta_bytes": "fc7f0b41faffb3406e562d3f77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd8406e56253f00000000",
+            "delta_bytes": "fcdf2141f9ffd8406e56253fb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000416e561d3f0000803f",
+            "delta_bytes": "00003841000000416e561d3fae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000843",
+            "vector4_arg_bytes": "d25f4e41da5f13417c14203f00000040",
+            "delta_bytes": "d25f4e41da5f13417c14203f39b40840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000943",
+            "vector4_arg_bytes": "a17f6541ba7f25418ad2223f00004040",
+            "delta_bytes": "a17f6541ba7f25418ad2223f9cc44840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "6c5f7d419d5f36419890253f00008040",
+            "delta_bytes": "6c5f7d419d5f36419890253f7f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000b43",
+            "vector4_arg_bytes": "9bff8a4187ff4541a64e283f0000a040",
+            "delta_bytes": "9bff8a4187ff4541a64e283fb072a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "b1af9741ac5f5441b40c2b3f0000c040",
+            "delta_bytes": "b1af9741ac5f5441b40c2b3fe17ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "c9bfa441cc7f6141c2ca2d3f00000000",
+            "delta_bytes": "c9bfa441cc7f6141c2ca2d3f4e62103e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "e22fb241e75f6d41d088303f0000803f",
+            "delta_bytes": "e22fb241e75f6d41d088303f0e2d923f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "0000c04100007841dd46333f00000040",
+            "delta_bytes": "0000c04100007841dd46333f9a990940"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "521cd141661c8241eb04363f00004040",
+            "delta_bytes": "521cd141661c8241eb04363ffed44840"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "401cdf41601c8741f9c2383f00008040",
+            "delta_bytes": "401cdf41601c8741f9c2383f31088440"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e442",
+            "vector4_arg_bytes": "c7ffe941ecff8a4107813b3f0000a040",
+            "delta_bytes": "c7ffe941ecff8a4107813b3fe3a5a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000cc42",
+            "vector4_arg_bytes": "0000f84100009041153f3e3f0000c040",
+            "delta_bytes": "0000f84100009041153f3e3f9643c340"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfcffbe3ffcff473f6e56553ffa7e8a3ffcff3d40fbffcf3f6e564d3f2db20540fcbf8d40fbff21406e56453fdd244640fcffbb40faff5f406e563d3fc74b8340fbbfe940fcff90406e56353f1f85a340fc7f0b41faffb3406e562d3f77bec340fcdf2141f9ffd8406e56253fb6f3fd3d00003841000000416e561d3fae47913fd25f4e41da5f13417c14203f39b40840a17f6541ba7f25418ad2223f9cc448406c5f7d419d5f36419890253f7f6a84409bff8a4187ff4541a64e283fb072a440b1af9741ac5f5441b40c2b3fe17ac440c9bfa441cc7f6141c2ca2d3f4e62103ee22fb241e75f6d41d088303f0e2d923f0000c04100007841dd46333f9a990940521cd141661c8241eb04363ffed44840401cdf41601c8741f9c2383f31088440c7ffe941ecff8a4107813b3fe3a5a3400000f84100009041153f3e3f9643c340"
+      }
+    },
+    "proto7-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b841000070410000f84100009041000010420000e041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f0000003f3333333f"
+          },
+          "timestamps": {
+            "data_hex": "2c010000370100004401000052010000630100007801000086010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f6e56553f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f6e56553ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f6e564d3f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f6e564d3f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff21406e56453f00004040",
+            "delta_bytes": "fcbf8d40fbff21406e56453fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f406e563d3f00008040",
+            "delta_bytes": "fcffbb40faff5f406e563d3fc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff90406e56353f0000a040",
+            "delta_bytes": "fbbfe940fcff90406e56353f1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3406e562d3f0000c040",
+            "delta_bytes": "fc7f0b41faffb3406e562d3f77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd8406e56253f00000000",
+            "delta_bytes": "fcdf2141f9ffd8406e56253fb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000416e561d3f0000803f",
+            "delta_bytes": "00003841000000416e561d3fae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000843",
+            "vector4_arg_bytes": "d25f4e41da5f13417c14203f00000040",
+            "delta_bytes": "d25f4e41da5f13417c14203f39b40840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000943",
+            "vector4_arg_bytes": "a17f6541ba7f25418ad2223f00004040",
+            "delta_bytes": "a17f6541ba7f25418ad2223f9cc44840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "6c5f7d419d5f36419890253f00008040",
+            "delta_bytes": "6c5f7d419d5f36419890253f7f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000b43",
+            "vector4_arg_bytes": "9bff8a4187ff4541a64e283f0000a040",
+            "delta_bytes": "9bff8a4187ff4541a64e283fb072a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "b1af9741ac5f5441b40c2b3f0000c040",
+            "delta_bytes": "b1af9741ac5f5441b40c2b3fe17ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "c9bfa441cc7f6141c2ca2d3f00000000",
+            "delta_bytes": "c9bfa441cc7f6141c2ca2d3f4e62103e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "e22fb241e75f6d41d088303f0000803f",
+            "delta_bytes": "e22fb241e75f6d41d088303f0e2d923f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "0000c04100007841dd46333f00000040",
+            "delta_bytes": "0000c04100007841dd46333f9a990940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001343",
+            "vector4_arg_bytes": "b080cf412a75824195f7383f00004040",
+            "delta_bytes": "b080cf412a75824195f7383f73684940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001043",
+            "vector4_arg_bytes": "bb1fdd41e8f589414da83e3f00008040",
+            "delta_bytes": "bb1fdd41e8f589414da83e3fa69b8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "9bcde94141fb92410559443f0000a040",
+            "delta_bytes": "9bcde94141fb92410559443f1283a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "4b94f54111b09d41bd094a3f0000c040",
+            "delta_bytes": "4b94f54111b09d41bd094a3f7f6ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "12ddff41876ca94175ba4f3f00000000",
+            "delta_bytes": "12ddff41876ca94175ba4f3f713d0a3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000443",
+            "vector4_arg_bytes": "449204425260b6412d6b553f0000803f",
+            "delta_bytes": "449204425260b6412d6b553f60e5903f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "67ad0842e3ebc341e51b5b3f00000040",
+            "delta_bytes": "67ad0842e3ebc341e51b5b3f89410840"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "766d0c42a5dcd1419dcc603f00004040",
+            "delta_bytes": "766d0c42a5dcd1419dcc603f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f642",
+            "vector4_arg_bytes": "00001042fdffdf41557d663f00008040",
+            "delta_bytes": "00001042fdffdf41557d663f9eef8340"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfcffbe3ffcff473f6e56553ffa7e8a3ffcff3d40fbffcf3f6e564d3f2db20540fcbf8d40fbff21406e56453fdd244640fcffbb40faff5f406e563d3fc74b8340fbbfe940fcff90406e56353f1f85a340fc7f0b41faffb3406e562d3f77bec340fcdf2141f9ffd8406e56253fb6f3fd3d00003841000000416e561d3fae47913fd25f4e41da5f13417c14203f39b40840a17f6541ba7f25418ad2223f9cc448406c5f7d419d5f36419890253f7f6a84409bff8a4187ff4541a64e283fb072a440b1af9741ac5f5441b40c2b3fe17ac440c9bfa441cc7f6141c2ca2d3f4e62103ee22fb241e75f6d41d088303f0e2d923f0000c04100007841dd46333f9a990940b080cf412a75824195f7383f73684940bb1fdd41e8f589414da83e3fa69b84409bcde94141fb92410559443f1283a4404b94f54111b09d41bd094a3f7f6ac44012ddff41876ca94175ba4f3f713d0a3e449204425260b6412d6b553f60e5903f67ad0842e3ebc341e51b5b3f89410840766d0c42a5dcd1419dcc603f6210484000001042fdffdf41557d663f9eef8340"
+      }
+    },
+    "proto8-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b841000070410000f84100009041000010420000e0410000344200000842"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f0000003f3333333fcdcccc3e"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000780100008601000097010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "00000000000000006e565d3f00000000",
+            "delta_bytes": "00000000000000006e565d3f9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f6e56553f0000803f",
+            "delta_bytes": "fcffbe3ffcff473f6e56553ffa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f6e564d3f00000040",
+            "delta_bytes": "fcff3d40fbffcf3f6e564d3f2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff21406e56453f00004040",
+            "delta_bytes": "fcbf8d40fbff21406e56453fdd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f406e563d3f00008040",
+            "delta_bytes": "fcffbb40faff5f406e563d3fc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff90406e56353f0000a040",
+            "delta_bytes": "fbbfe940fcff90406e56353f1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3406e562d3f0000c040",
+            "delta_bytes": "fc7f0b41faffb3406e562d3f77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd8406e56253f00000000",
+            "delta_bytes": "fcdf2141f9ffd8406e56253fb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000416e561d3f0000803f",
+            "delta_bytes": "00003841000000416e561d3fae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000843",
+            "vector4_arg_bytes": "d25f4e41da5f13417c14203f00000040",
+            "delta_bytes": "d25f4e41da5f13417c14203f39b40840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000943",
+            "vector4_arg_bytes": "a17f6541ba7f25418ad2223f00004040",
+            "delta_bytes": "a17f6541ba7f25418ad2223f9cc44840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "6c5f7d419d5f36419890253f00008040",
+            "delta_bytes": "6c5f7d419d5f36419890253f7f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000b43",
+            "vector4_arg_bytes": "9bff8a4187ff4541a64e283f0000a040",
+            "delta_bytes": "9bff8a4187ff4541a64e283fb072a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "b1af9741ac5f5441b40c2b3f0000c040",
+            "delta_bytes": "b1af9741ac5f5441b40c2b3fe17ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "c9bfa441cc7f6141c2ca2d3f00000000",
+            "delta_bytes": "c9bfa441cc7f6141c2ca2d3f4e62103e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "e22fb241e75f6d41d088303f0000803f",
+            "delta_bytes": "e22fb241e75f6d41d088303f0e2d923f"
+          },
+          {
+            "scalar_s0_f32_bits": "00001643",
+            "vector4_arg_bytes": "0000c04100007841dd46333f00000040",
+            "delta_bytes": "0000c04100007841dd46333f9a990940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001543",
+            "vector4_arg_bytes": "94b7cd41188f81416b2a2c3f00004040",
+            "delta_bytes": "94b7cd41188f81416b2a2c3f37894940"
+          },
+          {
+            "scalar_s0_f32_bits": "00001443",
+            "vector4_arg_bytes": "266fdb411a708841f90d253f00008040",
+            "delta_bytes": "266fdb411a708841f90d253f6abc8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001343",
+            "vector4_arg_bytes": "b926e94107a3904187f11d3f0000a040",
+            "delta_bytes": "b926e94107a3904187f11d3f39b4a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001243",
+            "vector4_arg_bytes": "4cdef641df279a4115d5163f0000c040",
+            "delta_bytes": "4cdef641df279a4115d5163f08acc440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001143",
+            "vector4_arg_bytes": "5d3901421238a341a3b80f3f00000000",
+            "delta_bytes": "5d3901421238a341a3b80f3fe17a143e"
+          },
+          {
+            "scalar_s0_f32_bits": "00001043",
+            "vector4_arg_bytes": "06eb0642b20cad41319c083f0000803f",
+            "delta_bytes": "06eb0642b20cad41319c083f986e923f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000f43",
+            "vector4_arg_bytes": "ae9c0c4238cab741bf7f013f00000040",
+            "delta_bytes": "ae9c0c4238cab741bf7f013fe9260940"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "564e1242a770c3419ac6f43e00004040",
+            "delta_bytes": "564e1242a770c3419ac6f43e87164940"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "000018420000d041ba8de63e00008040",
+            "delta_bytes": "000018420000d041ba8de63ee17a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000443",
+            "vector4_arg_bytes": "5ae01d42846edd416c2bee3e0000a040",
+            "delta_bytes": "5ae01d42846edd416c2bee3e5839a440"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "ba0f23428448e9411ec9f53e0000c040",
+            "delta_bytes": "ba0f23428448e9411ec9f53ecff7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e842",
+            "vector4_arg_bytes": "1f8e2742ff8df341d066fd3e00000000",
+            "delta_bytes": "1f8e2742ff8df341d066fd3e6891ed3d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "8c5b2b42f63efc414182023f0000803f",
+            "delta_bytes": "8c5b2b42f63efc414182023ff2d28d3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c842",
+            "vector4_arg_bytes": "81e33042b97104421a51063f00000040",
+            "delta_bytes": "81e33042b97104421a51063f66660640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b842",
+            "vector4_arg_bytes": "0000344200000842f31f0a3f00004040",
+            "delta_bytes": "0000344200000842f31f0a3f54e34540"
+          }
+        ],
+        "buffer_hex": "00000000000000006e565d3f9a99993dfcffbe3ffcff473f6e56553ffa7e8a3ffcff3d40fbffcf3f6e564d3f2db20540fcbf8d40fbff21406e56453fdd244640fcffbb40faff5f406e563d3fc74b8340fbbfe940fcff90406e56353f1f85a340fc7f0b41faffb3406e562d3f77bec340fcdf2141f9ffd8406e56253fb6f3fd3d00003841000000416e561d3fae47913fd25f4e41da5f13417c14203f39b40840a17f6541ba7f25418ad2223f9cc448406c5f7d419d5f36419890253f7f6a84409bff8a4187ff4541a64e283fb072a440b1af9741ac5f5441b40c2b3fe17ac440c9bfa441cc7f6141c2ca2d3f4e62103ee22fb241e75f6d41d088303f0e2d923f0000c04100007841dd46333f9a99094094b7cd41188f81416b2a2c3f37894940266fdb411a708841f90d253f6abc8440b926e94107a3904187f11d3f39b4a4404cdef641df279a4115d5163f08acc4405d3901421238a341a3b80f3fe17a143e06eb0642b20cad41319c083f986e923fae9c0c4238cab741bf7f013fe9260940564e1242a770c3419ac6f43e87164940000018420000d041ba8de63ee17a84405ae01d42846edd416c2bee3e5839a440ba0f23428448e9411ec9f53ecff7c3401f8e2742ff8df341d066fd3e6891ed3d8c5b2b42f63efc414182023ff2d28d3f81e33042b97104421a51063f666606400000344200000842f31f0a3f54e34540"
+      }
+    },
+    "size-high-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "00006144",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "000000000000000000005c4300000000",
+            "delta_bytes": "000000000000000000005c439a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000be42",
+            "vector4_arg_bytes": "c0717c40df380e4055555a430000803f",
+            "delta_bytes": "c0717c40df380e4055555a43f6288c3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "88e3f840c2719c40aaaa584300000040",
+            "delta_bytes": "88e3f840c2719c40aaaa5843295c0740"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000410000574300004040",
+            "delta_bytes": "000038410000004100005743d7a34840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "c91470412abd2e41abaa584300008040",
+            "delta_bytes": "c91470412abd2e41abaa58437f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "6b1a974115ec554156555a430000a040",
+            "delta_bytes": "6b1a974115ec554156555a431283a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00001043",
+            "vector4_arg_bytes": "fdffb7410000704101005c430000c040",
+            "delta_bytes": "fdffb7410000704101005c43a69bc440"
+          }
+        ],
+        "buffer_hex": "000000000000000000005c439a99993dc0717c40df380e4055555a43f6288c3f88e3f840c2719c40aaaa5843295c0740000038410000004100005743d7a34840c91470412abd2e41abaa58437f6a84406b1a974115ec554156555a431283a440fdffb7410000704101005c43a69bc440"
+      }
+    },
+    "size-low-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "cdcccc3d",
+        "source_arrays": {
+          "points": {
+            "data_hex": "00000000000000000000c04000004040000010410000404100008841000050410000b84100007041"
+          },
+          "pressures": {
+            "data_hex": "9a99993ecdcc0c3f0000403f3333b33e3333733f"
+          },
+          "timestamps": {
+            "data_hex": "2c01000037010000440100005201000063010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00009642",
+            "vector4_arg_bytes": "0000000000000000af47e13d00000000",
+            "delta_bytes": "0000000000000000af47e13d9a99993d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a442",
+            "vector4_arg_bytes": "fcffbe3ffcff473f723dca3d0000803f",
+            "delta_bytes": "fcffbe3ffcff473f723dca3dfa7e8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b242",
+            "vector4_arg_bytes": "fcff3d40fbffcf3f3433b33d00000040",
+            "delta_bytes": "fcff3d40fbffcf3f3433b33d2db20540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c042",
+            "vector4_arg_bytes": "fcbf8d40fbff2140f6289c3d00004040",
+            "delta_bytes": "fcbf8d40fbff2140f6289c3ddd244640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ce42",
+            "vector4_arg_bytes": "fcffbb40faff5f40b81e853d00008040",
+            "delta_bytes": "fcffbb40faff5f40b81e853dc74b8340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "fbbfe940fcff9040f5285c3d0000a040",
+            "delta_bytes": "fbbfe940fcff9040f5285c3d1f85a340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "fc7f0b41faffb3407a142e3d0000c040",
+            "delta_bytes": "fc7f0b41faffb3407a142e3d77bec340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fcdf2141f9ffd840feffff3c00000000",
+            "delta_bytes": "fcdf2141f9ffd840feffff3cb6f3fd3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "00003841000000410ad7a33c0000803f",
+            "delta_bytes": "00003841000000410ad7a33cae47913f"
+          },
+          {
+            "scalar_s0_f32_bits": "00000843",
+            "vector4_arg_bytes": "f07b5141935916413aa8033d00000040",
+            "delta_bytes": "f07b5141935916413aa8033d39b40840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000943",
+            "vector4_arg_bytes": "4ac468416d2d2941ef64353d00004040",
+            "delta_bytes": "4ac468416d2d2941ef64353d9cc44840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "b7e48041576e3b41a421673d00008040",
+            "delta_bytes": "b7e48041576e3b41a421673d7f6a8440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000b43",
+            "vector4_arg_bytes": "d7bd8d4150bc4b412d6f8c3d0000a040",
+            "delta_bytes": "d7bd8d4150bc4b412d6f8c3db072a440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "ca2c9c41b5d65a41884da53d0000c040",
+            "delta_bytes": "ca2c9c41b5d65a41884da53de17ac440"
+          },
+          {
+            "scalar_s0_f32_bits": "00000d43",
+            "vector4_arg_bytes": "5979aa4101a86641e32bbe3d00000000",
+            "delta_bytes": "5979aa4101a86641e32bbe3d4e62103e"
+          },
+          {
+            "scalar_s0_f32_bits": "00000e43",
+            "vector4_arg_bytes": "fdffb741000070413e0ad73d0000803f",
+            "delta_bytes": "fdffb741000070413e0ad73d0e2d923f"
+          }
+        ],
+        "buffer_hex": "0000000000000000af47e13d9a99993dfcffbe3ffcff473f723dca3dfa7e8a3ffcff3d40fbffcf3f3433b33d2db20540fcbf8d40fbff2140f6289c3ddd244640fcffbb40faff5f40b81e853dc74b8340fbbfe940fcff9040f5285c3d1f85a340fc7f0b41faffb3407a142e3d77bec340fcdf2141f9ffd840feffff3cb6f3fd3d00003841000000410ad7a33cae47913ff07b5141935916413aa8033d39b408404ac468416d2d2941ef64353d9cc44840b7e48041576e3b41a421673d7f6a8440d7bd8d4150bc4b412d6f8c3db072a440ca2c9c41b5d65a41884da53de17ac4405979aa4101a86641e32bbe3d4e62103efdffb741000070413e0ad73d0e2d923f"
+      }
+    },
+    "three-baseline-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe86ebac3f0000803f",
+            "delta_bytes": "68c6214028b82abe86ebac3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f71ceae3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f71ceae3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f405cb1b03f00004040",
+            "delta_bytes": "5eff97407bfe1f405cb1b03f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080404794b23f00008040",
+            "delta_bytes": "0000c040000080404794b23f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe86ebac3f04568e3ffdc57140f8a7aa3f71ceae3fb29d07405eff97407bfe1f405cb1b03f621048400000c040000080404794b23f89418440"
+      }
+    },
+    "three-baseline-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe9b08ab3f0000803f",
+            "delta_bytes": "68c6214028b82abe9b08ab3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f9b08ab3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f9b08ab3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f409b08ab3f00004040",
+            "delta_bytes": "5eff97407bfe1f409b08ab3f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080409b08ab3f00008040",
+            "delta_bytes": "0000c040000080409b08ab3f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe9b08ab3f04568e3ffdc57140f8a7aa3f9b08ab3fb29d07405eff97407bfe1f409b08ab3f621048400000c040000080409b08ab3f89418440"
+      }
+    },
+    "three-baseline-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ba42",
+            "vector4_arg_bytes": "89dd0f408ec369be04097e3f0000803f",
+            "delta_bytes": "89dd0f408ec369be04097e3f6de78b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d442",
+            "vector4_arg_bytes": "648858400a5f9a3f3c4e853f00000040",
+            "delta_bytes": "648858400a5f9a3f3c4e853fb4c80640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "88b2954034d12940f6978b3f00004040",
+            "delta_bytes": "88b2954034d12940f6978b3fb29d4740"
+          },
+          {
+            "scalar_s0_f32_bits": "00000443",
+            "vector4_arg_bytes": "fdffbf40faff7f40b0e1913f00008040",
+            "delta_bytes": "fdffbf40faff7f40b0e1913f58398440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d89dd0f408ec369be04097e3f6de78b3f648858400a5f9a3f3c4e853fb4c8064088b2954034d12940f6978b3fb29d4740fdffbf40faff7f40b0e1913f58398440"
+      }
+    },
+    "three-curveoff-v1": {
+      "input": {
+        "curve_enabled": false,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3fa4703d3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "feff0f40090000bf9b08ab3f0000803f",
+            "delta_bytes": "feff0f40090000bf9b08ab3f14ae973f"
+          },
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "fcff5f40eeff7f3f9b08ab3f00000040",
+            "delta_bytes": "fcff5f40eeff7f3f9b08ab3f0ad70b40"
+          },
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "feff9740faff1f409b08ab3f00004040",
+            "delta_bytes": "feff9740faff1f409b08ab3f0ad74b40"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3fa4703d3efeff0f40090000bf9b08ab3f14ae973ffcff5f40eeff7f3f9b08ab3f0ad70b40feff9740faff1f409b08ab3f0ad74b40"
+      }
+    },
+    "three-curveoff-v2": {
+      "input": {
+        "curve_enabled": false,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3fa4703d3e"
+          },
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "feff0f40090000bf9b08ab3f0000803f",
+            "delta_bytes": "feff0f40090000bf9b08ab3f14ae973f"
+          },
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "fcff5f40eeff7f3f9b08ab3f00000040",
+            "delta_bytes": "fcff5f40eeff7f3f9b08ab3f0ad70b40"
+          },
+          {
+            "scalar_s0_f32_bits": "00003943",
+            "vector4_arg_bytes": "feff9740faff1f409b08ab3f00004040",
+            "delta_bytes": "feff9740faff1f409b08ab3f0ad74b40"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3fa4703d3efeff0f40090000bf9b08ab3f14ae973ffcff5f40eeff7f3f9b08ab3f0ad70b40feff9740faff1f409b08ab3f0ad74b40"
+      }
+    },
+    "three-curveoff-v3": {
+      "input": {
+        "curve_enabled": false,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00002043",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7233e"
+          },
+          {
+            "scalar_s0_f32_bits": "00002043",
+            "vector4_arg_bytes": "5355d53f040080bf8f75713f0000803f",
+            "delta_bytes": "5355d53f040080bf8f75713fe17a943f"
+          },
+          {
+            "scalar_s0_f32_bits": "00002043",
+            "vector4_arg_bytes": "53551540000060b58f75713f00000040",
+            "delta_bytes": "53551540000060b58f75713f713d0a40"
+          },
+          {
+            "scalar_s0_f32_bits": "00002043",
+            "vector4_arg_bytes": "000040400000803f8f75713f00004040",
+            "delta_bytes": "000040400000803f8f75713f713d4a40"
+          },
+          {
+            "scalar_s0_f32_bits": "00002043",
+            "vector4_arg_bytes": "ffff7f40fdffff3f637f893f00008040",
+            "delta_bytes": "ffff7f40fdffff3f637f893fb81e8540"
+          },
+          {
+            "scalar_s0_f32_bits": "00002043",
+            "vector4_arg_bytes": "ffff9f40fdff3f40ff439a3f0000a040",
+            "delta_bytes": "ffff9f40fdff3f40ff439a3fb81ea540"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7233e5355d53f040080bf8f75713fe17a943f53551540000060b58f75713f713d0a40000040400000803f8f75713f713d4a40ffff7f40fdffff3f637f893fb81e8540ffff9f40fdff3f40ff439a3fb81ea540"
+      }
+    },
+    "three-display-portrait-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1440,
+        "height": 2560
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe9b08ab3f0000803f",
+            "delta_bytes": "68c6214028b82abe9b08ab3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f9b08ab3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f9b08ab3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f409b08ab3f00004040",
+            "delta_bytes": "5eff97407bfe1f409b08ab3f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080409b08ab3f00008040",
+            "delta_bytes": "0000c040000080409b08ab3f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe9b08ab3f04568e3ffdc57140f8a7aa3f9b08ab3fb29d07405eff97407bfe1f409b08ab3f621048400000c040000080409b08ab3f89418440"
+      }
+    },
+    "three-display-portrait-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1440,
+        "height": 2560
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe9b08ab3f0000803f",
+            "delta_bytes": "68c6214028b82abe9b08ab3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f9b08ab3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f9b08ab3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f409b08ab3f00004040",
+            "delta_bytes": "5eff97407bfe1f409b08ab3f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080409b08ab3f00008040",
+            "delta_bytes": "0000c040000080409b08ab3f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe9b08ab3f04568e3ffdc57140f8a7aa3f9b08ab3fb29d07405eff97407bfe1f409b08ab3f621048400000c040000080409b08ab3f89418440"
+      }
+    },
+    "three-duplicate-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000803f000000c00000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe86ebac3f0000803f",
+            "delta_bytes": "68c6214028b82abe86ebac3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f71ceae3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f71ceae3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f405cb1b03f00004040",
+            "delta_bytes": "5eff97407bfe1f405cb1b03f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080404794b23f00008040",
+            "delta_bytes": "0000c040000080404794b23f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe86ebac3f04568e3ffdc57140f8a7aa3f71ceae3fb29d07405eff97407bfe1f405cb1b03f621048400000c040000080404794b23f89418440"
+      }
+    },
+    "three-duplicate-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000803f000000c00000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe9b08ab3f0000803f",
+            "delta_bytes": "68c6214028b82abe9b08ab3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f9b08ab3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f9b08ab3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f409b08ab3f00004040",
+            "delta_bytes": "5eff97407bfe1f409b08ab3f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080409b08ab3f00008040",
+            "delta_bytes": "0000c040000080409b08ab3f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe9b08ab3f04568e3ffdc57140f8a7aa3f9b08ab3fb29d07405eff97407bfe1f409b08ab3f621048400000c040000080409b08ab3f89418440"
+      }
+    },
+    "three-fast-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100002d0100002e010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be3fa5783f0000803f",
+            "delta_bytes": "552217403002c1be3fa5783fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853fefd47f3f00000040",
+            "delta_bytes": "48a56440e4d5853fefd47f3f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d405082833f00004040",
+            "delta_bytes": "0ecc994084f51d405082833fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40281a873f00008040",
+            "delta_bytes": "5ac7c24045237a40281a873fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac4000b28a3f0000a040",
+            "delta_bytes": "2e23ee409728ac4000b28a3f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940d8498e3f0000c040",
+            "delta_bytes": "c0a50c412e0cd940d8498e3f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff40b0e1913f00000000",
+            "delta_bytes": "fdff1f41faffff40b0e1913f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be3fa5783fd1228b3f48a56440e4d5853fefd47f3f190406400ecc994084f51d405082833fc97646405ac7c24045237a40281a873fbc7483402e23ee409728ac4000b28a3f14aea340c0a50c412e0cd940d8498e3f6de7c340fdff1f41faffff40b0e1913f9318043e"
+      }
+    },
+    "three-fast-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100002d0100002e010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be3fa5783f0000803f",
+            "delta_bytes": "552217403002c1be3fa5783fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853fefd47f3f00000040",
+            "delta_bytes": "48a56440e4d5853fefd47f3f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d405082833f00004040",
+            "delta_bytes": "0ecc994084f51d405082833fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40281a873f00008040",
+            "delta_bytes": "5ac7c24045237a40281a873fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac4000b28a3f0000a040",
+            "delta_bytes": "2e23ee409728ac4000b28a3f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940d8498e3f0000c040",
+            "delta_bytes": "c0a50c412e0cd940d8498e3f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff40b0e1913f00000000",
+            "delta_bytes": "fdff1f41faffff40b0e1913f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be3fa5783fd1228b3f48a56440e4d5853fefd47f3f190406400ecc994084f51d405082833fc97646405ac7c24045237a40281a873fbc7483402e23ee409728ac4000b28a3f14aea340c0a50c412e0cd940d8498e3f6de7c340fdff1f41faffff40b0e1913f9318043e"
+      }
+    },
+    "three-micro-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0cdcc8c3f666606c09a99993fcdcc0cc0"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "0000803f000000c04c37493f00000000",
+            "delta_bytes": "0000803f000000c04c37493f713d0a3e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c04c37493f713d0a3e"
+      }
+    },
+    "three-micro-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0cdcc8c3f666606c09a99993fcdcc0cc0"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "0000803f000000c04c37493f00000000",
+            "delta_bytes": "0000803f000000c04c37493f713d0a3e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c04c37493f713d0a3e"
+      }
+    },
+    "three-pressure-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "cdcc4c3dcdcccc3e6666663f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "0000803f000000c02a18b53f00000000",
+            "delta_bytes": "0000803f000000c02a18b53fae47e13d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "68c6214028b82abe1c5ab63f0000803f",
+            "delta_bytes": "68c6214028b82abe1c5ab63fdbf98e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f0e9cb73f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f0e9cb73f9eef0740"
+          },
+          {
+            "scalar_s0_f32_bits": "00000343",
+            "vector4_arg_bytes": "5eff97407bfe1f4000deb83f00004040",
+            "delta_bytes": "5eff97407bfe1f4000deb83f4e624840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "0000c04000008040f21fba3f00008040",
+            "delta_bytes": "0000c04000008040f21fba3f7f6a8440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c02a18b53fae47e13d68c6214028b82abe1c5ab63fdbf98e3ffdc57140f8a7aa3f0e9cb73f9eef07405eff97407bfe1f4000deb83f4e6248400000c04000008040f21fba3f7f6a8440"
+      }
+    },
+    "three-pressure-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "cdcc4c3dcdcccc3e6666663f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000dc42",
+            "vector4_arg_bytes": "0000803f000000c02a18b53f00000000",
+            "delta_bytes": "0000803f000000c02a18b53fae47e13d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ea42",
+            "vector4_arg_bytes": "68c6214028b82abe2a18b53f0000803f",
+            "delta_bytes": "68c6214028b82abe2a18b53fdbf98e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f2a18b53f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f2a18b53f9eef0740"
+          },
+          {
+            "scalar_s0_f32_bits": "00000343",
+            "vector4_arg_bytes": "5eff97407bfe1f402a18b53f00004040",
+            "delta_bytes": "5eff97407bfe1f402a18b53f4e624840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000a43",
+            "vector4_arg_bytes": "0000c040000080402a18b53f00008040",
+            "delta_bytes": "0000c040000080402a18b53f7f6a8440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c02a18b53fae47e13d68c6214028b82abe2a18b53fdbf98e3ffdc57140f8a7aa3f2a18b53f9eef07405eff97407bfe1f402a18b53f4e6248400000c040000080402a18b53f7f6a8440"
+      }
+    },
+    "three-pressure-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "cdcc4c3dcdcccc3e6666663f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00007042",
+            "vector4_arg_bytes": "0000803f000000c00af9203f00000000",
+            "delta_bytes": "0000803f000000c00af9203f8fc2753d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "89dd0f408ec369bef41f3a3f0000803f",
+            "delta_bytes": "89dd0f408ec369bef41f3a3f713d8a3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c842",
+            "vector4_arg_bytes": "648858400a5f9a3fde46533f00000040",
+            "delta_bytes": "648858400a5f9a3fde46533f66660640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f042",
+            "vector4_arg_bytes": "88b2954034d12940c86d6c3f00004040",
+            "delta_bytes": "88b2954034d12940c86d6c3f14ae4740"
+          },
+          {
+            "scalar_s0_f32_bits": "00000c43",
+            "vector4_arg_bytes": "fdffbf40faff7f4059ca823f00008040",
+            "delta_bytes": "fdffbf40faff7f4059ca823fe17a8440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c00af9203f8fc2753d89dd0f408ec369bef41f3a3f713d8a3f648858400a5f9a3fde46533f6666064088b2954034d12940c86d6c3f14ae4740fdffbf40faff7f4059ca823fe17a8440"
+      }
+    },
+    "three-repeat-floor5-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "55550541",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c00000204000000000",
+            "delta_bytes": "0000803f000000c0000020400ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1bec33026400000803f",
+            "delta_bytes": "552217403002c1bec3302640d1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853f86612c4000000040",
+            "delta_bytes": "48a56440e4d5853f86612c4019040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d404992324000004040",
+            "delta_bytes": "0ecc994084f51d4049923240c9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a400cc3384000008040",
+            "delta_bytes": "5ac7c24045237a400cc33840bc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac40cff33e400000a040",
+            "delta_bytes": "2e23ee409728ac40cff33e4014aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940922445400000c040",
+            "delta_bytes": "c0a50c412e0cd940922445406de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff4055554b4000000000",
+            "delta_bytes": "fdff1f41faffff4055554b409318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000020400ad7a33d552217403002c1bec3302640d1228b3f48a56440e4d5853f86612c40190406400ecc994084f51d4049923240c97646405ac7c24045237a400cc33840bc7483402e23ee409728ac40cff33e4014aea340c0a50c412e0cd940922445406de7c340fdff1f41faffff4055554b409318043e"
+      }
+    },
+    "three-repeat-floor5-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "55550541",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c00000204000000000",
+            "delta_bytes": "0000803f000000c0000020400ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1bec33026400000803f",
+            "delta_bytes": "552217403002c1bec3302640d1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853f86612c4000000040",
+            "delta_bytes": "48a56440e4d5853f86612c4019040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d404992324000004040",
+            "delta_bytes": "0ecc994084f51d4049923240c9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a400cc3384000008040",
+            "delta_bytes": "5ac7c24045237a400cc33840bc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac40cff33e400000a040",
+            "delta_bytes": "2e23ee409728ac40cff33e4014aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940922445400000c040",
+            "delta_bytes": "c0a50c412e0cd940922445406de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff4055554b4000000000",
+            "delta_bytes": "fdff1f41faffff4055554b409318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000020400ad7a33d552217403002c1bec3302640d1228b3f48a56440e4d5853f86612c40190406400ecc994084f51d4049923240c97646405ac7c24045237a400cc33840bc7483402e23ee409728ac40cff33e4014aea340c0a50c412e0cd940922445406de7c340fdff1f41faffff4055554b409318043e"
+      }
+    },
+    "three-repeat-floor5-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "55550541",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c00000204000000000",
+            "delta_bytes": "0000803f000000c0000020400ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1bec33026400000803f",
+            "delta_bytes": "552217403002c1bec3302640d1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853f86612c4000000040",
+            "delta_bytes": "48a56440e4d5853f86612c4019040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d404992324000004040",
+            "delta_bytes": "0ecc994084f51d4049923240c9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a400cc3384000008040",
+            "delta_bytes": "5ac7c24045237a400cc33840bc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac40cff33e400000a040",
+            "delta_bytes": "2e23ee409728ac40cff33e4014aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940922445400000c040",
+            "delta_bytes": "c0a50c412e0cd940922445406de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff4055554b4000000000",
+            "delta_bytes": "fdff1f41faffff4055554b409318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000020400ad7a33d552217403002c1bec3302640d1228b3f48a56440e4d5853f86612c40190406400ecc994084f51d4049923240c97646405ac7c24045237a400cc33840bc7483402e23ee409728ac40cff33e4014aea340c0a50c412e0cd940922445406de7c340fdff1f41faffff4055554b409318043e"
+      }
+    },
+    "three-repeat-floor6-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "00002041",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c00000404000000000",
+            "delta_bytes": "0000803f000000c0000040400ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b642",
+            "vector4_arg_bytes": "713c3740ff125c3e66664a400000803f",
+            "delta_bytes": "713c3740ff125c3e66664a40e3a58b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000cc42",
+            "vector4_arg_bytes": "ecc89040f7580940cccc544000000040",
+            "delta_bytes": "ecc89040f7580940cccc54402b870640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e242",
+            "vector4_arg_bytes": "703cca402e4d854032335f4000004040",
+            "delta_bytes": "703cca402e4d854032335f40643b4740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "636804410423c8409899694000008040",
+            "delta_bytes": "636804410423c84098996940cff78340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "fdff1f41faffff40feff73400000a040",
+            "delta_bytes": "fdff1f41faffff40feff7340ec51a440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000040400ad7a33d713c3740ff125c3e66664a40e3a58b3fecc89040f7580940cccc54402b870640703cca402e4d854032335f40643b4740636804410423c84098996940cff78340fdff1f41faffff40feff7340ec51a440"
+      }
+    },
+    "three-repeat-floor6-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "00002041",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c00000404000000000",
+            "delta_bytes": "0000803f000000c0000040400ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b642",
+            "vector4_arg_bytes": "713c3740ff125c3e66664a400000803f",
+            "delta_bytes": "713c3740ff125c3e66664a40e3a58b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000cc42",
+            "vector4_arg_bytes": "ecc89040f7580940cccc544000000040",
+            "delta_bytes": "ecc89040f7580940cccc54402b870640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e242",
+            "vector4_arg_bytes": "703cca402e4d854032335f4000004040",
+            "delta_bytes": "703cca402e4d854032335f40643b4740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "636804410423c8409899694000008040",
+            "delta_bytes": "636804410423c84098996940cff78340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "fdff1f41faffff40feff73400000a040",
+            "delta_bytes": "fdff1f41faffff40feff7340ec51a440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000040400ad7a33d713c3740ff125c3e66664a40e3a58b3fecc89040f7580940cccc54402b870640703cca402e4d854032335f40643b4740636804410423c84098996940cff78340fdff1f41faffff40feff7340ec51a440"
+      }
+    },
+    "three-repeat-floor6-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "00002041",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c00000404000000000",
+            "delta_bytes": "0000803f000000c0000040400ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b642",
+            "vector4_arg_bytes": "713c3740ff125c3e66664a400000803f",
+            "delta_bytes": "713c3740ff125c3e66664a40e3a58b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000cc42",
+            "vector4_arg_bytes": "ecc89040f7580940cccc544000000040",
+            "delta_bytes": "ecc89040f7580940cccc54402b870640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e242",
+            "vector4_arg_bytes": "703cca402e4d854032335f4000004040",
+            "delta_bytes": "703cca402e4d854032335f40643b4740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f842",
+            "vector4_arg_bytes": "636804410423c8409899694000008040",
+            "delta_bytes": "636804410423c84098996940cff78340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000743",
+            "vector4_arg_bytes": "fdff1f41faffff40feff73400000a040",
+            "delta_bytes": "fdff1f41faffff40feff7340ec51a440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000040400ad7a33d713c3740ff125c3e66664a40e3a58b3fecc89040f7580940cccc54402b870640703cca402e4d854032335f40643b4740636804410423c84098996940cff78340fdff1f41faffff40feff7340ec51a440"
+      }
+    },
+    "three-slow-portrait-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1440,
+        "height": 2560
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be27cd7a3f0000803f",
+            "delta_bytes": "552217403002c1be27cd7a3fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853f6012823f00000040",
+            "delta_bytes": "48a56440e4d5853f6012823f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d402cbe863f00004040",
+            "delta_bytes": "0ecc994084f51d402cbe863fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40f8698b3f00008040",
+            "delta_bytes": "5ac7c24045237a40f8698b3fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac40c415903f0000a040",
+            "delta_bytes": "2e23ee409728ac40c415903f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd94090c1943f0000c040",
+            "delta_bytes": "c0a50c412e0cd94090c1943f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff405c6d993f00000000",
+            "delta_bytes": "fdff1f41faffff405c6d993f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be27cd7a3fd1228b3f48a56440e4d5853f6012823f190406400ecc994084f51d402cbe863fc97646405ac7c24045237a40f8698b3fbc7483402e23ee409728ac40c415903f14aea340c0a50c412e0cd94090c1943f6de7c340fdff1f41faffff405c6d993f9318043e"
+      }
+    },
+    "three-slow-portrait-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1440,
+        "height": 2560
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be27cd7a3f0000803f",
+            "delta_bytes": "552217403002c1be27cd7a3fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853f6012823f00000040",
+            "delta_bytes": "48a56440e4d5853f6012823f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d402cbe863f00004040",
+            "delta_bytes": "0ecc994084f51d402cbe863fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40f8698b3f00008040",
+            "delta_bytes": "5ac7c24045237a40f8698b3fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac40c415903f0000a040",
+            "delta_bytes": "2e23ee409728ac40c415903f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd94090c1943f0000c040",
+            "delta_bytes": "c0a50c412e0cd94090c1943f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff405c6d993f00000000",
+            "delta_bytes": "fdff1f41faffff405c6d993f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be27cd7a3fd1228b3f48a56440e4d5853f6012823f190406400ecc994084f51d402cbe863fc97646405ac7c24045237a40f8698b3fbc7483402e23ee409728ac40c415903f14aea340c0a50c412e0cd94090c1943f6de7c340fdff1f41faffff405c6d993f9318043e"
+      }
+    },
+    "three-slow-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be27cd7a3f0000803f",
+            "delta_bytes": "552217403002c1be27cd7a3fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853f6012823f00000040",
+            "delta_bytes": "48a56440e4d5853f6012823f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d402cbe863f00004040",
+            "delta_bytes": "0ecc994084f51d402cbe863fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40f8698b3f00008040",
+            "delta_bytes": "5ac7c24045237a40f8698b3fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac40c415903f0000a040",
+            "delta_bytes": "2e23ee409728ac40c415903f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd94090c1943f0000c040",
+            "delta_bytes": "c0a50c412e0cd94090c1943f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff405c6d993f00000000",
+            "delta_bytes": "fdff1f41faffff405c6d993f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be27cd7a3fd1228b3f48a56440e4d5853f6012823f190406400ecc994084f51d402cbe863fc97646405ac7c24045237a40f8698b3fbc7483402e23ee409728ac40c415903f14aea340c0a50c412e0cd94090c1943f6de7c340fdff1f41faffff405c6d993f9318043e"
+      }
+    },
+    "three-slow-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003075000060ea0000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be27cd7a3f0000803f",
+            "delta_bytes": "552217403002c1be27cd7a3fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853f6012823f00000040",
+            "delta_bytes": "48a56440e4d5853f6012823f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d402cbe863f00004040",
+            "delta_bytes": "0ecc994084f51d402cbe863fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40f8698b3f00008040",
+            "delta_bytes": "5ac7c24045237a40f8698b3fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac40c415903f0000a040",
+            "delta_bytes": "2e23ee409728ac40c415903f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd94090c1943f0000c040",
+            "delta_bytes": "c0a50c412e0cd94090c1943f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff405c6d993f00000000",
+            "delta_bytes": "fdff1f41faffff405c6d993f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be27cd7a3fd1228b3f48a56440e4d5853f6012823f190406400ecc994084f51d402cbe863fc97646405ac7c24045237a40f8698b3fbc7483402e23ee409728ac40c415903f14aea340c0a50c412e0cd94090c1943f6de7c340fdff1f41faffff405c6d993f9318043e"
+      }
+    },
+    "three-timeshift-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "14050000230500003c050000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe86ebac3f0000803f",
+            "delta_bytes": "68c6214028b82abe86ebac3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f71ceae3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f71ceae3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f405cb1b03f00004040",
+            "delta_bytes": "5eff97407bfe1f405cb1b03f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080404794b23f00008040",
+            "delta_bytes": "0000c040000080404794b23f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe86ebac3f04568e3ffdc57140f8a7aa3f71ceae3fb29d07405eff97407bfe1f405cb1b03f621048400000c040000080404794b23f89418440"
+      }
+    },
+    "three-timeshift-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "14050000230500003c050000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000d242",
+            "vector4_arg_bytes": "0000803f000000c09b08ab3f00000000",
+            "delta_bytes": "0000803f000000c09b08ab3f3d0ad73d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e042",
+            "vector4_arg_bytes": "68c6214028b82abe9b08ab3f0000803f",
+            "delta_bytes": "68c6214028b82abe9b08ab3f04568e3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f9b08ab3f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f9b08ab3fb29d0740"
+          },
+          {
+            "scalar_s0_f32_bits": "0000fc42",
+            "vector4_arg_bytes": "5eff97407bfe1f409b08ab3f00004040",
+            "delta_bytes": "5eff97407bfe1f409b08ab3f62104840"
+          },
+          {
+            "scalar_s0_f32_bits": "00000543",
+            "vector4_arg_bytes": "0000c040000080409b08ab3f00008040",
+            "delta_bytes": "0000c040000080409b08ab3f89418440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c09b08ab3f3d0ad73d68c6214028b82abe9b08ab3f04568e3ffdc57140f8a7aa3f9b08ab3fb29d07405eff97407bfe1f409b08ab3f621048400000c040000080409b08ab3f89418440"
+      }
+    },
+    "three-timeshift-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "14050000230500003c050000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ba42",
+            "vector4_arg_bytes": "89dd0f408ec369be04097e3f0000803f",
+            "delta_bytes": "89dd0f408ec369be04097e3f6de78b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d442",
+            "vector4_arg_bytes": "648858400a5f9a3f3c4e853f00000040",
+            "delta_bytes": "648858400a5f9a3f3c4e853fb4c80640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ee42",
+            "vector4_arg_bytes": "88b2954034d12940f6978b3f00004040",
+            "delta_bytes": "88b2954034d12940f6978b3fb29d4740"
+          },
+          {
+            "scalar_s0_f32_bits": "00000443",
+            "vector4_arg_bytes": "fdffbf40faff7f40b0e1913f00008040",
+            "delta_bytes": "fdffbf40faff7f40b0e1913f58398440"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d89dd0f408ec369be04097e3f6de78b3f648858400a5f9a3f3c4e853fb4c8064088b2954034d12940f6978b3fb29d4740fdffbf40faff7f40b0e1913f58398440"
+      }
+    },
+    "three-tool1-v1": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 1
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 1
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00008c42",
+            "vector4_arg_bytes": "0000803f000000c04c37493f00000000",
+            "delta_bytes": "0000803f000000c04c37493f295c8f3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00009a42",
+            "vector4_arg_bytes": "68c6214028b82abec1ca553f0000803f",
+            "delta_bytes": "68c6214028b82abec1ca553f23db893f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a842",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f365e623f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f365e623f42600540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b642",
+            "vector4_arg_bytes": "5eff97407bfe1f40abf16e3f00004040",
+            "delta_bytes": "5eff97407bfe1f40abf16e3ff2d24540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c442",
+            "vector4_arg_bytes": "0000c0400000804020857b3f00008040",
+            "delta_bytes": "0000c0400000804020857b3fd1228340"
+          }
+        ],
+        "buffer_hex": "0000803f000000c04c37493f295c8f3d68c6214028b82abec1ca553f23db893ffdc57140f8a7aa3f365e623f426005405eff97407bfe1f40abf16e3ff2d245400000c0400000804020857b3fd1228340"
+      }
+    },
+    "three-tool1-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 1
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00008c42",
+            "vector4_arg_bytes": "0000803f000000c04c37493f00000000",
+            "delta_bytes": "0000803f000000c04c37493f295c8f3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00009a42",
+            "vector4_arg_bytes": "68c6214028b82abe4c37493f0000803f",
+            "delta_bytes": "68c6214028b82abe4c37493f23db893f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a842",
+            "vector4_arg_bytes": "fdc57140f8a7aa3f4c37493f00000040",
+            "delta_bytes": "fdc57140f8a7aa3f4c37493f42600540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b642",
+            "vector4_arg_bytes": "5eff97407bfe1f404c37493f00004040",
+            "delta_bytes": "5eff97407bfe1f404c37493ff2d24540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c442",
+            "vector4_arg_bytes": "0000c040000080404c37493f00008040",
+            "delta_bytes": "0000c040000080404c37493fd1228340"
+          }
+        ],
+        "buffer_hex": "0000803f000000c04c37493f295c8f3d68c6214028b82abe4c37493f23db893ffdc57140f8a7aa3f4c37493f426005405eff97407bfe1f404c37493ff2d245400000c040000080404c37493fd1228340"
+      }
+    },
+    "three-tool1-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003b01000054010000"
+          }
+        },
+        "tool_type": 1
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "00008c42",
+            "vector4_arg_bytes": "0000803f000000c04c37493f00000000",
+            "delta_bytes": "0000803f000000c04c37493f295c8f3d"
+          },
+          {
+            "scalar_s0_f32_bits": "00009a42",
+            "vector4_arg_bytes": "89dd0f408ec369be4c37493f0000803f",
+            "delta_bytes": "89dd0f408ec369be4c37493f23db893f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000a842",
+            "vector4_arg_bytes": "648858400a5f9a3f4c37493f00000040",
+            "delta_bytes": "648858400a5f9a3f4c37493f42600540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000b642",
+            "vector4_arg_bytes": "88b2954034d129404c37493f00004040",
+            "delta_bytes": "88b2954034d129404c37493ff2d24540"
+          },
+          {
+            "scalar_s0_f32_bits": "0000c442",
+            "vector4_arg_bytes": "fdffbf40faff7f404c37493f00008040",
+            "delta_bytes": "fdffbf40faff7f404c37493fd1228340"
+          }
+        ],
+        "buffer_hex": "0000803f000000c04c37493f295c8f3d89dd0f408ec369be4c37493f23db893f648858400a5f9a3f4c37493f4260054088b2954034d129404c37493ff2d24540fdffbf40faff7f404c37493fd1228340"
+      }
+    },
+    "three-uneven-early-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100004a01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be3fa5783f0000803f",
+            "delta_bytes": "552217403002c1be3fa5783fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853fefd47f3f00000040",
+            "delta_bytes": "48a56440e4d5853fefd47f3f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d405082833f00004040",
+            "delta_bytes": "0ecc994084f51d405082833fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40281a873f00008040",
+            "delta_bytes": "5ac7c24045237a40281a873fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac4000b28a3f0000a040",
+            "delta_bytes": "2e23ee409728ac4000b28a3f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940d8498e3f0000c040",
+            "delta_bytes": "c0a50c412e0cd940d8498e3f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff40b0e1913f00000000",
+            "delta_bytes": "fdff1f41faffff40b0e1913f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be3fa5783fd1228b3f48a56440e4d5853fefd47f3f190406400ecc994084f51d405082833fc97646405ac7c24045237a40281a873fbc7483402e23ee409728ac4000b28a3f14aea340c0a50c412e0cd940d8498e3f6de7c340fdff1f41faffff40b0e1913f9318043e"
+      }
+    },
+    "three-uneven-early-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100004a01000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be3fa5783f0000803f",
+            "delta_bytes": "552217403002c1be3fa5783fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853fefd47f3f00000040",
+            "delta_bytes": "48a56440e4d5853fefd47f3f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d405082833f00004040",
+            "delta_bytes": "0ecc994084f51d405082833fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40281a873f00008040",
+            "delta_bytes": "5ac7c24045237a40281a873fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac4000b28a3f0000a040",
+            "delta_bytes": "2e23ee409728ac4000b28a3f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940d8498e3f0000c040",
+            "delta_bytes": "c0a50c412e0cd940d8498e3f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff40b0e1913f00000000",
+            "delta_bytes": "fdff1f41faffff40b0e1913f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be3fa5783fd1228b3f48a56440e4d5853fefd47f3f190406400ecc994084f51d405082833fc97646405ac7c24045237a40281a873fbc7483402e23ee409728ac4000b28a3f14aea340c0a50c412e0cd940d8498e3f6de7c340fdff1f41faffff40b0e1913f9318043e"
+      }
+    },
+    "three-uneven-late-v2": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003601000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 2
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be3fa5783f0000803f",
+            "delta_bytes": "552217403002c1be3fa5783fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853fefd47f3f00000040",
+            "delta_bytes": "48a56440e4d5853fefd47f3f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d405082833f00004040",
+            "delta_bytes": "0ecc994084f51d405082833fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40281a873f00008040",
+            "delta_bytes": "5ac7c24045237a40281a873fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac4000b28a3f0000a040",
+            "delta_bytes": "2e23ee409728ac4000b28a3f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940d8498e3f0000c040",
+            "delta_bytes": "c0a50c412e0cd940d8498e3f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff40b0e1913f00000000",
+            "delta_bytes": "fdff1f41faffff40b0e1913f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be3fa5783fd1228b3f48a56440e4d5853fefd47f3f190406400ecc994084f51d405082833fc97646405ac7c24045237a40281a873fbc7483402e23ee409728ac4000b28a3f14aea340c0a50c412e0cd940d8498e3f6de7c340fdff1f41faffff40b0e1913f9318043e"
+      }
+    },
+    "three-uneven-late-v3": {
+      "input": {
+        "curve_enabled": true,
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c00000c040000080400000204100000041"
+          },
+          "pressures": {
+            "data_hex": "9a99993e9a99193f9a99593f"
+          },
+          "timestamps": {
+            "data_hex": "2c0100003601000054010000"
+          }
+        },
+        "tool_type": 2
+      },
+      "profile": {
+        "width": 1920,
+        "height": 1080
+      },
+      "native_selection": {
+        "version": 3
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "scalar_s0_f32_bits": "0000a042",
+            "vector4_arg_bytes": "0000803f000000c08f75713f00000000",
+            "delta_bytes": "0000803f000000c08f75713f0ad7a33d"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ae42",
+            "vector4_arg_bytes": "552217403002c1be3fa5783f0000803f",
+            "delta_bytes": "552217403002c1be3fa5783fd1228b3f"
+          },
+          {
+            "scalar_s0_f32_bits": "0000bc42",
+            "vector4_arg_bytes": "48a56440e4d5853fefd47f3f00000040",
+            "delta_bytes": "48a56440e4d5853fefd47f3f19040640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000ca42",
+            "vector4_arg_bytes": "0ecc994084f51d405082833f00004040",
+            "delta_bytes": "0ecc994084f51d405082833fc9764640"
+          },
+          {
+            "scalar_s0_f32_bits": "0000d842",
+            "vector4_arg_bytes": "5ac7c24045237a40281a873f00008040",
+            "delta_bytes": "5ac7c24045237a40281a873fbc748340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000e642",
+            "vector4_arg_bytes": "2e23ee409728ac4000b28a3f0000a040",
+            "delta_bytes": "2e23ee409728ac4000b28a3f14aea340"
+          },
+          {
+            "scalar_s0_f32_bits": "0000f442",
+            "vector4_arg_bytes": "c0a50c412e0cd940d8498e3f0000c040",
+            "delta_bytes": "c0a50c412e0cd940d8498e3f6de7c340"
+          },
+          {
+            "scalar_s0_f32_bits": "00000143",
+            "vector4_arg_bytes": "fdff1f41faffff40b0e1913f00000000",
+            "delta_bytes": "fdff1f41faffff40b0e1913f9318043e"
+          }
+        ],
+        "buffer_hex": "0000803f000000c08f75713f0ad7a33d552217403002c1be3fa5783fd1228b3f48a56440e4d5853fefd47f3f190406400ecc994084f51d405082833fc97646405ac7c24045237a40281a873fbc7483402e23ee409728ac4000b28a3f14aea340c0a50c412e0cd940d8498e3f6de7c340fdff1f41faffff40b0e1913f9318043e"
+      }
+    }
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "cases": {
+    "six_point_tool1_nonstationary": {
+      "input": {
+        "pen_size_f32_bits": "00002041",
+        "points_f32_bits": [
+          [
+            "00000000",
+            "00000000"
+          ],
+          [
+            "00002041",
+            "00000000"
+          ],
+          [
+            "0000a041",
+            "00000000"
+          ],
+          [
+            "0000f041",
+            "00002041"
+          ],
+          [
+            "00002042",
+            "00000000"
+          ],
+          [
+            "00007042",
+            "0000a041"
+          ]
+        ],
+        "tool_type": 1
+      },
+      "native_redraw_callback_boundaries": [
+        {
+          "callbacks_emitted": 0,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "draw_object_stroke"
+        },
+        {
+          "callbacks_emitted": 0,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "draw_object_stroke"
+        },
+        {
+          "callbacks_emitted": 7,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "draw_object_stroke"
+        },
+        {
+          "callbacks_emitted": 0,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "draw_object_stroke"
+        },
+        {
+          "callbacks_emitted": 15,
+          "method": "DefaultPenStrokeDrawableGL::endPen",
+          "phase": "draw_object_stroke"
+        },
+        {
+          "callbacks_emitted": 0,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "saved_redraw"
+        },
+        {
+          "callbacks_emitted": 0,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "saved_redraw"
+        },
+        {
+          "callbacks_emitted": 7,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "saved_redraw"
+        },
+        {
+          "callbacks_emitted": 0,
+          "method": "DefaultPenStrokeDrawableGL::redrawLine",
+          "phase": "saved_redraw"
+        },
+        {
+          "callbacks_emitted": 15,
+          "method": "DefaultPenStrokeDrawableGL::endPen",
+          "phase": "saved_redraw"
+        }
+      ],
+      "phase_final_vectors": {
+        "draw_object_stroke": {
+          "triples_f32_bits": [
+            [
+              "00000000",
+              "00000000",
+              "0000b040"
+            ],
+            [
+              "83503c40",
+              "c2a3dd3d",
+              "0000b040"
+            ],
+            [
+              "8350bc40",
+              "c2a3dd3e",
+              "0000b040"
+            ],
+            [
+              "623c0d41",
+              "3a58793f",
+              "0000b040"
+            ],
+            [
+              "28b83a41",
+              "97e6d93f",
+              "0000b040"
+            ],
+            [
+              "6d256741",
+              "dbf62640",
+              "0000b040"
+            ],
+            [
+              "5ac98941",
+              "69506d40",
+              "0000b040"
+            ],
+            [
+              "0000a041",
+              "0000a040",
+              "0000b040"
+            ],
+            [
+              "7e5bb241",
+              "8bfcc240",
+              "0000b040"
+            ],
+            [
+              "df2bc841",
+              "f96de940",
+              "0000b040"
+            ],
+            [
+              "0723dd41",
+              "262c0641",
+              "0000b040"
+            ],
+            [
+              "c855f141",
+              "7c551641",
+              "0000b040"
+            ],
+            [
+              "7baf0342",
+              "076a2741",
+              "0000b040"
+            ],
+            [
+              "f3d60e42",
+              "413f3841",
+              "0000b040"
+            ],
+            [
+              "1ad21842",
+              "32fe4641",
+              "0000b040"
+            ],
+            [
+              "8e5e2342",
+              "714e5641",
+              "0000b040"
+            ],
+            [
+              "507c2e42",
+              "fe2f6641",
+              "0000b040"
+            ],
+            [
+              "52f63942",
+              "a9587641",
+              "0000b040"
+            ],
+            [
+              "0b004442",
+              "5b278241",
+              "0000b040"
+            ],
+            [
+              "456c4e42",
+              "a3538941",
+              "0000b040"
+            ],
+            [
+              "023b5942",
+              "2bb19041",
+              "0000b040"
+            ],
+            [
+              "3f6c6442",
+              "f43f9841",
+              "0000b040"
+            ]
+          ]
+        },
+        "saved_redraw": {
+          "triples_f32_bits": [
+            [
+              "00000000",
+              "00000000",
+              "0000b040"
+            ],
+            [
+              "83503c40",
+              "c2a3dd3d",
+              "0000b040"
+            ],
+            [
+              "8350bc40",
+              "c2a3dd3e",
+              "0000b040"
+            ],
+            [
+              "623c0d41",
+              "3a58793f",
+              "0000b040"
+            ],
+            [
+              "28b83a41",
+              "97e6d93f",
+              "0000b040"
+            ],
+            [
+              "6d256741",
+              "dbf62640",
+              "0000b040"
+            ],
+            [
+              "5ac98941",
+              "69506d40",
+              "0000b040"
+            ],
+            [
+              "0000a041",
+              "0000a040",
+              "0000b040"
+            ],
+            [
+              "7e5bb241",
+              "8bfcc240",
+              "0000b040"
+            ],
+            [
+              "df2bc841",
+              "f96de940",
+              "0000b040"
+            ],
+            [
+              "0723dd41",
+              "262c0641",
+              "0000b040"
+            ],
+            [
+              "c855f141",
+              "7c551641",
+              "0000b040"
+            ],
+            [
+              "7baf0342",
+              "076a2741",
+              "0000b040"
+            ],
+            [
+              "f3d60e42",
+              "413f3841",
+              "0000b040"
+            ],
+            [
+              "1ad21842",
+              "32fe4641",
+              "0000b040"
+            ],
+            [
+              "8e5e2342",
+              "714e5641",
+              "0000b040"
+            ],
+            [
+              "507c2e42",
+              "fe2f6641",
+              "0000b040"
+            ],
+            [
+              "52f63942",
+              "a9587641",
+              "0000b040"
+            ],
+            [
+              "0b004442",
+              "5b278241",
+              "0000b040"
+            ],
+            [
+              "456c4e42",
+              "a3538941",
+              "0000b040"
+            ],
+            [
+              "023b5942",
+              "2bb19041",
+              "0000b040"
+            ],
+            [
+              "3f6c6442",
+              "f43f9841",
+              "0000b040"
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

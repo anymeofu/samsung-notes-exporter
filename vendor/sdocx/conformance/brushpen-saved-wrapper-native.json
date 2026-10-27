@@ -1,0 +1,6683 @@
+{
+  "cases": [
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 0,
+        "path_length_f32": 2.1213202476501465,
+        "selected_path_method": "cubicTo"
+      },
+      "input": {
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 2
+      },
+      "label": "tool-2-curve-1-fixed-opacity-0-size-3.144-fixed-width-0",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "eae8633f",
+            "f685d9bf",
+            "0000803f",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e07f643f",
+            "be14d9bf",
+            "0000803f",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c67c663f",
+            "1297d7bf",
+            "0000803f",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "50416a3f",
+            "aac3d4bf",
+            "0000803f",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3e01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7444703f",
+            "4e41d0bf",
+            "0000803f",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a616793f",
+            "a8a3c9bf",
+            "0000803f",
+            "f628a840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7cb3823f",
+            "6c67c0bf",
+            "0000803f",
+            "f628c840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "97048b3f",
+            "c4edb3bf",
+            "0000803f",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "83fe953f",
+            "e276a3bf",
+            "0000803f",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "743ba43f",
+            "781b8ebf",
+            "0000803f",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2475b63f",
+            "e18965bf",
+            "0000803f",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4101553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "fc8acd3f",
+            "594820bf",
+            "0000803f",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d4000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "695a0e40",
+            "001c103b",
+            "0000803f",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c5e71640",
+            "9e094f3e",
+            "7d05823f",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "971a113f",
+            "a6e7523f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "72dc1f40",
+            "5d87cf3e",
+            "2613843f",
+            "5c8f823e",
+            "93a6653e",
+            "1c90003f",
+            "f328143f",
+            "f2c4503f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "443c2940",
+            "35971c3f",
+            "1c29863f",
+            "d7a3a03f",
+            "93a6653e",
+            "1c90003f",
+            "752b173f",
+            "b0994e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2f0b3340",
+            "4f40523f",
+            "8147883f",
+            "ec511040",
+            "93a6653e",
+            "1c90003f",
+            "b2211a3f",
+            "72664c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "454d3d40",
+            "2c61843f",
+            "776e8a3f",
+            "ec515040",
+            "93a6653e",
+            "1c90003f",
+            "470b1d3f",
+            "d02b4a3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c3064840",
+            "6110a03f",
+            "209e8c3f",
+            "f6288840",
+            "93a6653e",
+            "1c90003f",
+            "d7e71f3f",
+            "5aea473f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "053c5340",
+            "812fbc3f",
+            "a0d68e3f",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "12b7223f",
+            "afa2453f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "8ef15e40",
+            "54c0d83f",
+            "1a18913f",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "b278253f",
+            "6555433f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "0a2c6b40",
+            "a1c4f53f",
+            "b362933f",
+            "5c8f823e",
+            "93a6653e",
+            "1c90003f",
+            "742c283f",
+            "1203413f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "4cf07740",
+            "209f0940",
+            "8fb6953f",
+            "d7a3a03f",
+            "93a6653e",
+            "1c90003f",
+            "23d22a3f",
+            "53ac3e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a8a18240",
+            "84971840",
+            "d413983f",
+            "ec511040",
+            "93a6653e",
+            "1c90003f",
+            "91692d3f",
+            "bb513c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "20958940",
+            "6fcc2740",
+            "a87a9a3f",
+            "ec515040",
+            "93a6653e",
+            "1c90003f",
+            "9ef22f3f",
+            "e4f3393f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "37d59040",
+            "d33e3740",
+            "32eb9c3f",
+            "f6288840",
+            "93a6653e",
+            "1c90003f",
+            "276d323f",
+            "5f93373f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 2
+        },
+        {
+          "name": "SPen::MotionEvent::GetPressure(int) const",
+          "return_s0_f32": 0.8500000238418579
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.34609854221343994
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.37748268246650696
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.41171273589134216
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4490467607975006
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4897662401199341
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5341781377792358
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5826173424720764
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6354489922523499
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6930713653564453
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7559189796447754
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8244655728340149
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8992279767990112
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0157924890518188
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.031834363937378
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0481295585632324
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.064682126045227
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0814961194992065
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0985755920410156
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1159248352050781
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1335480213165283
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1514495611190796
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1696337461471558
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1881051063537598
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.2068681716918945
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.2259275913238525
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0157924890518188
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.031834363937378
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0481295585632324
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.064682126045227
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0814961194992065
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0985755920410156
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1159248352050781
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1335480213165283
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1514495611190796
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1696337461471558
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1881051063537598
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.2068681716918945
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.2259275913238525
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "eae8633ff685d9bf0000803f5c8f823eb4b8e0bd26e8993e0000000000000000000000000000000000000000e07f643fbe14d9bf0000803fd7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000c67c663f1297d7bf0000803fec511040b4b8e0bd26e8993ed5000e3f3f01553f00000000000000000000000050416a3faac3d4bf0000803fec515040b4b8e0bd26e8993ed5000e3f3e01553f0000000000000000000000007444703f4e41d0bf0000803ff6288840b4b8e0bd26e8993ed5000e3f3f01553f000000000000000000000000a616793fa8a3c9bf0000803ff628a840b4b8e0bd26e8993ed5000e3f4001553f0000000000000000000000007cb3823f6c67c0bf0000803ff628c840b4b8e0bd26e8993ed5000e3f3f01553f00000000000000000000000097048b3fc4edb3bf0000803f5c8f823eb4b8e0bd26e8993ed5000e3f3f01553f00000000000000000000000083fe953fe276a3bf0000803fd7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000743ba43f781b8ebf0000803fec511040b4b8e0bd26e8993ed5000e3f3f01553f0000000000000000000000002475b63fe18965bf0000803fec515040b4b8e0bd26e8993ed5000e3f4101553f000000000000000000000000fc8acd3f594820bf0000803ff6288840b4b8e0bd26e8993ed4000e3f3f01553f000000000000000000000000695a0e40001c103b0000803ff628a84093a6653e1c90003fd5000e3f4001553f000000000000000000000000c5e716409e094f3e7d05823ff628c84093a6653e1c90003f971a113fa6e7523f00000000000000000000000072dc1f405d87cf3e2613843f5c8f823e93a6653e1c90003ff328143ff2c4503f000000000000000000000000443c294035971c3f1c29863fd7a3a03f93a6653e1c90003f752b173fb0994e3f0000000000000000000000002f0b33404f40523f8147883fec51104093a6653e1c90003fb2211a3f72664c3f000000000000000000000000454d3d402c61843f776e8a3fec51504093a6653e1c90003f470b1d3fd02b4a3f000000000000000000000000c30648406110a03f209e8c3ff628884093a6653e1c90003fd7e71f3f5aea473f000000000000000000000000053c5340812fbc3fa0d68e3ff628a84093a6653e1c90003f12b7223fafa2453f0000000000000000000000008ef15e4054c0d83f1a18913ff628c84093a6653e1c90003fb278253f6555433f0000000000000000000000000a2c6b40a1c4f53fb362933f5c8f823e93a6653e1c90003f742c283f1203413f0000000000000000000000004cf07740209f09408fb6953fd7a3a03f93a6653e1c90003f23d22a3f53ac3e3f000000000000000000000000a8a1824084971840d413983fec51104093a6653e1c90003f91692d3fbb513c3f000000000000000000000000209589406fcc2740a87a9a3fec51504093a6653e1c90003f9ef22f3fe4f3393f00000000000000000000000037d59040d33e374032eb9c3ff628884093a6653e1c90003f276d323f5f93373f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": true,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 3.1440000534057617,
+        "native_saved_tool_type": 2
+      },
+      "style_setters": {
+        "fixed_width_argument": 3.144,
+        "native_GetFixedWidth_f32": 3.1440000534057617,
+        "native_GetSize_f32": 3.1440000534057617,
+        "native_fixed_width_enabled_byte_offset_89": 0,
+        "native_fixed_width_enabled_input": false
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 0,
+        "path_length_f32": 2.1213202476501465,
+        "selected_path_method": "cubicTo"
+      },
+      "input": {
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 2
+      },
+      "label": "tool-2-curve-1-fixed-opacity-0-size-3.144-fixed-width-1",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "0000803f",
+            "000000c0",
+            "4c37c93f",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7b4b803f",
+            "c78effbf",
+            "4c37c93f",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ee49813f",
+            "1b11febf",
+            "4c37c93f",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "332c833f",
+            "b33dfbbf",
+            "4c37c93f",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3e01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c52d863f",
+            "58bbf6bf",
+            "4c37c93f",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "de968a3f",
+            "b21df0bf",
+            "4c37c93f",
+            "f628a840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "07bf903f",
+            "75e1e6bf",
+            "4c37c93f",
+            "f628c840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2210993f",
+            "cd67dabf",
+            "4c37c93f",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "0e0aa43f",
+            "ebf0c9bf",
+            "4c37c93f",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ff46b23f",
+            "8195b4bf",
+            "4c37c93f",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "af80c43f",
+            "fa3e99bf",
+            "4c37c93f",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4101553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "8796db3f",
+            "6c3c6dbf",
+            "4c37c93f",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d4000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "00000040",
+            "000000bf",
+            "4c37c93f",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "55530840",
+            "f0aa9dbe",
+            "4c37c93f",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "971a113f",
+            "a6e7523f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "100d1140",
+            "4e21e7bd",
+            "4c37c93f",
+            "5c8f823e",
+            "93a6653e",
+            "1c90003f",
+            "f328143f",
+            "f2c4503f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "02311a40",
+            "69b8ae3d",
+            "4c37c93f",
+            "d7a3a03f",
+            "93a6653e",
+            "1c90003f",
+            "752b173f",
+            "b0994e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "1bc32340",
+            "bfbe923e",
+            "4c37c93f",
+            "ec511040",
+            "93a6653e",
+            "1c90003f",
+            "b2211a3f",
+            "72664c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "69c72d40",
+            "0e70fb3e",
+            "4c37c93f",
+            "ec515040",
+            "93a6653e",
+            "1c90003f",
+            "470b1d3f",
+            "d02b4a3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "25423840",
+            "51e4323f",
+            "4c37c93f",
+            "f6288840",
+            "93a6653e",
+            "1c90003f",
+            "d7e71f3f",
+            "5aea473f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a7374340",
+            "92e7683f",
+            "4c37c93f",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "12b7223f",
+            "afa2453f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6fac4e40",
+            "9ae28f3f",
+            "4c37c93f",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "b278253f",
+            "6555433f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "24a55a40",
+            "50c0ab3f",
+            "4c37c93f",
+            "5c8f823e",
+            "93a6653e",
+            "1c90003f",
+            "742c283f",
+            "1203413f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "95266740",
+            "b10ec83f",
+            "4c37c93f",
+            "d7a3a03f",
+            "93a6653e",
+            "1c90003f",
+            "23d22a3f",
+            "53ac3e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ba357440",
+            "83cfe43f",
+            "4c37c93f",
+            "ec511040",
+            "93a6653e",
+            "1c90003f",
+            "91692d3f",
+            "bb513c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "dceb8040",
+            "4a020140",
+            "4c37c93f",
+            "ec515040",
+            "93a6653e",
+            "1c90003f",
+            "9ef22f3f",
+            "e4f3393f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ef088840",
+            "dcd70f40",
+            "4c37c93f",
+            "f6288840",
+            "93a6653e",
+            "1c90003f",
+            "276d323f",
+            "5f93373f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 2
+        },
+        {
+          "name": "SPen::MotionEvent::GetPressure(int) const",
+          "return_s0_f32": 0.8500000238418579
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.34609854221343994
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.37748268246650696
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.41171273589134216
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4490467607975006
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4897662401199341
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5341781377792358
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5826173424720764
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6354489922523499
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6930713653564453
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7559189796447754
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8244655728340149
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8992279767990112
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0157924890518188
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.031834363937378
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0481295585632324
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.064682126045227
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0814961194992065
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0985755920410156
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1159248352050781
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1335480213165283
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1514495611190796
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1696337461471558
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1881051063537598
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.2068681716918945
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.2259275913238525
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.5720000267028809
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "0000803f000000c04c37c93f5c8f823eb4b8e0bd26e8993e00000000000000000000000000000000000000007b4b803fc78effbf4c37c93fd7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000ee49813f1b11febf4c37c93fec511040b4b8e0bd26e8993ed5000e3f3f01553f000000000000000000000000332c833fb33dfbbf4c37c93fec515040b4b8e0bd26e8993ed5000e3f3e01553f000000000000000000000000c52d863f58bbf6bf4c37c93ff6288840b4b8e0bd26e8993ed5000e3f3f01553f000000000000000000000000de968a3fb21df0bf4c37c93ff628a840b4b8e0bd26e8993ed5000e3f4001553f00000000000000000000000007bf903f75e1e6bf4c37c93ff628c840b4b8e0bd26e8993ed5000e3f3f01553f0000000000000000000000002210993fcd67dabf4c37c93f5c8f823eb4b8e0bd26e8993ed5000e3f3f01553f0000000000000000000000000e0aa43febf0c9bf4c37c93fd7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000ff46b23f8195b4bf4c37c93fec511040b4b8e0bd26e8993ed5000e3f3f01553f000000000000000000000000af80c43ffa3e99bf4c37c93fec515040b4b8e0bd26e8993ed5000e3f4101553f0000000000000000000000008796db3f6c3c6dbf4c37c93ff6288840b4b8e0bd26e8993ed4000e3f3f01553f00000000000000000000000000000040000000bf4c37c93ff628a84093a6653e1c90003fd5000e3f4001553f00000000000000000000000055530840f0aa9dbe4c37c93ff628c84093a6653e1c90003f971a113fa6e7523f000000000000000000000000100d11404e21e7bd4c37c93f5c8f823e93a6653e1c90003ff328143ff2c4503f00000000000000000000000002311a4069b8ae3d4c37c93fd7a3a03f93a6653e1c90003f752b173fb0994e3f0000000000000000000000001bc32340bfbe923e4c37c93fec51104093a6653e1c90003fb2211a3f72664c3f00000000000000000000000069c72d400e70fb3e4c37c93fec51504093a6653e1c90003f470b1d3fd02b4a3f0000000000000000000000002542384051e4323f4c37c93ff628884093a6653e1c90003fd7e71f3f5aea473f000000000000000000000000a737434092e7683f4c37c93ff628a84093a6653e1c90003f12b7223fafa2453f0000000000000000000000006fac4e409ae28f3f4c37c93ff628c84093a6653e1c90003fb278253f6555433f00000000000000000000000024a55a4050c0ab3f4c37c93f5c8f823e93a6653e1c90003f742c283f1203413f00000000000000000000000095266740b10ec83f4c37c93fd7a3a03f93a6653e1c90003f23d22a3f53ac3e3f000000000000000000000000ba35744083cfe43f4c37c93fec51104093a6653e1c90003f91692d3fbb513c3f000000000000000000000000dceb80404a0201404c37c93fec51504093a6653e1c90003f9ef22f3fe4f3393f000000000000000000000000ef088840dcd70f404c37c93ff628884093a6653e1c90003f276d323f5f93373f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": true,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 3.1440000534057617,
+        "native_saved_tool_type": 2
+      },
+      "style_setters": {
+        "fixed_width_argument": 3.144,
+        "native_GetFixedWidth_f32": 3.1440000534057617,
+        "native_GetSize_f32": 3.1440000534057617,
+        "native_fixed_width_enabled_byte_offset_89": 1,
+        "native_fixed_width_enabled_input": true
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 0,
+        "path_length_f32": 2.1213202476501465,
+        "selected_path_method": "cubicTo"
+      },
+      "input": {
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 2
+      },
+      "label": "tool-2-curve-1-fixed-opacity-0-size-20-fixed-width-0",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "eae8633f",
+            "f685d9bf",
+            "0000803f",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e07f643f",
+            "be14d9bf",
+            "0000803f",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "aafc673f",
+            "2677d6bf",
+            "0000803f",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "b668663f",
+            "fb09babf",
+            "b1a6bf3f",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d6000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "96ef713f",
+            "638e72bf",
+            "f2231c40",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "411d4640",
+            "bd02fa3f",
+            "61519c40",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e74a7c40",
+            "aeb95140",
+            "efe2b440",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "b24c1c3f",
+            "4bbf4a3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 2
+        },
+        {
+          "name": "SPen::MotionEvent::GetPressure(int) const",
+          "return_s0_f32": 0.8500000238418579
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.34609854221343994
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5639410018920898
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.9188985228538513
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.4972745180130005
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 2.4396939277648926
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 4.884933948516846
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 5.6527018547058105
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.4972745180130005
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 2.4396939277648926
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 4.884933948516846
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 5.6527018547058105
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "eae8633ff685d9bf0000803f5c8f823eb4b8e0bd26e8993e0000000000000000000000000000000000000000e07f643fbe14d9bf0000803fd7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000aafc673f2677d6bf0000803fec511040b4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000b668663ffb09babfb1a6bf3fec515040b4b8e0bd26e8993ed6000e3f4001553f00000000000000000000000096ef713f638e72bff2231c40f6288840b4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000411d4640bd02fa3f61519c40f628a84093a6653e1c90003fd5000e3f4001553f000000000000000000000000e74a7c40aeb95140efe2b440f628c84093a6653e1c90003fb24c1c3f4bbf4a3f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": true,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 20.0,
+        "native_saved_tool_type": 2
+      },
+      "style_setters": {
+        "fixed_width_argument": 20.0,
+        "native_GetFixedWidth_f32": 20.0,
+        "native_GetSize_f32": 20.0,
+        "native_fixed_width_enabled_byte_offset_89": 0,
+        "native_fixed_width_enabled_input": false
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 0,
+        "path_length_f32": 2.1213202476501465,
+        "selected_path_method": "cubicTo"
+      },
+      "input": {
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 2
+      },
+      "label": "tool-2-curve-1-fixed-opacity-0-size-20-fixed-width-1",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "0000803f",
+            "000000c0",
+            "00002041",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7b4b803f",
+            "c78effbf",
+            "00002041",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e009823f",
+            "30f1fcbf",
+            "00002041",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "df3b883f",
+            "31a6f3bf",
+            "00002041",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d6000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "d23b9b3f",
+            "4526d7bf",
+            "00002041",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "00000040",
+            "000000bf",
+            "00002041",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "8e282b40",
+            "c258e03e",
+            "00002041",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "b24c1c3f",
+            "4bbf4a3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 2
+        },
+        {
+          "name": "SPen::MotionEvent::GetPressure(int) const",
+          "return_s0_f32": 0.8500000238418579
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.34609854221343994
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5639410018920898
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.9188985228538513
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.4972745180130005
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 2.4396939277648926
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 4.884933948516846
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 5.6527018547058105
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 10.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 10.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 10.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 10.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 10.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 10.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 10.0
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "0000803f000000c0000020415c8f823eb4b8e0bd26e8993e00000000000000000000000000000000000000007b4b803fc78effbf00002041d7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000e009823f30f1fcbf00002041ec511040b4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000df3b883f31a6f3bf00002041ec515040b4b8e0bd26e8993ed6000e3f4001553f000000000000000000000000d23b9b3f4526d7bf00002041f6288840b4b8e0bd26e8993ed5000e3f4001553f00000000000000000000000000000040000000bf00002041f628a84093a6653e1c90003fd5000e3f4001553f0000000000000000000000008e282b40c258e03e00002041f628c84093a6653e1c90003fb24c1c3f4bbf4a3f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": true,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 20.0,
+        "native_saved_tool_type": 2
+      },
+      "style_setters": {
+        "fixed_width_argument": 20.0,
+        "native_GetFixedWidth_f32": 20.0,
+        "native_GetSize_f32": 20.0,
+        "native_fixed_width_enabled_byte_offset_89": 1,
+        "native_fixed_width_enabled_input": true
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 0,
+        "path_length_f32": 0.0,
+        "selected_path_method": "lineTo"
+      },
+      "input": {
+        "curve_enabled": false,
+        "fixed_opacity_enabled": false,
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 1
+      },
+      "label": "tool-1-curve-0-fixed-opacity-0-size-3.144-fixed-width-0",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "a659843f",
+            "9c11a9bf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "3d78893f",
+            "ba63a1bf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7ed78e3f",
+            "d85499bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "997a943f",
+            "2ee090bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e8649a3f",
+            "b80088bf",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ef99a03f",
+            "5d627dbf",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5c1da73f",
+            "15d869bf",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "0ef3ad3f",
+            "ff5655bf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "151fb53f",
+            "ebd23fbf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "b2a5bc3f",
+            "133f29bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5e8bc43f",
+            "0d8e11bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "cad4cc3f",
+            "9263f1be",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e286d53f",
+            "0637bdbe",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "cea6de3f",
+            "7e7786be",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "fc39e83f",
+            "d4081abe",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "1a46f23f",
+            "b0dd05bd",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "20d1fc3f",
+            "c819ba3d",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a9f00340",
+            "34cf613e",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a1be0940",
+            "3a8fb63e",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e9d50f40",
+            "a0a6ff3e",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "213a1640",
+            "9d2c263f",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "13ef1c40",
+            "4c6a4e3f",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "bdf82340",
+            "45a4783f",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "4b5b2b40",
+            "cc79923f",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "201b3340",
+            "4cb9a93f",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "d32c4240",
+            "64eed63f",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "99804d40",
+            "7319ee3f",
+            "d8cb803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "68e65840",
+            "b4b40240",
+            "f598813f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5f5e6440",
+            "3e6f0e40",
+            "5967823f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "98e86f40",
+            "763c1a40",
+            "0537833f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "33857b40",
+            "791c2640",
+            "fc07843f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "269a8340",
+            "660f3240",
+            "40da843f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "017b8940",
+            "5a153e40",
+            "d3ad853f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "37658f40",
+            "752e4a40",
+            "b782863f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "da589540",
+            "d35a5640",
+            "ee58873f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "f5559b40",
+            "959a6240",
+            "7a30883f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "9c5ca140",
+            "d8ed6e40",
+            "5d09893f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "db6ca740",
+            "bb547b40",
+            "9ae3893f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c286ad40",
+            "b0e78340",
+            "32bf8a3f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "60aab340",
+            "f22e8a40",
+            "289c8b3f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c5d7b940",
+            "33809040",
+            "7e7a8c3f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 1
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.28841543197631836
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3026457130908966
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.31757810711860657
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.33324724435806274
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3496895134449005
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.36694303154945374
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3850478231906891
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4040459096431732
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.42398133873939514
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.44490036368370056
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.46685153245925903
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.48988574743270874
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5140564441680908
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5394197106361389
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5660344362258911
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5939623117446899
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6232681274414062
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6540198922157288
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6862888932228088
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7201500535011292
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7556819319725037
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.792966902256012
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8320915102958679
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8731464743614197
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.9162271022796631
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.006220817565918
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.01248037815094
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.018778920173645
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0251165628433228
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0314936637878418
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0379104614257812
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0443671941757202
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0508641004562378
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.057401418685913
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0639793872833252
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0705982446670532
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0772583484649658
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0839598178863525
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.090703010559082
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0974881649017334
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.006220817565918
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.01248037815094
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.018778920173645
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0251165628433228
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0314936637878418
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0379104614257812
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0443671941757202
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0508641004562378
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.057401418685913
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0639793872833252
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0705982446670532
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0772583484649658
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0839598178863525
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.090703010559082
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0974881649017334
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "a659843f9c11a9bf0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000003d78893fba63a1bf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000007ed78e3fd85499bf0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000997a943f2ee090bf0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000e8649a3fb80088bf0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000ef99a03f5d627dbf0000803ff628a840bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000005c1da73f15d869bf0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000000ef3ad3fff5655bf0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000151fb53febd23fbf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000b2a5bc3f133f29bf0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000005e8bc43f0d8e11bf0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000cad4cc3f9263f1be0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000e286d53f0637bdbe0000803ff628a840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000cea6de3f7e7786be0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000fc39e83fd4081abe0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000001a46f23fb0dd05bd0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000020d1fc3fc819ba3d0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000a9f0034034cf613e0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000a1be09403a8fb63e0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000e9d50f40a0a6ff3e0000803ff628a840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000213a16409d2c263f0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000013ef1c404c6a4e3f0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000bdf8234045a4783f0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000004b5b2b40cc79923f0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000201b33404cb9a93f0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000d32c424064eed63f0000803ff6288840bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000099804d407319ee3fd8cb803ff628a840bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000068e65840b4b40240f598813ff628c840bb340b3dc9dc2d3ff404353ff404353f0000000000000000000000005f5e64403e6f0e405967823f5c8f823ebb340b3dc9dc2d3ff404353ff404353f00000000000000000000000098e86f40763c1a400537833fd7a3a03fbb340b3dc9dc2d3ff404353ff404353f00000000000000000000000033857b40791c2640fc07843fec511040bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000269a8340660f324040da843fec515040bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000017b89405a153e40d3ad853ff6288840bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000037658f40752e4a40b782863ff628a840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000da589540d35a5640ee58873ff628c840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000f5559b40959a62407a30883f5c8f823ebb340b3dc9dc2d3ff404353ff404353f0000000000000000000000009c5ca140d8ed6e405d09893fd7a3a03fbb340b3dc9dc2d3ff404353ff404353f000000000000000000000000db6ca740bb547b409ae3893fec511040bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000c286ad40b0e7834032bf8a3fec515040bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000060aab340f22e8a40289c8b3ff6288840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000c5d7b940338090407e7a8c3ff628a840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": false,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 3.1440000534057617,
+        "native_saved_tool_type": 1
+      },
+      "style_setters": {
+        "fixed_width_argument": 3.144,
+        "native_GetFixedWidth_f32": 3.1440000534057617,
+        "native_GetSize_f32": 3.1440000534057617,
+        "native_fixed_width_enabled_byte_offset_89": 0,
+        "native_fixed_width_enabled_input": false
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 9,
+        "path_length_f32": 2.1213202476501465,
+        "selected_path_method": "cubicTo"
+      },
+      "input": {
+        "curve_enabled": true,
+        "fixed_opacity_enabled": false,
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 1
+      },
+      "label": "tool-1-curve-1-fixed-opacity-0-size-3.144-fixed-width-0",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "a659843f",
+            "9c11a9bf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "118e843f",
+            "fac2a8bf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "8640853f",
+            "4cb7a7bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7c96863f",
+            "5ab6a5bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "4dbe883f",
+            "a27aa2bf",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "26f18b3f",
+            "5cae9dbf",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6875903f",
+            "f8e796bf",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "83a1963f",
+            "d0a58dbf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "70df9e3f",
+            "ee4881bf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e5b0a93f",
+            "7b1d62bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d6000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6fb4b73f",
+            "dd1238bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "9cabc93f",
+            "572d02bf",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6f82e03f",
+            "74a376be",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "d32c0240",
+            "2473373e",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "eb830a40",
+            "4468c03e",
+            "77dd803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "971a113f",
+            "a6e7523f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "442d1340",
+            "95e2123f",
+            "6dbc813f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "1922143f",
+            "d0c9503f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5c2a1c40",
+            "b8e8453f",
+            "e59c823f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "6117173f",
+            "60a84e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ae7c2540",
+            "2347793f",
+            "e17e833f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "7ffa193f",
+            "fd834c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c2252f40",
+            "377f963f",
+            "6462843f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "8bcb1c3f",
+            "415d4a3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "22273940",
+            "9987b03f",
+            "7147853f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "a38a1f3f",
+            "c434483f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "61824340",
+            "08bdca3f",
+            "0a2e863f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "ee37223f",
+            "180b463f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "15394e40",
+            "ce1fe53f",
+            "3216873f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "9bd3243f",
+            "c4e0433f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "dd4c5940",
+            "3cb0ff3f",
+            "ebff873f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "dd5d273f",
+            "50b6413f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "59bf6440",
+            "4f370d40",
+            "39eb883f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "edd6293f",
+            "368c3f3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "38927040",
+            "a3ad1a40",
+            "1ed8893f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "0b3f2c3f",
+            "f0623d3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "29c77c40",
+            "423b2840",
+            "9dc68a3f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "77962e3f",
+            "ea3a3b3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "f1af8440",
+            "55e03540",
+            "b9b68b3f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "78dd303f",
+            "8f14393f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ce339140",
+            "ea0d5040",
+            "60838d3f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "bd179b40",
+            "adda6140",
+            "5b5f873f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f204353f",
+            "f204353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6523a340",
+            "dcfe6f40",
+            "1354813f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "1bb0a940",
+            "96aa7c40",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7ef9ae40",
+            "af9e8340",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2a35b340",
+            "5ada8740",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ac92b640",
+            "dd378b40",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ff39b940",
+            "2fdf8d40",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2b78bc40",
+            "5b1d9140",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 1
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.28841543197631836
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.31687599420547485
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3481450080871582
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3824996054172516
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4202443063259125
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.46171361207962036
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5072750449180603
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.557332456111908
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6123294830322266
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6727535724639893
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7391402125358582
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8120778799057007
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8922129273414612
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0067585706710815
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.013562798500061
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0204130411148071
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.027309536933899
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.034252643585205
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0412427186965942
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0482800006866455
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0553648471832275
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0624974966049194
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0696784257888794
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0769078731536865
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0841861963272095
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.091513752937317
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1055717468261719
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0575975179672241
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0103782415390015
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.964168906211853
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.9191651940345764
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8755134344100952
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8333188891410828
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7926530838012695
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.753559947013855
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0067585706710815
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.013562798500061
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0204130411148071
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.027309536933899
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.034252643585205
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0412427186965942
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0482800006866455
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0553648471832275
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0624974966049194
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0696784257888794
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0769078731536865
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0841861963272095
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.091513752937317
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1055717468261719
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0575975179672241
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0103782415390015
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "a659843f9c11a9bf0000803f5c8f823ebb340b3dc9dc2d3f0000000000000000000000000000000000000000118e843ffac2a8bf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000008640853f4cb7a7bf0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000007c96863f5ab6a5bf0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000004dbe883fa27aa2bf0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000026f18b3f5cae9dbf0000803ff628a840bb340b3dc9dc2d3fd5000e3f3f01553f0000000000000000000000006875903ff8e796bf0000803ff628c840bb340b3dc9dc2d3fd5000e3f3f01553f00000000000000000000000083a1963fd0a58dbf0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000070df9e3fee4881bf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f3f01553f000000000000000000000000e5b0a93f7b1d62bf0000803fec511040bb340b3dc9dc2d3fd6000e3f4001553f0000000000000000000000006fb4b73fdd1238bf0000803fec515040bb340b3dc9dc2d3fd5000e3f3f01553f0000000000000000000000009cabc93f572d02bf0000803ff6288840bb340b3dc9dc2d3fd5000e3f3f01553f0000000000000000000000006f82e03f74a376be0000803ff628a840bb340b3dc9dc2d3fd5000e3f3f01553f000000000000000000000000d32c02402473373e0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000eb830a404468c03e77dd803f5c8f823ebb340b3dc9dc2d3f971a113fa6e7523f000000000000000000000000442d134095e2123f6dbc813fd7a3a03fbb340b3dc9dc2d3f1922143fd0c9503f0000000000000000000000005c2a1c40b8e8453fe59c823fec511040bb340b3dc9dc2d3f6117173f60a84e3f000000000000000000000000ae7c25402347793fe17e833fec515040bb340b3dc9dc2d3f7ffa193ffd834c3f000000000000000000000000c2252f40377f963f6462843ff6288840bb340b3dc9dc2d3f8bcb1c3f415d4a3f000000000000000000000000222739409987b03f7147853ff628a840bb340b3dc9dc2d3fa38a1f3fc434483f0000000000000000000000006182434008bdca3f0a2e863ff628c840bb340b3dc9dc2d3fee37223f180b463f00000000000000000000000015394e40ce1fe53f3216873f5c8f823ebb340b3dc9dc2d3f9bd3243fc4e0433f000000000000000000000000dd4c59403cb0ff3febff873fd7a3a03fbb340b3dc9dc2d3fdd5d273f50b6413f00000000000000000000000059bf64404f370d4039eb883fec511040bb340b3dc9dc2d3fedd6293f368c3f3f00000000000000000000000038927040a3ad1a401ed8893fec515040bb340b3dc9dc2d3f0b3f2c3ff0623d3f00000000000000000000000029c77c40423b28409dc68a3ff6288840bb340b3dc9dc2d3f77962e3fea3a3b3f000000000000000000000000f1af844055e03540b9b68b3ff628a840bb340b3dc9dc2d3f78dd303f8f14393f000000000000000000000000ce339140ea0d504060838d3ff628c840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000bd179b40adda61405b5f873f5c8f823ebb340b3dc9dc2d3ff204353ff204353f0000000000000000000000006523a340dcfe6f401354813fd7a3a03fbb340b3dc9dc2d3ff304353ff304353f0000000000000000000000001bb0a94096aa7c400000803fec511040bb340b3dc9dc2d3ff304353ff304353f0000000000000000000000007ef9ae40af9e83400000803fec515040bb340b3dc9dc2d3ff304353ff304353f0000000000000000000000002a35b3405ada87400000803ff6288840bb340b3dc9dc2d3ff304353ff304353f000000000000000000000000ac92b640dd378b400000803ff628a840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000ff39b9402fdf8d400000803ff628c840bb340b3dc9dc2d3ff304353ff304353f0000000000000000000000002b78bc405b1d91400000803f5c8f823ebb340b3dc9dc2d3ff304353ff304353f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": true,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 3.1440000534057617,
+        "native_saved_tool_type": 1
+      },
+      "style_setters": {
+        "fixed_width_argument": 3.144,
+        "native_GetFixedWidth_f32": 3.1440000534057617,
+        "native_GetSize_f32": 3.1440000534057617,
+        "native_fixed_width_enabled_byte_offset_89": 0,
+        "native_fixed_width_enabled_input": false
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 0,
+        "path_length_f32": 0.0,
+        "selected_path_method": "lineTo"
+      },
+      "input": {
+        "curve_enabled": false,
+        "fixed_opacity_enabled": false,
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 3
+      },
+      "label": "tool-3-curve-0-fixed-opacity-0-size-3.144-fixed-width-0",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "a659843f",
+            "9c11a9bf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "3d78893f",
+            "ba63a1bf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7ed78e3f",
+            "d85499bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "997a943f",
+            "2ee090bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e8649a3f",
+            "b80088bf",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ef99a03f",
+            "5d627dbf",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5c1da73f",
+            "15d869bf",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "0ef3ad3f",
+            "ff5655bf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "151fb53f",
+            "ebd23fbf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "b2a5bc3f",
+            "133f29bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5e8bc43f",
+            "0d8e11bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "cad4cc3f",
+            "9263f1be",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e286d53f",
+            "0637bdbe",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "cea6de3f",
+            "7e7786be",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "fc39e83f",
+            "d4081abe",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "1a46f23f",
+            "b0dd05bd",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "20d1fc3f",
+            "c819ba3d",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a9f00340",
+            "34cf613e",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a1be0940",
+            "3a8fb63e",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e9d50f40",
+            "a0a6ff3e",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "213a1640",
+            "9d2c263f",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "13ef1c40",
+            "4c6a4e3f",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "bdf82340",
+            "45a4783f",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "4b5b2b40",
+            "cc79923f",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "201b3340",
+            "4cb9a93f",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "d32c4240",
+            "64eed63f",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "99804d40",
+            "7319ee3f",
+            "d8cb803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "68e65840",
+            "b4b40240",
+            "f598813f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5f5e6440",
+            "3e6f0e40",
+            "5967823f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "98e86f40",
+            "763c1a40",
+            "0537833f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "33857b40",
+            "791c2640",
+            "fc07843f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "269a8340",
+            "660f3240",
+            "40da843f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "017b8940",
+            "5a153e40",
+            "d3ad853f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "37658f40",
+            "752e4a40",
+            "b782863f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "da589540",
+            "d35a5640",
+            "ee58873f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "f5559b40",
+            "959a6240",
+            "7a30883f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "9c5ca140",
+            "d8ed6e40",
+            "5d09893f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "db6ca740",
+            "bb547b40",
+            "9ae3893f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c286ad40",
+            "b0e78340",
+            "32bf8a3f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "60aab340",
+            "f22e8a40",
+            "289c8b3f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c5d7b940",
+            "33809040",
+            "7e7a8c3f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 3
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.28841543197631836
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3026457130908966
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.31757810711860657
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.33324724435806274
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3496895134449005
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.36694303154945374
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3850478231906891
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4040459096431732
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.42398133873939514
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.44490036368370056
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.46685153245925903
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.48988574743270874
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5140564441680908
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5394197106361389
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5660344362258911
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5939623117446899
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6232681274414062
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6540198922157288
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6862888932228088
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7201500535011292
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7556819319725037
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.792966902256012
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8320915102958679
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8731464743614197
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.9162271022796631
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.006220817565918
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.01248037815094
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.018778920173645
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0251165628433228
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0314936637878418
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0379104614257812
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0443671941757202
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0508641004562378
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.057401418685913
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0639793872833252
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0705982446670532
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0772583484649658
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0839598178863525
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.090703010559082
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0974881649017334
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.006220817565918
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.01248037815094
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.018778920173645
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0251165628433228
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0314936637878418
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0379104614257812
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0443671941757202
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0508641004562378
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.057401418685913
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0639793872833252
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0705982446670532
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0772583484649658
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0839598178863525
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.090703010559082
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0974881649017334
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "a659843f9c11a9bf0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000003d78893fba63a1bf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000007ed78e3fd85499bf0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000997a943f2ee090bf0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000e8649a3fb80088bf0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000ef99a03f5d627dbf0000803ff628a840bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000005c1da73f15d869bf0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000000ef3ad3fff5655bf0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000151fb53febd23fbf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000b2a5bc3f133f29bf0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000005e8bc43f0d8e11bf0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000cad4cc3f9263f1be0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000e286d53f0637bdbe0000803ff628a840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000cea6de3f7e7786be0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000fc39e83fd4081abe0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000001a46f23fb0dd05bd0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000020d1fc3fc819ba3d0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000a9f0034034cf613e0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000a1be09403a8fb63e0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000e9d50f40a0a6ff3e0000803ff628a840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000213a16409d2c263f0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000013ef1c404c6a4e3f0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000bdf8234045a4783f0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000004b5b2b40cc79923f0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000201b33404cb9a93f0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000d32c424064eed63f0000803ff6288840bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000099804d407319ee3fd8cb803ff628a840bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000068e65840b4b40240f598813ff628c840bb340b3dc9dc2d3ff404353ff404353f0000000000000000000000005f5e64403e6f0e405967823f5c8f823ebb340b3dc9dc2d3ff404353ff404353f00000000000000000000000098e86f40763c1a400537833fd7a3a03fbb340b3dc9dc2d3ff404353ff404353f00000000000000000000000033857b40791c2640fc07843fec511040bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000269a8340660f324040da843fec515040bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000017b89405a153e40d3ad853ff6288840bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000037658f40752e4a40b782863ff628a840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000da589540d35a5640ee58873ff628c840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000f5559b40959a62407a30883f5c8f823ebb340b3dc9dc2d3ff404353ff404353f0000000000000000000000009c5ca140d8ed6e405d09893fd7a3a03fbb340b3dc9dc2d3ff404353ff404353f000000000000000000000000db6ca740bb547b409ae3893fec511040bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000c286ad40b0e7834032bf8a3fec515040bb340b3dc9dc2d3ff404353ff404353f00000000000000000000000060aab340f22e8a40289c8b3ff6288840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000c5d7b940338090407e7a8c3ff628a840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": false,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 3.1440000534057617,
+        "native_saved_tool_type": 3
+      },
+      "style_setters": {
+        "fixed_width_argument": 3.144,
+        "native_GetFixedWidth_f32": 3.1440000534057617,
+        "native_GetSize_f32": 3.1440000534057617,
+        "native_fixed_width_enabled_byte_offset_89": 0,
+        "native_fixed_width_enabled_input": false
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 9,
+        "path_length_f32": 2.1213202476501465,
+        "selected_path_method": "cubicTo"
+      },
+      "input": {
+        "curve_enabled": true,
+        "fixed_opacity_enabled": false,
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 3
+      },
+      "label": "tool-3-curve-1-fixed-opacity-0-size-3.144-fixed-width-0",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "a659843f",
+            "9c11a9bf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "118e843f",
+            "fac2a8bf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "8640853f",
+            "4cb7a7bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7c96863f",
+            "5ab6a5bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "4dbe883f",
+            "a27aa2bf",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "26f18b3f",
+            "5cae9dbf",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6875903f",
+            "f8e796bf",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "83a1963f",
+            "d0a58dbf",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "70df9e3f",
+            "ee4881bf",
+            "0000803f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e5b0a93f",
+            "7b1d62bf",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d6000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6fb4b73f",
+            "dd1238bf",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "9cabc93f",
+            "572d02bf",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6f82e03f",
+            "74a376be",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "d32c0240",
+            "2473373e",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "eb830a40",
+            "4468c03e",
+            "77dd803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "971a113f",
+            "a6e7523f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "442d1340",
+            "95e2123f",
+            "6dbc813f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "1922143f",
+            "d0c9503f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "5c2a1c40",
+            "b8e8453f",
+            "e59c823f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "6117173f",
+            "60a84e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ae7c2540",
+            "2347793f",
+            "e17e833f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "7ffa193f",
+            "fd834c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c2252f40",
+            "377f963f",
+            "6462843f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "8bcb1c3f",
+            "415d4a3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "22273940",
+            "9987b03f",
+            "7147853f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "a38a1f3f",
+            "c434483f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "61824340",
+            "08bdca3f",
+            "0a2e863f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "ee37223f",
+            "180b463f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "15394e40",
+            "ce1fe53f",
+            "3216873f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "9bd3243f",
+            "c4e0433f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "dd4c5940",
+            "3cb0ff3f",
+            "ebff873f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "dd5d273f",
+            "50b6413f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "59bf6440",
+            "4f370d40",
+            "39eb883f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "edd6293f",
+            "368c3f3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "38927040",
+            "a3ad1a40",
+            "1ed8893f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "0b3f2c3f",
+            "f0623d3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "29c77c40",
+            "423b2840",
+            "9dc68a3f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "77962e3f",
+            "ea3a3b3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "f1af8440",
+            "55e03540",
+            "b9b68b3f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "78dd303f",
+            "8f14393f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ce339140",
+            "ea0d5040",
+            "60838d3f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "bd179b40",
+            "adda6140",
+            "5b5f873f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f204353f",
+            "f204353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "6523a340",
+            "dcfe6f40",
+            "1354813f",
+            "d7a3a03f",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "1bb0a940",
+            "96aa7c40",
+            "0000803f",
+            "ec511040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7ef9ae40",
+            "af9e8340",
+            "0000803f",
+            "ec515040",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2a35b340",
+            "5ada8740",
+            "0000803f",
+            "f6288840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ac92b640",
+            "dd378b40",
+            "0000803f",
+            "f628a840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f404353f",
+            "f404353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "ff39b940",
+            "2fdf8d40",
+            "0000803f",
+            "f628c840",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2b78bc40",
+            "5b1d9140",
+            "0000803f",
+            "5c8f823e",
+            "bb340b3d",
+            "c9dc2d3f",
+            "f304353f",
+            "f304353f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 3
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.28841543197631836
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.31687599420547485
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3481450080871582
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.3824996054172516
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4202443063259125
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.46171361207962036
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5072750449180603
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.557332456111908
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6123294830322266
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6727535724639893
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7391402125358582
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8120778799057007
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8922129273414612
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0067585706710815
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.013562798500061
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0204130411148071
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.027309536933899
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.034252643585205
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0412427186965942
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0482800006866455
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0553648471832275
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0624974966049194
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0696784257888794
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0769078731536865
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0841861963272095
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.091513752937317
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1055717468261719
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0575975179672241
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0103782415390015
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.964168906211853
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.9191651940345764
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8755134344100952
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8333188891410828
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7926530838012695
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.753559947013855
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0067585706710815
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.013562798500061
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0204130411148071
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.027309536933899
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.034252643585205
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0412427186965942
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0482800006866455
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0553648471832275
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0624974966049194
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0696784257888794
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0769078731536865
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0841861963272095
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.091513752937317
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1055717468261719
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0575975179672241
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0103782415390015
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        }
+      ],
+      "native_output_buffer_f32_le_hex": "a659843f9c11a9bf0000803f5c8f823ebb340b3dc9dc2d3f0000000000000000000000000000000000000000118e843ffac2a8bf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000008640853f4cb7a7bf0000803fec511040bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000007c96863f5ab6a5bf0000803fec515040bb340b3dc9dc2d3fd5000e3f4001553f0000000000000000000000004dbe883fa27aa2bf0000803ff6288840bb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000026f18b3f5cae9dbf0000803ff628a840bb340b3dc9dc2d3fd5000e3f3f01553f0000000000000000000000006875903ff8e796bf0000803ff628c840bb340b3dc9dc2d3fd5000e3f3f01553f00000000000000000000000083a1963fd0a58dbf0000803f5c8f823ebb340b3dc9dc2d3fd5000e3f4001553f00000000000000000000000070df9e3fee4881bf0000803fd7a3a03fbb340b3dc9dc2d3fd5000e3f3f01553f000000000000000000000000e5b0a93f7b1d62bf0000803fec511040bb340b3dc9dc2d3fd6000e3f4001553f0000000000000000000000006fb4b73fdd1238bf0000803fec515040bb340b3dc9dc2d3fd5000e3f3f01553f0000000000000000000000009cabc93f572d02bf0000803ff6288840bb340b3dc9dc2d3fd5000e3f3f01553f0000000000000000000000006f82e03f74a376be0000803ff628a840bb340b3dc9dc2d3fd5000e3f3f01553f000000000000000000000000d32c02402473373e0000803ff628c840bb340b3dc9dc2d3fd5000e3f4001553f000000000000000000000000eb830a404468c03e77dd803f5c8f823ebb340b3dc9dc2d3f971a113fa6e7523f000000000000000000000000442d134095e2123f6dbc813fd7a3a03fbb340b3dc9dc2d3f1922143fd0c9503f0000000000000000000000005c2a1c40b8e8453fe59c823fec511040bb340b3dc9dc2d3f6117173f60a84e3f000000000000000000000000ae7c25402347793fe17e833fec515040bb340b3dc9dc2d3f7ffa193ffd834c3f000000000000000000000000c2252f40377f963f6462843ff6288840bb340b3dc9dc2d3f8bcb1c3f415d4a3f000000000000000000000000222739409987b03f7147853ff628a840bb340b3dc9dc2d3fa38a1f3fc434483f0000000000000000000000006182434008bdca3f0a2e863ff628c840bb340b3dc9dc2d3fee37223f180b463f00000000000000000000000015394e40ce1fe53f3216873f5c8f823ebb340b3dc9dc2d3f9bd3243fc4e0433f000000000000000000000000dd4c59403cb0ff3febff873fd7a3a03fbb340b3dc9dc2d3fdd5d273f50b6413f00000000000000000000000059bf64404f370d4039eb883fec511040bb340b3dc9dc2d3fedd6293f368c3f3f00000000000000000000000038927040a3ad1a401ed8893fec515040bb340b3dc9dc2d3f0b3f2c3ff0623d3f00000000000000000000000029c77c40423b28409dc68a3ff6288840bb340b3dc9dc2d3f77962e3fea3a3b3f000000000000000000000000f1af844055e03540b9b68b3ff628a840bb340b3dc9dc2d3f78dd303f8f14393f000000000000000000000000ce339140ea0d504060838d3ff628c840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000bd179b40adda61405b5f873f5c8f823ebb340b3dc9dc2d3ff204353ff204353f0000000000000000000000006523a340dcfe6f401354813fd7a3a03fbb340b3dc9dc2d3ff304353ff304353f0000000000000000000000001bb0a94096aa7c400000803fec511040bb340b3dc9dc2d3ff304353ff304353f0000000000000000000000007ef9ae40af9e83400000803fec515040bb340b3dc9dc2d3ff304353ff304353f0000000000000000000000002a35b3405ada87400000803ff6288840bb340b3dc9dc2d3ff304353ff304353f000000000000000000000000ac92b640dd378b400000803ff628a840bb340b3dc9dc2d3ff404353ff404353f000000000000000000000000ff39b9402fdf8d400000803ff628c840bb340b3dc9dc2d3ff304353ff304353f0000000000000000000000002b78bc405b1d91400000803f5c8f823ebb340b3dc9dc2d3ff304353ff304353f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": true,
+        "native_fixed_opacity_enabled": false,
+        "native_saved_size_f32": 3.1440000534057617,
+        "native_saved_tool_type": 3
+      },
+      "style_setters": {
+        "fixed_width_argument": 3.144,
+        "native_GetFixedWidth_f32": 3.1440000534057617,
+        "native_GetSize_f32": 3.1440000534057617,
+        "native_fixed_width_enabled_byte_offset_89": 0,
+        "native_fixed_width_enabled_input": false
+      }
+    },
+    {
+      "endPen_terminal_record": {
+        "emitted_addpoint_count": 0,
+        "path_length_f32": 2.1213202476501465,
+        "selected_path_method": "cubicTo"
+      },
+      "input": {
+        "curve_enabled": true,
+        "fixed_opacity_enabled": true,
+        "orientations": [
+          0.2,
+          0.35,
+          -0.42
+        ],
+        "points": [
+          [
+            1,
+            -2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "pressures": [
+          0.3,
+          0.6,
+          0.85
+        ],
+        "tilts": [
+          0.12,
+          0.32,
+          0.55
+        ],
+        "times": [
+          300,
+          315,
+          340
+        ],
+        "tool_type": 2
+      },
+      "label": "tool-2-curve-1-fixed-opacity-1-size-3.144-fixed-width-0",
+      "native_AddPoint_records": [
+        {
+          "instance_bits_le": [
+            "eae8633f",
+            "f685d9bf",
+            "0000803f",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "e07f643f",
+            "be14d9bf",
+            "0000803f",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c67c663f",
+            "1297d7bf",
+            "0000803f",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "50416a3f",
+            "aac3d4bf",
+            "0000803f",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3e01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7444703f",
+            "4e41d0bf",
+            "0000803f",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a616793f",
+            "a8a3c9bf",
+            "0000803f",
+            "f628a840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "7cb3823f",
+            "6c67c0bf",
+            "0000803f",
+            "f628c840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "97048b3f",
+            "c4edb3bf",
+            "0000803f",
+            "5c8f823e",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "83fe953f",
+            "e276a3bf",
+            "0000803f",
+            "d7a3a03f",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "743ba43f",
+            "781b8ebf",
+            "0000803f",
+            "ec511040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2475b63f",
+            "e18965bf",
+            "0000803f",
+            "ec515040",
+            "b4b8e0bd",
+            "26e8993e",
+            "d5000e3f",
+            "4101553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "fc8acd3f",
+            "594820bf",
+            "0000803f",
+            "f6288840",
+            "b4b8e0bd",
+            "26e8993e",
+            "d4000e3f",
+            "3f01553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "695a0e40",
+            "001c103b",
+            "0000803f",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "d5000e3f",
+            "4001553f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c5e71640",
+            "9e094f3e",
+            "7d05823f",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "971a113f",
+            "a6e7523f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "72dc1f40",
+            "5d87cf3e",
+            "2613843f",
+            "5c8f823e",
+            "93a6653e",
+            "1c90003f",
+            "f328143f",
+            "f2c4503f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "443c2940",
+            "35971c3f",
+            "1c29863f",
+            "d7a3a03f",
+            "93a6653e",
+            "1c90003f",
+            "752b173f",
+            "b0994e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "2f0b3340",
+            "4f40523f",
+            "8147883f",
+            "ec511040",
+            "93a6653e",
+            "1c90003f",
+            "b2211a3f",
+            "72664c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "454d3d40",
+            "2c61843f",
+            "776e8a3f",
+            "ec515040",
+            "93a6653e",
+            "1c90003f",
+            "470b1d3f",
+            "d02b4a3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "c3064840",
+            "6110a03f",
+            "209e8c3f",
+            "f6288840",
+            "93a6653e",
+            "1c90003f",
+            "d7e71f3f",
+            "5aea473f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "053c5340",
+            "812fbc3f",
+            "a0d68e3f",
+            "f628a840",
+            "93a6653e",
+            "1c90003f",
+            "12b7223f",
+            "afa2453f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "8ef15e40",
+            "54c0d83f",
+            "1a18913f",
+            "f628c840",
+            "93a6653e",
+            "1c90003f",
+            "b278253f",
+            "6555433f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "0a2c6b40",
+            "a1c4f53f",
+            "b362933f",
+            "5c8f823e",
+            "93a6653e",
+            "1c90003f",
+            "742c283f",
+            "1203413f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "4cf07740",
+            "209f0940",
+            "8fb6953f",
+            "d7a3a03f",
+            "93a6653e",
+            "1c90003f",
+            "23d22a3f",
+            "53ac3e3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "a8a18240",
+            "84971840",
+            "d413983f",
+            "ec511040",
+            "93a6653e",
+            "1c90003f",
+            "91692d3f",
+            "bb513c3f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "20958940",
+            "6fcc2740",
+            "a87a9a3f",
+            "ec515040",
+            "93a6653e",
+            "1c90003f",
+            "9ef22f3f",
+            "e4f3393f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        },
+        {
+          "instance_bits_le": [
+            "37d59040",
+            "d33e3740",
+            "32eb9c3f",
+            "f6288840",
+            "93a6653e",
+            "1c90003f",
+            "276d323f",
+            "5f93373f",
+            "00000000",
+            "00000000",
+            "00000000"
+          ]
+        }
+      ],
+      "native_MotionEvent_constructor_calls": [
+        {
+          "arguments_decoded": {
+            "down_time_ms_i64": 300
+          },
+          "pointer_coords_decoded_from_Base_getter_offsets": {
+            "event_time_i64_ms": 340,
+            "pressure_f32": 0.8500000238418579,
+            "x_f64": 6.0,
+            "y_f64": 4.0
+          }
+        }
+      ],
+      "native_MotionEvent_getter_returns": [
+        {
+          "name": "SPen::MotionEvent::GetX(int) const",
+          "return_d0_f64": 6.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetY(int) const",
+          "return_d0_f64": 4.0
+        },
+        {
+          "name": "SPen::MotionEvent::GetEventTime() const",
+          "return_x0": 40
+        },
+        {
+          "name": "SPen::MotionEvent::GetToolType(int) const",
+          "return_x0": 2
+        },
+        {
+          "name": "SPen::MotionEvent::GetPressure(int) const",
+          "return_s0_f32": 0.8500000238418579
+        }
+      ],
+      "native_admission": {
+        "actual_getVersion": 10
+      },
+      "native_drawPattern_calls": [
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.34609854221343994
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.37748268246650696
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.41171273589134216
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4490467607975006
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.4897662401199341
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5341781377792358
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.5826173424720764
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6354489922523499
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.6930713653564453
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.7559189796447754
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8244655728340149
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 0.8992279767990112
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0157924890518188
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.031834363937378
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0481295585632324
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.064682126045227
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0814961194992065
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.0985755920410156
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1159248352050781
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1335480213165283
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1514495611190796
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1696337461471558
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.1881051063537598
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.2068681716918945
+        },
+        {
+          "input_opacity_u32": 255,
+          "radius_argument_s0_f32": 1.2259275913238525
+        }
+      ],
+      "native_drawPattern_style_transition_steps": [
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0157924890518188
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.031834363937378
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0481295585632324
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.064682126045227
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0814961194992065
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.0985755920410156
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1159248352050781
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1335480213165283
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1514495611190796
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1696337461471558
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.1881051063537598
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.2068681716918945
+        },
+        {
+          "working_opacity_w20_u32": 255,
+          "working_radius_s14_f32": 1.2259275913238525
+        }
+      ],
+      "native_fixed_opacity_buffer_comparison": {
+        "native_AddPoint_records_equal": true,
+        "native_buffer_bytes_equal": true
+      },
+      "native_fixed_opacity_contract": {
+        "GetMorphable_result_is_pen_plus_96": true,
+        "getter_symbol_target_match": true,
+        "native_calls": [
+          {
+            "getter_return_w0_u32": 0,
+            "pen_256_bytes_unchanged": true,
+            "setter_input": false,
+            "setter_return_w0_u32": 1,
+            "settings_96_bytes_unchanged": true
+          },
+          {
+            "getter_return_w0_u32": 0,
+            "pen_256_bytes_unchanged": true,
+            "setter_input": true,
+            "setter_return_w0_u32": 1,
+            "settings_96_bytes_unchanged": true
+          }
+        ],
+        "setter_symbol_target_match": true,
+        "vtable_slot_8_brush_elf_offset": "0x566e0",
+        "vtable_slot_9_brush_elf_offset": "0x566e8"
+      },
+      "native_output_buffer_f32_le_hex": "eae8633ff685d9bf0000803f5c8f823eb4b8e0bd26e8993e0000000000000000000000000000000000000000e07f643fbe14d9bf0000803fd7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000c67c663f1297d7bf0000803fec511040b4b8e0bd26e8993ed5000e3f3f01553f00000000000000000000000050416a3faac3d4bf0000803fec515040b4b8e0bd26e8993ed5000e3f3e01553f0000000000000000000000007444703f4e41d0bf0000803ff6288840b4b8e0bd26e8993ed5000e3f3f01553f000000000000000000000000a616793fa8a3c9bf0000803ff628a840b4b8e0bd26e8993ed5000e3f4001553f0000000000000000000000007cb3823f6c67c0bf0000803ff628c840b4b8e0bd26e8993ed5000e3f3f01553f00000000000000000000000097048b3fc4edb3bf0000803f5c8f823eb4b8e0bd26e8993ed5000e3f3f01553f00000000000000000000000083fe953fe276a3bf0000803fd7a3a03fb4b8e0bd26e8993ed5000e3f4001553f000000000000000000000000743ba43f781b8ebf0000803fec511040b4b8e0bd26e8993ed5000e3f3f01553f0000000000000000000000002475b63fe18965bf0000803fec515040b4b8e0bd26e8993ed5000e3f4101553f000000000000000000000000fc8acd3f594820bf0000803ff6288840b4b8e0bd26e8993ed4000e3f3f01553f000000000000000000000000695a0e40001c103b0000803ff628a84093a6653e1c90003fd5000e3f4001553f000000000000000000000000c5e716409e094f3e7d05823ff628c84093a6653e1c90003f971a113fa6e7523f00000000000000000000000072dc1f405d87cf3e2613843f5c8f823e93a6653e1c90003ff328143ff2c4503f000000000000000000000000443c294035971c3f1c29863fd7a3a03f93a6653e1c90003f752b173fb0994e3f0000000000000000000000002f0b33404f40523f8147883fec51104093a6653e1c90003fb2211a3f72664c3f000000000000000000000000454d3d402c61843f776e8a3fec51504093a6653e1c90003f470b1d3fd02b4a3f000000000000000000000000c30648406110a03f209e8c3ff628884093a6653e1c90003fd7e71f3f5aea473f000000000000000000000000053c5340812fbc3fa0d68e3ff628a84093a6653e1c90003f12b7223fafa2453f0000000000000000000000008ef15e4054c0d83f1a18913ff628c84093a6653e1c90003fb278253f6555433f0000000000000000000000000a2c6b40a1c4f53fb362933f5c8f823e93a6653e1c90003f742c283f1203413f0000000000000000000000004cf07740209f09408fb6953fd7a3a03f93a6653e1c90003f23d22a3f53ac3e3f000000000000000000000000a8a1824084971840d413983fec51104093a6653e1c90003f91692d3fbb513c3f000000000000000000000000209589406fcc2740a87a9a3fec51504093a6653e1c90003f9ef22f3fe4f3393f00000000000000000000000037d59040d33e374032eb9c3ff628884093a6653e1c90003f276d323f5f93373f000000000000000000000000",
+      "object_setters_and_getters": {
+        "native_channel_getter_import_calls": {
+          "SPen::ObjectStroke::GetOrientation() const": 1,
+          "SPen::ObjectStroke::GetPoint() const": 1,
+          "SPen::ObjectStroke::GetPointCount() const": 1,
+          "SPen::ObjectStroke::GetPressure() const": 1,
+          "SPen::ObjectStroke::GetTilt() const": 1,
+          "SPen::ObjectStroke::GetTimeStamp() const": 1
+        },
+        "native_curve_enabled": true,
+        "native_fixed_opacity_enabled": true,
+        "native_saved_size_f32": 3.1440000534057617,
+        "native_saved_tool_type": 2
+      },
+      "style_setters": {
+        "fixed_width_argument": 3.144,
+        "native_GetFixedWidth_f32": 3.1440000534057617,
+        "native_GetSize_f32": 3.1440000534057617,
+        "native_fixed_width_enabled_byte_offset_89": 0,
+        "native_fixed_width_enabled_input": false
+      }
+    }
+  ],
+  "schema": "sdocx-brushpen-saved-wrapper-native-v1"
+}

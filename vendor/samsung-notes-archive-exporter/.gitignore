@@ -1,0 +1,18 @@
+# Private local captures and generated archives
+ui_dumps/
+observations/
+screen_schemas/
+input_exports/
+output_archive/
+samsung_notes_archive/
+conversion_workspace/
+
+# Python/runtime noise
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+
+# macOS
+.DS_Store

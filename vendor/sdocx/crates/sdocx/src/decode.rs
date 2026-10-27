@@ -1,0 +1,530 @@
+use crate::binary::Reader;
+use crate::frame::Frame;
+use crate::{Color, Error, ObjectMetadata, ParseLimits, Point, Result, Stroke, StrokeStyle};
+
+/// Decode a type-1 outer object's base/stroke frame chain. The caller supplies
+/// only its payload, excluding the object hash and recursive child records.
+pub(crate) fn decode_stroke(data: &[u8], limits: &ParseLimits) -> Result<Stroke> {
+    let mut frames = Reader::new(data, "stroke object");
+    let base = ObjectMetadata::read(&mut frames)?;
+
+    let frame = Frame::read(&mut frames)?;
+    frame.expect_kind(1)?;
+    let channels = StrokeChannels::read(&frame, limits)?;
+    let count = usize::from(channels.point_count);
+    let compressed = channels.compressed;
+    let stylus = channels.stylus;
+    let mut fixed = Reader::new(channels.data, "stroke channels");
+
+    let mut points = Vec::with_capacity(count);
+    if count != 0 && compressed {
+        // NewApplyBinary stores the initial doubles in native float points,
+        // then rounds each compressed delta addition at float precision.
+        let mut x = fixed.read_f64("first x")? as f32;
+        let mut y = fixed.read_f64("first y")? as f32;
+        points.push(Point {
+            x: f64::from(x),
+            y: f64::from(y),
+        });
+        for _ in 1..count {
+            x += signed_delta(fixed.read_u16("x delta")?, 32.0) as f32;
+            y += signed_delta(fixed.read_u16("y delta")?, 32.0) as f32;
+            points.push(Point {
+                x: f64::from(x),
+                y: f64::from(y),
+            });
+        }
+    } else {
+        for _ in 0..count {
+            points.push(Point {
+                x: fixed.read_f64("x")?,
+                y: fixed.read_f64("y")?,
+            });
+        }
+    }
+    if points
+        .iter()
+        .any(|point| !point.x.is_finite() || !point.y.is_finite())
+    {
+        return Err(Error::Format(
+            "stroke contains non-finite coordinates".into(),
+        ));
+    }
+    // Both native representations store complete arrays by channel, including
+    // the uncompressed form (they are not interleaved point structs).
+    let pressures = float_channel(&mut fixed, count, compressed)?;
+    let mut timestamps = Vec::with_capacity(count);
+    if count != 0 {
+        let mut timestamp = i64::from(fixed.read_i32("first timestamp")?);
+        timestamps.push(timestamp);
+        for _ in 1..count {
+            timestamp = if compressed {
+                timestamp + i64::from(fixed.read_u16("timestamp delta")?)
+            } else {
+                i64::from(fixed.read_i32("timestamp")?)
+            };
+            timestamps.push(timestamp);
+        }
+    }
+    let (tilts, orientations) = if stylus {
+        (
+            float_channel(&mut fixed, count, compressed)?,
+            float_channel(&mut fixed, count, compressed)?,
+        )
+    } else {
+        (Vec::new(), Vec::new())
+    };
+    let style = StrokeStyle::read(&frame, &base, limits)?;
+    // Future frame extensions are bounded too; no frame may borrow its bytes
+    // from the object hash or the next sibling.
+    while frames.remaining() != 0 {
+        Frame::read(&mut frames)?;
+    }
+    Ok(Stroke {
+        bbox: base.bbox,
+        points,
+        pressures,
+        timestamps,
+        tilts,
+        orientations,
+        color: style.color_argb.map(|argb| Color {
+            r: (argb >> 16) as u8,
+            g: (argb >> 8) as u8,
+            b: argb as u8,
+        }),
+        pen_width: style.pen_size.unwrap_or(0.8),
+        rendering: Some(crate::StrokeRendering {
+            metadata: Some(Box::new(base)),
+            pen_name: None,
+            advanced_settings: None,
+            tool_type_raw: channels.tool_type_raw,
+            properties: crate::StrokeProperties::read(frame.properties),
+            style,
+        }),
+    })
+}
+
+fn signed_delta(raw: u16, divisor: f64) -> f64 {
+    let magnitude = f64::from(raw & 0x7fff) / divisor;
+    if raw & 0x8000 == 0 {
+        magnitude
+    } else {
+        -magnitude
+    }
+}
+
+fn float_channel(reader: &mut Reader<'_>, count: usize, compressed: bool) -> Result<Vec<f64>> {
+    let mut values = Vec::with_capacity(count);
+    if count != 0 {
+        let mut value = reader.read_f32("first channel value")?;
+        values.push(f64::from(value));
+        for _ in 1..count {
+            value = if compressed {
+                // Native NewApplyBinary rounds each channel addition to f32.
+                value + signed_delta(reader.read_u16("channel delta")?, 4096.0) as f32
+            } else {
+                reader.read_f32("channel value")?
+            };
+            values.push(f64::from(value));
+        }
+    }
+    if values.iter().any(|value| !value.is_finite()) {
+        return Err(Error::Format(
+            "stroke contains non-finite channel values".into(),
+        ));
+    }
+    Ok(values)
+}
+
+pub(crate) struct StrokeChannels<'a> {
+    pub(crate) point_count: u16,
+    pub(crate) compressed: bool,
+    pub(crate) stylus: bool,
+    pub(crate) tool_type_raw: u16,
+    pub(crate) data: &'a [u8],
+}
+
+impl<'a> StrokeChannels<'a> {
+    pub(crate) fn read(frame: &Frame<'a>, limits: &ParseLimits) -> Result<Self> {
+        let mut fixed = Reader::new(frame.fixed, "stroke channels");
+        let point_count = fixed.read_u16("point count")?;
+        let count = usize::from(point_count);
+        if count > limits.max_points_per_stroke {
+            return Err(Error::LimitExceeded {
+                resource: "points per stroke",
+                limit: limits.max_points_per_stroke as u64,
+                actual: count as u64,
+            });
+        }
+        let compressed = frame.properties.contains(0);
+        let stylus = frame.properties.contains(2);
+        let channel_bytes = if count == 0 {
+            0
+        } else if compressed {
+            16 + (count - 1) * 4 + (2 + usize::from(stylus) * 2) * (4 + (count - 1) * 2)
+        } else {
+            count * (24 + usize::from(stylus) * 8)
+        };
+        if fixed.remaining() != channel_bytes + 2 {
+            return Err(Error::Format(format!(
+                "stroke channels: {count} points require {} fixed bytes, found {}",
+                channel_bytes + 2,
+                fixed.remaining()
+            )));
+        }
+        let data = fixed.read_bytes(channel_bytes, "point channels")?;
+        let tool_type_raw = fixed.read_u16("tool/input type")?;
+        Ok(Self {
+            point_count,
+            compressed,
+            stylus,
+            tool_type_raw,
+            data,
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn bytes(hex: &str) -> Vec<u8> {
+        (0..hex.len())
+            .step_by(2)
+            .map(|index| u8::from_str_radix(&hex[index..index + 2], 16).unwrap())
+            .collect()
+    }
+
+    fn native_floats(hex: &str) -> Vec<f64> {
+        bytes(hex)
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .map(|word| f64::from(f32::from_le_bytes(*word)))
+            .collect()
+    }
+
+    #[test]
+    fn saved_channels_match_native_real_frame_and_float_delta_controls() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/object-stroke-channels-native.json"
+        ))
+        .unwrap();
+        let payload = bytes(fixture["source"]["payload_hex"].as_str().unwrap());
+        let stroke = decode_stroke(&payload, &ParseLimits::default()).unwrap();
+        let count = fixture["native_getters"]["point_count"].as_u64().unwrap() as usize;
+        assert_eq!(stroke.points.len(), count);
+        let point_bytes: Vec<u8> = stroke
+            .points
+            .iter()
+            .flat_map(|point| [point.x as f32, point.y as f32])
+            .flat_map(f32::to_le_bytes)
+            .collect();
+        assert_eq!(
+            point_bytes,
+            bytes(fixture["channels"]["points"]["data_hex"].as_str().unwrap())
+        );
+        for (name, values) in [
+            ("pressures", &stroke.pressures),
+            ("tilts", &stroke.tilts),
+            ("orientations", &stroke.orientations),
+        ] {
+            assert_eq!(
+                values,
+                &native_floats(fixture["channels"][name]["data_hex"].as_str().unwrap()),
+                "native {name}"
+            );
+        }
+        let times: Vec<i64> = bytes(
+            fixture["channels"]["timestamps"]["data_hex"]
+                .as_str()
+                .unwrap(),
+        )
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .map(|word| i64::from(i32::from_le_bytes(*word)))
+        .collect();
+        assert_eq!(stroke.timestamps, times);
+        let definitions = fixture["synthetic_control_definition"].as_array().unwrap();
+        let controls = fixture["synthetic_pressure_controls"].as_array().unwrap();
+        assert_eq!(definitions.len(), 3);
+        assert_eq!(controls.len(), 3);
+        for (definition, control) in definitions.iter().zip(controls) {
+            assert_eq!(definition["id"], control["id"]);
+            let mut encoded = (definition["initial_f32"].as_f64().unwrap() as f32)
+                .to_le_bytes()
+                .to_vec();
+            let deltas = definition["delta_words_le"].as_array().unwrap();
+            for delta in deltas {
+                encoded.extend_from_slice(&(delta.as_u64().unwrap() as u16).to_le_bytes());
+            }
+            let mut reader = Reader::new(&encoded, "native float channel control");
+            assert_eq!(
+                float_channel(&mut reader, deltas.len() + 1, true).unwrap(),
+                native_floats(control["pressure_data_hex"].as_str().unwrap()),
+                "native control {}",
+                control["id"]
+            );
+        }
+    }
+
+    #[test]
+    fn q12_native_reducer_restore_pressure_matches_emitted_words_exactly() {
+        use sha2::{Digest, Sha256};
+
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/q12-native-reducer-restore-v10.json"
+        ))
+        .unwrap();
+        let source_text = include_str!("../../../conformance/object-stroke-channels-native.json");
+        let source: serde_json::Value = serde_json::from_str(source_text).unwrap();
+        assert_eq!(
+            format!("{:x}", Sha256::digest(source_text)),
+            fixture["source_fixture"]["sha256"].as_str().unwrap()
+        );
+        let count = fixture["point_count"].as_u64().unwrap() as usize;
+        assert_eq!(count, 204);
+        let pressure_wire = bytes(fixture["emitted_pressure"]["bytes_hex"].as_str().unwrap());
+        assert_eq!(pressure_wire.len(), 4 + 2 * (count - 1));
+        let expected = bytes(
+            fixture["native_restore_pressure"]["f32_bytes_hex"]
+                .as_str()
+                .unwrap(),
+        );
+        assert_eq!(expected.len(), count * 4);
+        let mut reader = Reader::new(&pressure_wire, "native re-encoded Q12 pressure");
+        let decoded = float_channel(&mut reader, count, true).unwrap();
+        let decoded_bytes: Vec<u8> = decoded
+            .iter()
+            .flat_map(|value| (*value as f32).to_le_bytes())
+            .collect();
+        assert_eq!(
+            decoded_bytes, expected,
+            "exact native Restore pressure bits"
+        );
+
+        let original = native_floats(
+            source["channels"]["pressures"]["data_hex"]
+                .as_str()
+                .unwrap(),
+        );
+        assert_eq!(original.len(), count);
+        assert_eq!(&pressure_wire[..4], &expected[..4]);
+        assert_eq!(
+            original[0], decoded[0],
+            "native preserves the pressure seed"
+        );
+        assert_eq!(
+            original
+                .iter()
+                .zip(&decoded)
+                .filter(|(a, b)| a != b)
+                .count(),
+            198
+        );
+        assert!(
+            original
+                .iter()
+                .zip(&decoded)
+                .all(|(a, b)| (a - b).abs() <= 1.0 / 4096.0)
+        );
+
+        // Native reduction changes an encoded delta even for restored input.
+        // Read the original wire word, rather than infer it from getter floats.
+        let payload = bytes(source["source"]["payload_hex"].as_str().unwrap());
+        let mut frames = Reader::new(&payload, "source native stroke");
+        ObjectMetadata::read(&mut frames).unwrap();
+        let frame = Frame::read(&mut frames).unwrap();
+        let channels = StrokeChannels::read(&frame, &ParseLimits::default()).unwrap();
+        assert_eq!(usize::from(channels.point_count), count);
+        assert!(channels.compressed && channels.stylus);
+        let index = fixture["emitted_pressure"]["delta_word_index"]
+            .as_u64()
+            .unwrap() as usize;
+        let word_offset = 4 + 2 * index;
+        let source_pressure_offset = 16 + 4 * (count - 1);
+        assert_eq!(
+            &channels.data
+                [source_pressure_offset + word_offset..source_pressure_offset + word_offset + 2],
+            &0x51_u16.to_le_bytes()
+        );
+        assert_eq!(
+            &pressure_wire[word_offset..word_offset + 2],
+            &0x50_u16.to_le_bytes()
+        );
+    }
+
+    #[test]
+    fn compressed_coordinates_match_native_float_steps_on_both_axes() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/object-stroke-channels-native.json"
+        ))
+        .unwrap();
+        let source = bytes(fixture["source"]["payload_hex"].as_str().unwrap());
+        let frame_offset = fixture["source"]["frame_offset"].as_u64().unwrap() as usize;
+        let controls = fixture["synthetic_xy_controls"].as_array().unwrap();
+        assert_eq!(controls.len(), 6);
+        for control in controls {
+            let mut payload = source[..frame_offset].to_vec();
+            payload.extend(bytes(control["frame_hex"].as_str().unwrap()));
+            let stroke = decode_stroke(&payload, &ParseLimits::default()).unwrap();
+            // Compare the public f64 values exactly, not a cast that could hide
+            // extra precision or drift between the native float stores.
+            let actual: Vec<u8> = stroke
+                .points
+                .iter()
+                .flat_map(|point| [point.x, point.y])
+                .flat_map(f64::to_le_bytes)
+                .collect();
+            assert_eq!(
+                actual,
+                bytes(control["points_lifted_f64_bits_hex"].as_str().unwrap()),
+                "native compressed coordinates: {}",
+                control["id"]
+            );
+        }
+    }
+
+    #[test]
+    fn packed_deltas_preserve_sign_and_high_magnitude_bits() {
+        assert_eq!(signed_delta(0x2590, 32.0), 300.5);
+        assert_eq!(signed_delta(0x8048, 32.0), -2.25);
+        assert_eq!(signed_delta(0x8200, 4096.0), -0.125);
+    }
+
+    #[test]
+    fn native_rotated_stroke_roundtrips_keep_serialized_samples() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/object-stroke-rotation-roundtrip-native.json"
+        ))
+        .unwrap();
+        assert_eq!(
+            fixture["model_library_sha256"],
+            "4fbcf6d4213e929f1535d32abb487743643fd5d0dfc366e50dfeb2e7d8015b7a"
+        );
+        let expected_bbox: Vec<u32> = fixture["saved_bbox_f32_bits"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|value| u32::from_str_radix(value.as_str().unwrap(), 16).unwrap())
+            .collect();
+        let cases = fixture["cases"].as_array().unwrap();
+        assert_eq!(cases.len(), 4);
+        for case in cases {
+            let payload = bytes(case["payload_hex"].as_str().unwrap());
+            assert_eq!(
+                payload.len(),
+                case["native_payload_size"].as_u64().unwrap() as usize
+            );
+            let stroke = decode_stroke(&payload, &ParseLimits::default()).unwrap();
+
+            let rotation =
+                u32::from_str_radix(case["rotation_f32_bits"].as_str().unwrap(), 16).unwrap();
+            let metadata = stroke
+                .rendering
+                .as_ref()
+                .unwrap()
+                .metadata
+                .as_ref()
+                .unwrap();
+            assert_eq!(
+                (metadata.rotation_degrees.unwrap_or_default() as f32).to_bits(),
+                rotation,
+                "rotation bits {rotation:08x}"
+            );
+
+            let actual_points: Vec<u32> = stroke
+                .points
+                .iter()
+                .flat_map(|point| [point.x as f32, point.y as f32])
+                .map(f32::to_bits)
+                .collect();
+            let expected_points: Vec<u32> = case["native_loaded_point_f32_bits"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|value| u32::from_str_radix(value.as_str().unwrap(), 16).unwrap())
+                .collect();
+            assert_eq!(
+                actual_points, expected_points,
+                "rotation bits {rotation:08x}"
+            );
+
+            let actual_bbox = [
+                stroke.bbox.x_min,
+                stroke.bbox.y_min,
+                stroke.bbox.x_max,
+                stroke.bbox.y_max,
+            ]
+            .map(|value| (value as f32).to_bits());
+            assert_eq!(
+                actual_bbox.as_slice(),
+                expected_bbox,
+                "rotation bits {rotation:08x}"
+            );
+        }
+
+        let style_roundtrip = &fixture["raw_size_2_style_roundtrip"];
+        assert_eq!(style_roundtrip["source_pen_size_f32_bits"], "4111de6a");
+        assert_eq!(style_roundtrip["applied_pen_size_f32_bits"], "40000000");
+        let style_cases = style_roundtrip["cases"].as_array().unwrap();
+        assert_eq!(style_cases.len(), 4);
+        for case in style_cases {
+            let payload = bytes(case["payload_hex"].as_str().unwrap());
+            assert_eq!(
+                payload.len(),
+                case["native_payload_size"].as_u64().unwrap() as usize
+            );
+            let stroke = decode_stroke(&payload, &ParseLimits::default()).unwrap();
+            let rotation =
+                u32::from_str_radix(case["rotation_f32_bits"].as_str().unwrap(), 16).unwrap();
+            let rendering = stroke.rendering.as_ref().unwrap();
+            assert_eq!(
+                rendering.style.pen_size.unwrap().to_bits(),
+                u32::from_str_radix(case["raw_pen_size_f32_bits"].as_str().unwrap(), 16).unwrap(),
+                "raw pen size at rotation {rotation:08x}"
+            );
+            let metadata = rendering.metadata.as_ref().unwrap();
+            assert_eq!(
+                (metadata.rotation_degrees.unwrap_or_default() as f32).to_bits(),
+                rotation,
+                "rotation bits {rotation:08x}"
+            );
+            let actual_points: Vec<u32> = stroke
+                .points
+                .iter()
+                .flat_map(|point| [point.x as f32, point.y as f32])
+                .map(f32::to_bits)
+                .collect();
+            let expected_points: Vec<u32> = case["native_loaded_point_f32_bits"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|value| u32::from_str_radix(value.as_str().unwrap(), 16).unwrap())
+                .collect();
+            assert_eq!(
+                actual_points, expected_points,
+                "loaded samples at rotation {rotation:08x}"
+            );
+            let actual_bbox = [
+                stroke.bbox.x_min,
+                stroke.bbox.y_min,
+                stroke.bbox.x_max,
+                stroke.bbox.y_max,
+            ]
+            .map(|value| (value as f32).to_bits());
+            let expected_bbox: Vec<u32> = case["saved_bbox_f32_bits"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|value| u32::from_str_radix(value.as_str().unwrap(), 16).unwrap())
+                .collect();
+            assert_eq!(
+                actual_bbox.as_slice(),
+                expected_bbox,
+                "saved bbox at rotation {rotation:08x}"
+            );
+        }
+    }
+}

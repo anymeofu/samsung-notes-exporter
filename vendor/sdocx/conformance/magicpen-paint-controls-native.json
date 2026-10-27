@@ -1,0 +1,13 @@
+{
+  "controls": [
+    {
+      "id": "identity-v1-transparent",
+      "paint": {
+        "native_vector_bytes": 96,
+        "native_vector_hex": "0000000000000000000060407f01454033cf0a3d922469402af9ba40e79c053e24497240072a0c41e766a13eb66d7b40bb6338413a71153f2449824047cf6841a2c67e3f6ddb864034d78a41cfa6bd3fb66d8b40fdff9f41f7ffff3fffff8f40",
+        "native_vector_sha256": "48fab498fb7b870d2fb0ebcf3d725efbcf1352324592286aa9082df635b1377d"
+      }
+    }
+  ],
+  "schema": "magicpen-paint-controls-native-v1"
+}

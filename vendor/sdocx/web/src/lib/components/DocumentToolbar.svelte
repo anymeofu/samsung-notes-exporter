@@ -1,0 +1,145 @@
+<script lang="ts">
+	import { Info, RefreshCw, ArrowLeft } from '@lucide/svelte';
+	import type { ColorMode, PageRenderReport, SvgRenderResult } from '$converter/protocol';
+	import type { ProcessingProgress as WorkProgress, WorkListener } from '$converter/progress';
+	import ConverterToolbar from './ConverterToolbar.svelte';
+	import ColorModeSwitch from './ui/ColorModeSwitch.svelte';
+	import ExportDialog from './ui/ExportDialog.svelte';
+	import IconButton from './ui/IconButton.svelte';
+	import ViewerToolbarShell from './viewer/ViewerToolbarShell.svelte';
+
+	import type { ExportRequest } from '$converter/export-options';
+
+	interface DocumentToolbarModel {
+		document: {
+			title: string;
+			filename: string;
+			fileSize: number;
+			pageCount: number;
+		};
+		viewer: {
+			pageIndex: number;
+			previewZoom: number;
+			fitPage: boolean;
+			colorMode: ColorMode;
+			detailsOpen: boolean;
+		};
+		activity: {
+			exporting: boolean;
+			rendering: boolean;
+			exportProgress: string;
+			exportWork?: WorkProgress | null;
+			exportReports: PageRenderReport[];
+			exportColorMode: ColorMode;
+		};
+	}
+
+	interface DocumentToolbarActions {
+		onToggleDetails: () => void;
+		onSelectPage: (page: number) => void;
+		onStepPage: (direction: -1 | 1) => void;
+		onSetZoom: (zoom: number) => void;
+		onStepZoom: (direction: -1 | 1) => void;
+		onFitWidth: () => void;
+		onFitPage: () => void;
+		onColorMode: (mode: ColorMode) => void;
+		onExport: (request: ExportRequest) => Promise<string>;
+		onResolvePages: (selection: string) => Promise<number[]>;
+		onPreview: (page: number, colorMode: ColorMode, onProgress?: WorkListener) => Promise<SvgRenderResult>;
+		onCancel: () => void;
+		onReplace: () => void;
+		onClose: () => void;
+	}
+
+	interface Props {
+		model: DocumentToolbarModel;
+		actions: DocumentToolbarActions;
+	}
+
+	let { model, actions }: Props = $props();
+
+	function formatBytes(bytes: number): string {
+		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KiB`;
+		return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+	}
+</script>
+
+<ViewerToolbarShell label="Document toolbar">
+	{#snippet start()}
+		<div class="flex min-w-0 items-center gap-1.5">
+			<IconButton
+				label="Document information"
+				tooltip
+				active={model.viewer.detailsOpen}
+				onclick={actions.onToggleDetails}
+			>
+				<Info size={13} strokeWidth={1.4} />
+			</IconButton>
+			<div class="min-w-0 leading-tight">
+				<h1 class="block truncate text-[11px] font-[550]" title={model.document.title}>{model.document.title}</h1>
+				<span class="block truncate font-mono text-[9px] text-muted" title={model.document.filename}>
+					{formatBytes(model.document.fileSize)} · {model.document.pageCount} {model.document.pageCount === 1 ? 'page' : 'pages'} · local
+				</span>
+			</div>
+		</div>
+	{/snippet}
+
+	{#snippet center()}
+		<ConverterToolbar
+			model={{
+				pageIndex: model.viewer.pageIndex,
+				pageCount: model.document.pageCount,
+				previewZoom: model.viewer.previewZoom,
+				fitPage: model.viewer.fitPage,
+				disabled: model.activity.exporting || model.activity.rendering
+			}}
+			actions={{
+				onSelectPage: actions.onSelectPage,
+				onStepPage: actions.onStepPage,
+				onSetZoom: actions.onSetZoom,
+				onStepZoom: actions.onStepZoom,
+				onFitWidth: actions.onFitWidth,
+				onFitPage: actions.onFitPage
+			}}
+		/>
+	{/snippet}
+
+	{#snippet end()}
+		<div class="flex min-w-0 items-center justify-end gap-1">
+			{#if model.activity.exporting}
+				<span class="motion-fade-in max-w-36 truncate font-mono text-[9px] text-muted max-[620px]:hidden">
+					{model.activity.exportProgress}
+				</span>
+			{/if}
+			<ColorModeSwitch value={model.viewer.colorMode} disabled={model.activity.rendering} onChange={actions.onColorMode} />
+			<span class="mx-0.5 h-4 w-px bg-subtle" aria-hidden="true"></span>
+			<ExportDialog
+				model={{
+					exporting: model.activity.exporting,
+					rendering: model.activity.rendering,
+					title: model.document.title,
+					filename: model.document.filename,
+					pageCount: model.document.pageCount,
+					pageIndex: model.viewer.pageIndex,
+					colorMode: model.viewer.colorMode,
+					exportProgress: model.activity.exportProgress,
+					exportWork: model.activity.exportWork,
+					exportReports: model.activity.exportReports,
+					exportColorMode: model.activity.exportColorMode
+				}}
+				actions={{
+					onExport: actions.onExport,
+					onResolvePages: actions.onResolvePages,
+					onPreview: actions.onPreview,
+					onCancel: actions.onCancel
+				}}
+			/>
+			<IconButton label="Import notes" tooltip onclick={actions.onReplace}>
+				<RefreshCw size={12} strokeWidth={1.4} />
+			</IconButton>
+			<IconButton label="Back to library" tooltip onclick={actions.onClose}>
+				<ArrowLeft size={13} strokeWidth={1.4} />
+			</IconButton>
+		</div>
+	{/snippet}
+</ViewerToolbarShell>

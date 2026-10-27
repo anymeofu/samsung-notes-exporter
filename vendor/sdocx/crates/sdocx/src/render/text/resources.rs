@@ -1,0 +1,1494 @@
+use std::cell::RefCell;
+use std::collections::{BTreeSet, HashMap, hash_map::Entry};
+use std::ops::Range;
+use std::rc::Rc;
+
+use crate::fonts::{
+    Direction, FontBook, FontError, NativeFontNameRequest, PaintShapeDirection, ResolvedFace,
+    UnicodeBuffer,
+};
+
+use super::objects::{ObjectDiagnostic, ObjectDiagnosticKind, ObjectPageOwnership};
+use super::{
+    PageExclusions, StyledText, TextContext, TextSettings, TextStyle, WrappedLine,
+    explicit_line_height, finite_native_geometry,
+};
+use crate::render::vector::{EmbeddedFont, Scene};
+use crate::{LineSpacingType, ParagraphLineSpacing, RichTextSpanType};
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
+pub enum TextDiagnosticKind {
+    UnavailableFamily,
+    UnusableFontData,
+    MissingGlyphs,
+    MeasurementFailure,
+    UnsupportedMeasurementStyle,
+    UnsupportedMeasurementFont,
+    UnsupportedMeasurementShaping,
+    UnsupportedMeasurementBudget,
+    UnsupportedTabMeasurement,
+    UnsupportedNativeWrapping,
+    InvalidGeometry,
+    /// The saved text frame is retained because its native template geometry is unsupported.
+    UnsupportedTextFrame,
+    /// Measured glyph positions cannot be reproduced by independently positioned SVG text.
+    UnsupportedGlyphPositioning,
+    /// Retained text measurements do not provide the highlighted range's boundaries.
+    UnsupportedBackgroundPositioning,
+    UnsupportedCompositionStyle,
+    UnsupportedSuggestionStyle,
+    UnsupportedCorrectionStyle,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct TextDiagnostic {
+    pub kind: TextDiagnosticKind,
+    pub family: String,
+    pub codepoints: Vec<u32>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub(in crate::render) enum SourceOwner {
+    Text(Range<usize>),
+    Object(Range<usize>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(in crate::render) struct SourceTextDiagnostic {
+    pub owner: Option<SourceOwner>,
+    pub diagnostic: TextDiagnostic,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(in crate::render) struct SourceObjectDiagnostic {
+    pub owner: Option<SourceOwner>,
+    pub diagnostic: ObjectDiagnostic,
+}
+
+#[derive(Default)]
+struct TextDiagnostics {
+    ordered: Vec<CollectedDiagnostic>,
+    positions: HashMap<DiagnosticKey, usize>,
+}
+
+#[derive(PartialEq, Eq, Hash)]
+struct DiagnosticKey {
+    owner: Option<SourceOwner>,
+    kind: TextDiagnosticKind,
+    family: String,
+}
+
+struct CollectedDiagnostic {
+    owner: Option<SourceOwner>,
+    kind: TextDiagnosticKind,
+    family: String,
+    codepoints: BTreeSet<u32>,
+}
+
+impl CollectedDiagnostic {
+    fn diagnostic(&self) -> TextDiagnostic {
+        TextDiagnostic {
+            kind: self.kind.clone(),
+            family: self.family.clone(),
+            codepoints: self.codepoints.iter().copied().collect(),
+        }
+    }
+}
+
+impl TextDiagnostics {
+    fn record(&mut self, issue: SourceTextDiagnostic) {
+        let key = DiagnosticKey {
+            owner: issue.owner.clone(),
+            kind: issue.diagnostic.kind.clone(),
+            family: issue.diagnostic.family.clone(),
+        };
+        match self.positions.entry(key) {
+            Entry::Occupied(position) => {
+                let existing = &mut self.ordered[*position.get()];
+                existing.codepoints.extend(issue.diagnostic.codepoints);
+            }
+            Entry::Vacant(position) => {
+                position.insert(self.ordered.len());
+                self.ordered.push(CollectedDiagnostic {
+                    owner: issue.owner,
+                    kind: issue.diagnostic.kind,
+                    family: issue.diagnostic.family,
+                    codepoints: issue.diagnostic.codepoints.into_iter().collect(),
+                });
+            }
+        }
+    }
+
+    fn public(&self) -> Vec<TextDiagnostic> {
+        let mut diagnostics = Self::default();
+        for issue in &self.ordered {
+            diagnostics.record(SourceTextDiagnostic {
+                owner: None,
+                diagnostic: issue.diagnostic(),
+            });
+        }
+        diagnostics
+            .ordered
+            .iter()
+            .map(CollectedDiagnostic::diagnostic)
+            .collect()
+    }
+
+    fn scoped(&self) -> Vec<SourceTextDiagnostic> {
+        self.ordered
+            .iter()
+            .map(|issue| SourceTextDiagnostic {
+                owner: issue.owner.clone(),
+                diagnostic: issue.diagnostic(),
+            })
+            .collect()
+    }
+}
+
+#[derive(Clone)]
+pub(in crate::render) struct TextRenderer<'a> {
+    pub settings: TextSettings,
+    pub point_marker_target: crate::render::PointMarkerTarget,
+    pub object_page_ownership: ObjectPageOwnership,
+    pub table_export_page: Option<crate::render::table::TableExportPage>,
+    pub fonts: &'a FontBook,
+    pub native_object_page_obstacles: Option<super::NativeObjectPageObstacles>,
+    pub native_cell_page_obstacles: Option<super::NativeCellPageObstacles>,
+    default_family: &'static str,
+    faces: Rc<RefCell<Vec<ResolvedFace>>>,
+    diagnostics: Rc<RefCell<TextDiagnostics>>,
+    local_measurement_issues: Rc<RefCell<TextDiagnostics>>,
+    object_diagnostics: Rc<RefCell<Vec<SourceObjectDiagnostic>>>,
+    page_exclusions: Option<Rc<PageExclusions>>,
+    source_owner: Option<SourceOwner>,
+    source_owner_locked: bool,
+    local_source: Option<Range<usize>>,
+}
+
+impl<'a> TextRenderer<'a> {
+    pub fn new(settings: TextSettings, fonts: &'a FontBook) -> Self {
+        Self {
+            settings,
+            point_marker_target: Default::default(),
+            object_page_ownership: Default::default(),
+            table_export_page: None,
+            fonts,
+            default_family: "Roboto",
+            faces: Default::default(),
+            diagnostics: Default::default(),
+            local_measurement_issues: Default::default(),
+            object_diagnostics: Default::default(),
+            page_exclusions: None,
+            native_object_page_obstacles: None,
+            native_cell_page_obstacles: None,
+            source_owner: None,
+            source_owner_locked: false,
+            local_source: None,
+        }
+    }
+
+    pub fn with_page_exclusions(mut self, exclusions: Option<PageExclusions>) -> Self {
+        self.page_exclusions = exclusions.map(Rc::new);
+        self
+    }
+
+    pub fn with_native_object_page_obstacles(
+        mut self,
+        source: Option<super::NativeObjectPageObstacles>,
+    ) -> Self {
+        self.native_object_page_obstacles = source;
+        self
+    }
+
+    pub fn with_native_cell_page_obstacles(
+        mut self,
+        source: Option<super::NativeCellPageObstacles>,
+    ) -> Self {
+        self.native_cell_page_obstacles = source;
+        self
+    }
+
+    pub fn with_table_export_page(
+        mut self,
+        page: Option<crate::render::table::TableExportPage>,
+    ) -> Self {
+        self.table_export_page = page;
+        self
+    }
+
+    pub fn translated_paint(&self, dx: f64, dy: f64) -> Self {
+        let mut renderer = self.clone();
+        renderer.table_export_page = self.table_export_page.map(|page| page.translated(dx, dy));
+        renderer
+    }
+
+    pub fn with_point_marker_target(mut self, target: crate::render::PointMarkerTarget) -> Self {
+        self.point_marker_target = target;
+        self
+    }
+
+    pub fn with_object_page_ownership(mut self, ownership: ObjectPageOwnership) -> Self {
+        self.object_page_ownership = ownership;
+        self
+    }
+
+    pub fn default_cap_height_ratio(&self) -> Option<f64> {
+        self.fonts
+            .resolve("sans-serif", false, false)
+            .ok()?
+            .metrics
+            .cap_height_ratio()
+    }
+
+    pub fn for_resolved_text(&self, default_family: &'static str) -> Self {
+        Self {
+            settings: TextSettings::resolved(),
+            point_marker_target: self.point_marker_target,
+            object_page_ownership: self.object_page_ownership,
+            table_export_page: self.table_export_page,
+            fonts: self.fonts,
+            default_family,
+            faces: Rc::clone(&self.faces),
+            diagnostics: Rc::clone(&self.diagnostics),
+            local_measurement_issues: Default::default(),
+            object_diagnostics: Rc::clone(&self.object_diagnostics),
+            page_exclusions: None,
+            native_object_page_obstacles: self.native_object_page_obstacles,
+            native_cell_page_obstacles: self.native_cell_page_obstacles,
+            source_owner: self.source_owner.clone(),
+            source_owner_locked: self.source_owner.is_some(),
+            local_source: None,
+        }
+    }
+
+    pub fn for_source(&self, source: Range<usize>) -> Self {
+        let mut renderer = self.clone();
+        renderer.local_source = Some(source.clone());
+        if !renderer.source_owner_locked {
+            renderer.source_owner = Some(SourceOwner::Text(source));
+        }
+        renderer
+    }
+
+    pub fn for_object_source(&self, source: Range<usize>) -> Self {
+        let mut renderer = self.clone();
+        if !renderer.source_owner_locked {
+            renderer.source_owner = Some(SourceOwner::Object(source));
+            renderer.source_owner_locked = true;
+        }
+        renderer
+    }
+
+    pub fn planning_scope(&self) -> Self {
+        let mut renderer = self.local_measurement_scope();
+        renderer.faces = Default::default();
+        renderer.diagnostics = Default::default();
+        renderer.object_diagnostics = Default::default();
+        renderer
+    }
+
+    pub fn local_measurement_scope(&self) -> Self {
+        let mut renderer = self.clone();
+        renderer.local_measurement_issues = Default::default();
+        renderer.local_source = None;
+        renderer
+    }
+
+    pub fn local_measurement_issues(&self, source: Range<usize>) -> Vec<SourceTextDiagnostic> {
+        self.local_measurement_issues
+            .borrow()
+            .scoped()
+            .into_iter()
+            .filter(|issue| {
+                matches!(&issue.owner, Some(SourceOwner::Text(range))
+                    if range.start < source.end && source.start < range.end)
+            })
+            .collect()
+    }
+
+    fn register_face(&self, face: &ResolvedFace) {
+        let mut faces = self.faces.borrow_mut();
+        if !faces.iter().any(|registered| registered.id == face.id) {
+            faces.push(face.clone());
+        }
+    }
+
+    pub fn table_split_rects(
+        &self,
+        constraint: crate::ObjectSpanLayoutConstraint,
+        candidate_top: f64,
+    ) -> Vec<crate::BoundingBox> {
+        self.page_exclusions
+            .as_ref()
+            .map_or_else(Vec::new, |pages| {
+                pages.table_split_rects(constraint, candidate_top)
+            })
+    }
+
+    pub fn resolve_native(
+        &self,
+        family: Option<&str>,
+        direction: Direction,
+    ) -> Option<ResolvedFace> {
+        let direction = match direction {
+            Direction::LeftToRight => PaintShapeDirection::LeftToRight,
+            Direction::RightToLeft => PaintShapeDirection::RightToLeft,
+            _ => return None,
+        };
+        let request =
+            NativeFontNameRequest::new(family, Some(self.default_family), direction).ok()?;
+        let selection = self.fonts.resolve_native_name(&request).ok()?;
+        let native_style = selection.typeface_style();
+        if native_style.weight() != 400 || native_style.italic() {
+            return None;
+        }
+        if selection.used_default_family()
+            && let Some(family) = family.filter(|family| !family.is_empty())
+            && self
+                .fonts
+                .resolve(family, false, false)
+                .is_ok_and(|available| available.id != selection.face().id)
+        {
+            return None;
+        }
+        if selection.used_default_family()
+            && let Some(family) = family.filter(|family| !family.is_empty())
+        {
+            self.record(TextDiagnostic {
+                kind: TextDiagnosticKind::UnavailableFamily,
+                family: family.into(),
+                codepoints: Vec::new(),
+            });
+        }
+        Some(selection.face().clone())
+    }
+
+    pub fn resolve(&self, style: &TextStyle, context: TextContext) -> Option<ResolvedFace> {
+        self.resolve_face(style, context, Direction::LeftToRight)
+            .map(|(face, _)| face)
+    }
+
+    pub(super) fn resolve_face(
+        &self,
+        style: &TextStyle,
+        context: TextContext,
+        direction: Direction,
+    ) -> Option<(ResolvedFace, bool)> {
+        self.resolve_face_with_native_synthesis(style, context, direction)
+            .map(|(face, italic, _)| (face, italic))
+    }
+
+    pub(super) fn resolve_face_with_native_synthesis(
+        &self,
+        style: &TextStyle,
+        context: TextContext,
+        direction: Direction,
+    ) -> Option<(ResolvedFace, bool, bool)> {
+        let family = style.family.as_deref().unwrap_or(self.default_family);
+        if matches!(context, TextContext::Flow)
+            && style.italic
+            && let Some(face) = self.resolve_native(style.family.as_deref(), direction)
+        {
+            return Some((face, false, true));
+        }
+        let bold = style.bold && matches!(context, TextContext::Placed);
+        match self.fonts.resolve_with_fallback(family, bold, style.italic) {
+            Ok(selection) => {
+                if selection.used_fallback {
+                    self.record(TextDiagnostic {
+                        kind: TextDiagnosticKind::UnavailableFamily,
+                        family: family.into(),
+                        codepoints: Vec::new(),
+                    });
+                }
+                Some((selection.face, style.italic, false))
+            }
+            Err(error) => {
+                self.record(TextDiagnostic {
+                    kind: match error {
+                        FontError::MissingFont { .. } => TextDiagnosticKind::UnavailableFamily,
+                        _ => TextDiagnosticKind::UnusableFontData,
+                    },
+                    family: family.into(),
+                    codepoints: Vec::new(),
+                });
+                None
+            }
+        }
+    }
+
+    pub fn output_style(&self, text: &str, style: &TextStyle, context: TextContext) -> TextStyle {
+        let mut output = style.clone();
+        if let Some(face) = self.resolve(style, context) {
+            output = self.output_style_with_face(style, &face);
+            let mut buffer = UnicodeBuffer::new();
+            buffer.push_str(text);
+            if let Ok(run) = face.shape(buffer, &[]) {
+                let mut clusters = run
+                    .glyphs
+                    .iter()
+                    .map(|glyph| glyph.cluster as usize)
+                    .collect::<Vec<_>>();
+                clusters.extend([text.len()]);
+                clusters.sort_unstable();
+                clusters.dedup();
+                let mut codepoints = Vec::new();
+                for glyph in run.glyphs.iter().filter(|glyph| glyph.id == 0) {
+                    let start = glyph.cluster as usize;
+                    let end = clusters
+                        .iter()
+                        .copied()
+                        .find(|index| *index > start)
+                        .unwrap_or(text.len());
+                    if let Some(cluster) = text.get(start..end) {
+                        codepoints.extend(cluster.chars().map(u32::from));
+                    }
+                }
+                if !codepoints.is_empty() {
+                    self.record(TextDiagnostic {
+                        kind: TextDiagnosticKind::MissingGlyphs,
+                        family: face.family,
+                        codepoints,
+                    });
+                }
+            } else {
+                self.record(TextDiagnostic {
+                    kind: TextDiagnosticKind::UnusableFontData,
+                    family: face.family,
+                    codepoints: Vec::new(),
+                });
+            }
+        }
+        output
+    }
+
+    pub fn output_style_with_face(&self, style: &TextStyle, face: &ResolvedFace) -> TextStyle {
+        self.register_face(face);
+        let mut output = style.clone();
+        output.family = Some(face.svg_family().to_string());
+        output
+    }
+
+    pub fn report_resolution(&self, style: &TextStyle, context: TextContext) {
+        let _ = self.resolve(style, context);
+    }
+
+    pub fn embed_fonts(&self, svg: &mut Scene) {
+        for face in self.faces.borrow().iter() {
+            match EmbeddedFont::new(
+                &face.svg_family(),
+                face.weight.0,
+                face.style,
+                face.bytes(),
+                face.index,
+            ) {
+                Ok(font) => svg.push(font),
+                Err(_) => self.record(TextDiagnostic {
+                    kind: TextDiagnosticKind::UnusableFontData,
+                    family: face.family.clone(),
+                    codepoints: Vec::new(),
+                }),
+            }
+        }
+    }
+
+    pub fn diagnostics(&self) -> Vec<TextDiagnostic> {
+        self.diagnostics.borrow().public()
+    }
+
+    pub fn scoped_diagnostics(&self) -> Vec<SourceTextDiagnostic> {
+        self.diagnostics.borrow().scoped()
+    }
+
+    pub fn report_text_issues(&self, issues: &[SourceTextDiagnostic]) {
+        for issue in issues {
+            self.record_owned(issue.clone());
+        }
+    }
+
+    pub fn object_diagnostics(&self) -> Vec<ObjectDiagnostic> {
+        let mut diagnostics = Vec::new();
+        for issue in self.object_diagnostics.borrow().iter() {
+            if !diagnostics.contains(&issue.diagnostic) {
+                diagnostics.push(issue.diagnostic);
+            }
+        }
+        diagnostics
+    }
+
+    pub fn scoped_object_diagnostics(&self) -> Vec<SourceObjectDiagnostic> {
+        self.object_diagnostics.borrow().clone()
+    }
+
+    pub fn report_object_issues(&self, issues: &[ObjectDiagnostic]) {
+        for issue in issues {
+            self.record_object_issue(SourceObjectDiagnostic {
+                owner: self.source_owner.clone(),
+                diagnostic: *issue,
+            });
+        }
+    }
+
+    pub fn report_owned_object_issues(&self, issues: &[SourceObjectDiagnostic]) {
+        for issue in issues {
+            self.record_object_issue(issue.clone());
+        }
+    }
+
+    fn record_object_issue(&self, issue: SourceObjectDiagnostic) {
+        let mut diagnostics = self.object_diagnostics.borrow_mut();
+        if !diagnostics.contains(&issue) {
+            diagnostics.push(issue);
+        }
+    }
+
+    pub fn report_geometry_issues(&self, issues: &[TextDiagnostic]) {
+        for issue in issues {
+            self.record(issue.clone());
+        }
+    }
+
+    pub fn report_owned_geometry_issues(&self, issues: &[SourceTextDiagnostic]) {
+        for issue in issues {
+            let mut issue = issue.clone();
+            if self.source_owner_locked || issue.owner.is_none() {
+                issue.owner = self.source_owner.clone();
+            }
+            self.record_owned(issue);
+        }
+    }
+
+    pub fn report_span_issues(&self, styled: &StyledText<'_>) {
+        for (range, span) in &styled.spans {
+            let kind = match span.kind {
+                RichTextSpanType::ComposingBackgroundColor
+                    if span.composing_background_value().is_none() =>
+                {
+                    TextDiagnosticKind::UnsupportedCompositionStyle
+                }
+                RichTextSpanType::Composing | RichTextSpanType::ComposingTag
+                    if span.composition_value().is_none() =>
+                {
+                    TextDiagnosticKind::UnsupportedCompositionStyle
+                }
+                RichTextSpanType::Suggestion => TextDiagnosticKind::UnsupportedSuggestionStyle,
+                RichTextSpanType::SpellCorrection => TextDiagnosticKind::UnsupportedCorrectionStyle,
+                _ => continue,
+            };
+            self.report_span_issue(styled, range, kind);
+        }
+    }
+
+    fn report_span_issue(
+        &self,
+        styled: &StyledText<'_>,
+        range: &Range<usize>,
+        kind: TextDiagnosticKind,
+    ) {
+        let codepoints = styled
+            .index
+            .slice(range.clone())
+            .into_iter()
+            .flat_map(str::chars)
+            .filter(|character| !matches!(character, '\r' | '\n'))
+            .map(u32::from)
+            .collect::<Vec<_>>();
+        if codepoints.is_empty() {
+            return;
+        }
+        let style = styled.style_at(range.start, super::RenderTheme::for_canvas(false), None);
+        self.record_owned(SourceTextDiagnostic {
+            owner: if self.source_owner_locked {
+                self.source_owner.clone()
+            } else {
+                Some(SourceOwner::Text(range.clone()))
+            },
+            diagnostic: TextDiagnostic {
+                kind,
+                family: style.family.unwrap_or_else(|| self.default_family.into()),
+                codepoints,
+            },
+        });
+    }
+
+    pub fn invalid_geometry(&self, family: &str) {
+        self.record(TextDiagnostic {
+            kind: TextDiagnosticKind::InvalidGeometry,
+            family: family.into(),
+            codepoints: Vec::new(),
+        });
+    }
+
+    pub fn report_line_geometry(&self, line: &WrappedLine, spacing: Option<ParagraphLineSpacing>) {
+        if line.has_block_margins() {
+            return;
+        }
+        let explicit_height = spacing
+            .and_then(|spacing| explicit_line_height(line.font_size, spacing, self.settings));
+        let invalid_spacing = spacing.is_some_and(|spacing| {
+            matches!(
+                spacing.kind,
+                LineSpacingType::Pixels | LineSpacingType::Percent
+            ) && (spacing.value > 0.0 || !spacing.value.is_finite())
+                && explicit_height.is_none()
+        });
+        let invalid_default_height =
+            explicit_height.is_none() && finite_native_geometry(line.font_size * 1.35).is_none();
+        if invalid_spacing || invalid_default_height {
+            let family = line
+                .placements
+                .first()
+                .and_then(|placement| placement.cluster.run.style.family.as_deref())
+                .unwrap_or("Roboto");
+            self.invalid_geometry(family);
+        }
+    }
+
+    pub fn object_layout_unsupported(&self, anchor_utf16: i32) {
+        self.report_object_issues(&[ObjectDiagnostic {
+            anchor_utf16,
+            kind: ObjectDiagnosticKind::MixedParagraphLayout,
+        }]);
+    }
+
+    pub fn measurement_failed(&self, family: &str) {
+        self.record(TextDiagnostic {
+            kind: TextDiagnosticKind::MeasurementFailure,
+            family: family.into(),
+            codepoints: Vec::new(),
+        });
+    }
+
+    pub fn measurement_unsupported(&self, kind: TextDiagnosticKind, family: &str, text: &str) {
+        let diagnostic = TextDiagnostic {
+            kind,
+            family: family.into(),
+            codepoints: text.chars().map(u32::from).collect(),
+        };
+        if let Some(source) = &self.local_source
+            && matches!(
+                diagnostic.kind,
+                TextDiagnosticKind::UnsupportedMeasurementStyle
+                    | TextDiagnosticKind::UnsupportedMeasurementFont
+                    | TextDiagnosticKind::UnsupportedMeasurementShaping
+                    | TextDiagnosticKind::UnsupportedMeasurementBudget
+                    | TextDiagnosticKind::UnsupportedTabMeasurement
+            )
+        {
+            self.local_measurement_issues
+                .borrow_mut()
+                .record(SourceTextDiagnostic {
+                    owner: Some(SourceOwner::Text(source.clone())),
+                    diagnostic: diagnostic.clone(),
+                });
+        }
+        self.record(diagnostic);
+    }
+
+    pub fn report_visible_line_issues(&self, styled: &StyledText<'_>, line: &WrappedLine) {
+        for issue in line.fallback_measurement_issues() {
+            if let Some(SourceOwner::Text(source)) = &issue.owner {
+                let source = source.start.max(line.source.start)..source.end.min(line.source.end);
+                if !source.is_empty()
+                    && let Some(text) = styled.index.slice(source.clone())
+                {
+                    self.for_source(source).measurement_unsupported(
+                        issue.diagnostic.kind.clone(),
+                        &issue.diagnostic.family,
+                        text,
+                    );
+                }
+            }
+        }
+        for placement in &line.placements {
+            let run = &placement.cluster.run;
+            if let Some(kind) = run.measurement_issue()
+                && let Some(text) = styled.index.slice(placement.cluster.source.clone())
+            {
+                self.for_source(placement.cluster.source.clone())
+                    .measurement_unsupported(
+                        kind.clone(),
+                        run.style.family.as_deref().unwrap_or("Roboto"),
+                        text,
+                    );
+            }
+        }
+        if line.unsupported_native_wrapping()
+            && let Some(text) = styled.index.slice(line.source.clone())
+        {
+            self.for_source(line.source.clone())
+                .measurement_unsupported(
+                    TextDiagnosticKind::UnsupportedNativeWrapping,
+                    "native",
+                    text,
+                );
+        }
+    }
+
+    pub fn glyph_positioning_unsupported(&self, family: &str, text: &str) {
+        self.record(TextDiagnostic {
+            kind: TextDiagnosticKind::UnsupportedGlyphPositioning,
+            family: family.into(),
+            codepoints: text.chars().map(u32::from).collect(),
+        });
+    }
+
+    pub fn missing_glyphs(&self, family: &str, text: &str) {
+        self.record(TextDiagnostic {
+            kind: TextDiagnosticKind::MissingGlyphs,
+            family: family.into(),
+            codepoints: text.chars().map(u32::from).collect(),
+        });
+    }
+
+    fn record(&self, diagnostic: TextDiagnostic) {
+        self.record_owned(SourceTextDiagnostic {
+            owner: self.source_owner.clone(),
+            diagnostic,
+        });
+    }
+
+    fn record_owned(&self, issue: SourceTextDiagnostic) {
+        self.diagnostics.borrow_mut().record(issue);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use super::*;
+    use crate::Color;
+    use crate::fonts::fontdb::Database;
+
+    fn renderer(fonts: &FontBook) -> TextRenderer<'_> {
+        TextRenderer::new(
+            TextSettings {
+                scale: 1.0,
+                font_size_delta: 0.0,
+                ..Default::default()
+            },
+            fonts,
+        )
+    }
+
+    fn style(family: &str) -> TextStyle {
+        TextStyle {
+            font_size: 19.0,
+            family: Some(family.into()),
+            color: "#262626".into(),
+            source_color: Color {
+                r: 38,
+                g: 38,
+                b: 38,
+            },
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
+            link_target: None,
+        }
+    }
+
+    #[test]
+    fn diagnostic_keys_preserve_owners_reasons_families_and_first_occurrence_order() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        let text = renderer.for_source(0..1);
+        let object = renderer.for_object_source(0..1);
+        text.missing_glyphs("Roboto", "😀中😀");
+        object.missing_glyphs("Roboto", "日");
+        text.glyph_positioning_unsupported("Roboto", "λ");
+        text.missing_glyphs("Roboto Mono", "語");
+        renderer.missing_glyphs("Roboto", "本");
+        text.missing_glyphs("Roboto", "中日");
+
+        let scoped = renderer.scoped_diagnostics();
+        assert_eq!(scoped.len(), 5);
+        assert_eq!(scoped[0].owner, Some(SourceOwner::Text(0..1)));
+        assert_eq!(scoped[1].owner, Some(SourceOwner::Object(0..1)));
+        assert_eq!(scoped[4].owner, None);
+        assert_eq!(scoped[0].diagnostic.codepoints, [0x4e2d, 0x65e5, 0x1f600]);
+        assert_eq!(scoped[1].diagnostic.codepoints, [0x65e5]);
+        assert_eq!(
+            renderer.diagnostics(),
+            [
+                TextDiagnostic {
+                    kind: TextDiagnosticKind::MissingGlyphs,
+                    family: "Roboto".into(),
+                    codepoints: vec![0x4e2d, 0x65e5, 0x672c, 0x1f600],
+                },
+                TextDiagnostic {
+                    kind: TextDiagnosticKind::UnsupportedGlyphPositioning,
+                    family: "Roboto".into(),
+                    codepoints: vec![0x3bb],
+                },
+                TextDiagnostic {
+                    kind: TextDiagnosticKind::MissingGlyphs,
+                    family: "Roboto Mono".into(),
+                    codepoints: vec![0x8a9e],
+                },
+            ]
+        );
+        renderer.report_text_issues(&scoped);
+        assert_eq!(renderer.scoped_diagnostics(), scoped);
+    }
+
+    #[test]
+    fn large_diagnostic_stream_keeps_replay_order_and_sorted_codepoint_unions() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        const COUNT: usize = 20_000;
+        for index in 0..COUNT {
+            renderer
+                .for_source(index..index + 1)
+                .missing_glyphs("Roboto", "中");
+        }
+        for index in (0..COUNT).rev() {
+            let scalar = char::from_u32(0x4e00 + index as u32).unwrap();
+            renderer
+                .for_source(index..index + 1)
+                .missing_glyphs("Roboto", &format!("{scalar}中{scalar}"));
+        }
+        let scoped = renderer.scoped_diagnostics();
+        assert_eq!(scoped.len(), COUNT);
+        for (index, issue) in scoped.iter().enumerate() {
+            assert_eq!(issue.owner, Some(SourceOwner::Text(index..index + 1)));
+            assert!(
+                issue
+                    .diagnostic
+                    .codepoints
+                    .contains(&(0x4e00 + index as u32))
+            );
+            assert!(issue.diagnostic.codepoints.contains(&0x4e2d));
+        }
+        assert_eq!(
+            renderer.diagnostics()[0].codepoints,
+            (0x4e00..0x4e00 + COUNT as u32).collect::<Vec<_>>()
+        );
+        let page = self::renderer(&fonts);
+        page.report_text_issues(&scoped[COUNT - 2..]);
+        page.report_text_issues(&scoped[COUNT - 2..]);
+        assert_eq!(page.scoped_diagnostics(), scoped[COUNT - 2..]);
+    }
+
+    #[test]
+    fn repeated_diagnostic_key_collects_many_distinct_codepoints() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts).for_source(0..20_000);
+        for codepoint in (0x4e00..0x4e00 + 20_000).rev() {
+            let scalar = char::from_u32(codepoint).unwrap().to_string();
+            renderer.missing_glyphs("Roboto", &scalar);
+            renderer.missing_glyphs("Roboto", &scalar);
+        }
+        let scoped = renderer.scoped_diagnostics();
+        assert_eq!(scoped.len(), 1);
+        assert_eq!(scoped[0].owner, Some(SourceOwner::Text(0..20_000)));
+        assert_eq!(
+            scoped[0].diagnostic.codepoints,
+            (0x4e00..0x4e00 + 20_000).collect::<Vec<_>>()
+        );
+        assert_eq!(renderer.diagnostics(), [scoped[0].diagnostic.clone()]);
+    }
+
+    #[test]
+    fn owned_geometry_preserves_local_ranges_and_locks_nested_parent_ownership() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        let issues = [
+            SourceTextDiagnostic {
+                owner: Some(SourceOwner::Text(1..2)),
+                diagnostic: TextDiagnostic {
+                    kind: TextDiagnosticKind::InvalidGeometry,
+                    family: "Roboto".into(),
+                    codepoints: Vec::new(),
+                },
+            },
+            SourceTextDiagnostic {
+                owner: None,
+                diagnostic: TextDiagnostic {
+                    kind: TextDiagnosticKind::InvalidGeometry,
+                    family: "Roboto Mono".into(),
+                    codepoints: Vec::new(),
+                },
+            },
+        ];
+        renderer
+            .for_source(10..20)
+            .report_owned_geometry_issues(&issues);
+        let scoped = renderer.scoped_diagnostics();
+        assert_eq!(scoped[0].owner, Some(SourceOwner::Text(1..2)));
+        assert_eq!(scoped[1].owner, Some(SourceOwner::Text(10..20)));
+
+        let child = renderer
+            .planning_scope()
+            .for_object_source(30..31)
+            .for_resolved_text("sans-serif");
+        child.for_source(1..2).report_owned_geometry_issues(&issues);
+        assert!(
+            child
+                .scoped_diagnostics()
+                .iter()
+                .all(|issue| { issue.owner == Some(SourceOwner::Object(30..31)) })
+        );
+        assert_eq!(renderer.scoped_diagnostics(), scoped);
+    }
+
+    #[test]
+    fn planning_faces_are_not_embedded_until_retained_text_is_painted() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts);
+        let sans = planner
+            .resolve(&style("Roboto"), TextContext::Placed)
+            .unwrap();
+        planner
+            .resolve(&style("Roboto Mono"), TextContext::Placed)
+            .unwrap();
+        assert!(planner.faces.borrow().is_empty());
+
+        let page = renderer(&fonts);
+        let requested = style("Missing family");
+        page.report_resolution(&requested, TextContext::Placed);
+        assert!(page.faces.borrow().is_empty());
+        assert_eq!(
+            page.diagnostics()[0].kind,
+            TextDiagnosticKind::UnavailableFamily
+        );
+        page.output_style_with_face(&requested, &sans);
+        assert_eq!(page.faces.borrow().len(), 1);
+        assert_eq!(page.faces.borrow()[0].id, sans.id);
+        assert!(planner.faces.borrow().is_empty());
+
+        let generic = renderer(&fonts);
+        generic.report_resolution(&style("sans-serif"), TextContext::Placed);
+        assert!(generic.diagnostics().is_empty());
+        assert!(generic.faces.borrow().is_empty());
+    }
+
+    #[test]
+    fn source_owned_issues_are_filtered_before_page_deduplication() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts);
+        planner.for_source(0..4).missing_glyphs("Roboto", "中");
+        planner.for_source(8..12).missing_glyphs("Roboto", "😀");
+        assert_eq!(planner.diagnostics()[0].codepoints, [0x4e2d, 0x1f600]);
+        let owned = planner.scoped_diagnostics();
+        assert_eq!(owned.len(), 2);
+        assert_eq!(owned[0].owner, Some(SourceOwner::Text(0..4)));
+        assert_eq!(owned[1].owner, Some(SourceOwner::Text(8..12)));
+
+        let second_page = renderer(&fonts);
+        second_page.report_text_issues(&owned[1..]);
+        second_page.report_text_issues(&owned[1..]);
+        assert_eq!(second_page.diagnostics()[0].codepoints, [0x1f600]);
+        assert_eq!(second_page.scoped_diagnostics(), owned[1..]);
+        assert_eq!(planner.scoped_diagnostics(), owned);
+    }
+
+    fn unsupported_span_text() -> crate::RichTextBox {
+        use RichTextSpanType::{
+            Bold, Composing, ComposingBackgroundColor, ComposingTag, ForegroundColor,
+            SpellCorrection, Suggestion,
+        };
+        crate::RichTextBox {
+            text_area_type: None,
+            bbox: Default::default(),
+            rotation_degrees: None,
+            text: "A😀B\r\nC".into(),
+            color: None,
+            highlight_color: None,
+            underline: false,
+            font_size: None,
+            runs: Vec::new(),
+            spans: [
+                (ComposingBackgroundColor, 0, 1),
+                (Composing, 1, 3),
+                (ComposingTag, 3, 4),
+                (Suggestion, 0, 1),
+                (Suggestion, 6, 7),
+                (SpellCorrection, 3, 4),
+                (Bold, 0, 4),
+                (ForegroundColor, 0, 4),
+                (Suggestion, 6, 6),
+                (Suggestion, 7, 8),
+                (Suggestion, 4, 3),
+                (Suggestion, 2, 3),
+                (Composing, 4, 6),
+            ]
+            .into_iter()
+            .map(|(kind, start_utf16, end_utf16)| crate::RichTextSpan {
+                kind,
+                start_utf16,
+                end_utf16,
+                interval_type: crate::SpanIntervalType::ClosedOpen,
+                payload: vec![1, 0, 0, 255],
+            })
+            .collect(),
+            paragraphs: Vec::new(),
+            object_spans: Vec::new(),
+            text_sections: Vec::new(),
+            margins: None,
+            gravity: None,
+        }
+    }
+
+    #[test]
+    fn unsupported_span_diagnostics_preserve_sources_before_page_deduplication() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts);
+        let content = unsupported_span_text();
+        let styled = StyledText::new(&content, TextContext::Placed, TextSettings::default());
+        planner.report_span_issues(&styled);
+        let owned = planner.scoped_diagnostics();
+        planner.report_span_issues(&styled);
+        assert_eq!(planner.scoped_diagnostics(), owned);
+        assert_eq!(owned.len(), 6);
+        assert_eq!(owned[1].owner, Some(SourceOwner::Text(1..2)));
+        assert_eq!(owned[1].diagnostic.codepoints, [0x1f600]);
+        assert_eq!(owned[4].owner, Some(SourceOwner::Text(5..6)));
+        assert_eq!(planner.diagnostics().len(), 3);
+        assert_eq!(planner.diagnostics()[0].codepoints, [0x41, 0x42, 0x1f600]);
+        assert_eq!(
+            owned[3].diagnostic.kind,
+            TextDiagnosticKind::UnsupportedSuggestionStyle
+        );
+        assert_eq!(
+            owned[5].diagnostic.kind,
+            TextDiagnosticKind::UnsupportedCorrectionStyle
+        );
+        let page = renderer(&fonts);
+        page.report_text_issues(&owned[4..5]);
+        page.report_text_issues(&owned[4..5]);
+        assert_eq!(page.scoped_diagnostics(), owned[4..5]);
+        assert_eq!(page.diagnostics()[0].codepoints, [0x43]);
+    }
+
+    #[test]
+    fn unsupported_child_spans_keep_distinct_outer_object_owners() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts);
+        let content = unsupported_span_text();
+        let styled = StyledText::new(&content, TextContext::Placed, TextSettings::default());
+        for anchor in [20, 30, 20] {
+            planner
+                .for_object_source(anchor..anchor + 1)
+                .for_resolved_text("sans-serif")
+                .for_source(0..6)
+                .for_object_source(3..4)
+                .report_span_issues(&styled);
+        }
+        let owned = planner.scoped_diagnostics();
+        assert_eq!(owned.len(), 6);
+        for (issues, anchor) in owned.as_chunks::<3>().0.iter().zip([20, 30]) {
+            assert!(
+                issues
+                    .iter()
+                    .all(|issue| issue.owner == Some(SourceOwner::Object(anchor..anchor + 1)))
+            );
+        }
+        assert_eq!(planner.diagnostics().len(), 3);
+    }
+
+    #[test]
+    fn child_measurement_retains_outer_object_owner_and_unknown_issues_stay_explicit() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts);
+        let child = planner
+            .for_object_source(20..21)
+            .for_resolved_text("sans-serif")
+            .for_source(0..10)
+            .for_object_source(3..4);
+        child.measurement_failed("sans-serif");
+        planner.measurement_failed("sans-serif");
+        let owned = planner.scoped_diagnostics();
+        assert_eq!(owned.len(), 2);
+        assert_eq!(owned[0].owner, Some(SourceOwner::Object(20..21)));
+        assert_eq!(owned[1].owner, None);
+        assert_eq!(planner.diagnostics().len(), 1);
+    }
+
+    #[test]
+    fn local_measurement_failures_keep_child_ranges_and_isolate_identical_sources() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts).for_object_source(20..21);
+        let title = planner.local_measurement_scope();
+        let body = planner.local_measurement_scope();
+        for _ in 0..2 {
+            title.for_source(0..2).measurement_unsupported(
+                TextDiagnosticKind::UnsupportedMeasurementFont,
+                "title font",
+                "CD",
+            );
+        }
+        body.for_source(0..2).measurement_unsupported(
+            TextDiagnosticKind::UnsupportedMeasurementStyle,
+            "body font",
+            "CD",
+        );
+        let title_issues = title.local_measurement_issues(1..2);
+        assert_eq!(title_issues.len(), 1);
+        assert_eq!(title_issues[0].owner, Some(SourceOwner::Text(0..2)));
+        assert_eq!(title_issues[0].diagnostic.family, "title font");
+        assert_eq!(body.local_measurement_issues(0..1).len(), 1);
+        assert_eq!(
+            body.local_measurement_issues(0..1)[0].diagnostic.family,
+            "body font"
+        );
+        assert!(body.local_measurement_issues(2..3).is_empty());
+        assert!(
+            body.planning_scope()
+                .local_measurement_issues(0..2)
+                .is_empty()
+        );
+        assert!(
+            body.for_resolved_text("sans-serif")
+                .local_measurement_issues(0..2)
+                .is_empty()
+        );
+        assert_eq!(planner.scoped_diagnostics().len(), 2);
+        assert!(
+            planner
+                .scoped_diagnostics()
+                .iter()
+                .all(|issue| { issue.owner == Some(SourceOwner::Object(20..21)) })
+        );
+    }
+
+    #[test]
+    fn numeric_child_local_runs_keep_the_parent_marker_anchor() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts);
+        planner
+            .for_source(50..51)
+            .for_resolved_text("sans-serif")
+            .for_source(0..2)
+            .measurement_failed("sans-serif");
+        assert_eq!(
+            planner.scoped_diagnostics()[0].owner,
+            Some(SourceOwner::Text(50..51))
+        );
+    }
+
+    #[test]
+    fn planning_scope_keeps_context_and_isolates_all_output_registries() {
+        let fonts = FontBook::default();
+        let page = renderer(&fonts)
+            .with_point_marker_target(crate::render::PointMarkerTarget::Uwp)
+            .for_object_source(20..21)
+            .for_resolved_text("sans-serif");
+        let face = fonts.resolve("Roboto", false, false).unwrap();
+        page.output_style_with_face(&style("Roboto"), &face);
+        page.invalid_geometry("Roboto");
+        page.object_layout_unsupported(20);
+        let page_text_issues = page.scoped_diagnostics();
+        let page_object_issues = page.scoped_object_diagnostics();
+
+        let planner = page.planning_scope();
+        assert_eq!(planner.default_family, page.default_family);
+        assert_eq!(planner.settings.scale, page.settings.scale);
+        assert_eq!(
+            planner.settings.font_size_delta,
+            page.settings.font_size_delta
+        );
+        assert_eq!(planner.point_marker_target, page.point_marker_target);
+        assert_eq!(planner.source_owner, page.source_owner);
+        assert_eq!(planner.source_owner_locked, page.source_owner_locked);
+        assert!(std::ptr::eq(planner.fonts, page.fonts));
+        assert!(planner.faces.borrow().is_empty());
+        assert!(planner.scoped_diagnostics().is_empty());
+        assert!(planner.scoped_object_diagnostics().is_empty());
+
+        let mono = fonts.resolve("Roboto Mono", false, false).unwrap();
+        planner.output_style_with_face(&style("Roboto Mono"), &mono);
+        planner.for_source(0..2).measurement_failed("sans-serif");
+        planner.object_layout_unsupported(0);
+        assert_eq!(planner.faces.borrow().len(), 1);
+        assert_eq!(planner.faces.borrow()[0].id, mono.id);
+        assert_eq!(
+            planner.scoped_diagnostics()[0].owner,
+            Some(SourceOwner::Object(20..21))
+        );
+        assert_eq!(page.faces.borrow().len(), 1);
+        assert_eq!(page.faces.borrow()[0].id, face.id);
+        assert_eq!(page.scoped_diagnostics(), page_text_issues);
+        assert_eq!(page.scoped_object_diagnostics(), page_object_issues);
+    }
+
+    #[test]
+    fn repeated_child_anchors_keep_distinct_outer_object_owners() {
+        let fonts = FontBook::default();
+        let planner = renderer(&fonts);
+        let issue = ObjectDiagnostic {
+            anchor_utf16: 0,
+            kind: ObjectDiagnosticKind::MixedParagraphLayout,
+        };
+        planner
+            .for_object_source(5..6)
+            .report_object_issues(&[issue]);
+        planner
+            .for_object_source(20..21)
+            .for_source(0..10)
+            .report_object_issues(&[issue]);
+        let owned = planner.scoped_object_diagnostics();
+        assert_eq!(owned.len(), 2);
+        assert_eq!(planner.object_diagnostics(), [issue]);
+        assert_eq!(owned[0].owner, Some(SourceOwner::Object(5..6)));
+        assert_eq!(owned[1].owner, Some(SourceOwner::Object(20..21)));
+
+        let second_page = renderer(&fonts);
+        second_page.report_owned_object_issues(&owned[1..]);
+        assert_eq!(second_page.scoped_object_diagnostics(), owned[1..]);
+        assert_eq!(second_page.object_diagnostics(), [issue]);
+    }
+
+    #[test]
+    fn supplied_face_changes_family_without_resolving_or_losing_emphasis() {
+        let fonts = FontBook::new(Arc::new(Database::new()));
+        let renderer = renderer(&fonts);
+        let face = FontBook::default()
+            .resolve("Roboto Mono", false, false)
+            .unwrap();
+        let style = TextStyle {
+            font_size: 19.0,
+            family: Some("Unavailable".into()),
+            color: "#123456".into(),
+            source_color: Color {
+                r: 18,
+                g: 52,
+                b: 86,
+            },
+            bold: true,
+            italic: true,
+            underline: true,
+            strikethrough: true,
+            link_target: Some("https://example.com".into()),
+        };
+        let output = renderer.output_style_with_face(&style, &face);
+        assert_eq!(output.family.as_deref(), Some(face.svg_family().as_ref()));
+        assert_eq!(output.font_size, style.font_size);
+        assert_eq!(output.color, style.color);
+        assert_eq!(output.source_color, style.source_color);
+        assert!(output.bold && output.italic && output.underline && output.strikethrough);
+        assert_eq!(output.link_target, style.link_target);
+        assert!(renderer.diagnostics().is_empty());
+        assert_eq!(renderer.faces.borrow().len(), 1);
+        assert_eq!(renderer.faces.borrow()[0].id, face.id);
+    }
+
+    #[test]
+    fn geometry_diagnostics_merge_cached_and_used_spacing_issues() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        let issue = TextDiagnostic {
+            kind: TextDiagnosticKind::InvalidGeometry,
+            family: "Roboto".into(),
+            codepoints: Vec::new(),
+        };
+        renderer.report_geometry_issues(std::slice::from_ref(&issue));
+        renderer.report_geometry_issues(std::slice::from_ref(&issue));
+        renderer.invalid_geometry("Roboto");
+        assert_eq!(renderer.diagnostics(), [issue]);
+    }
+
+    #[test]
+    fn margin_blocks_skip_unused_line_spacing_validation() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        let spacing = Some(ParagraphLineSpacing {
+            kind: LineSpacingType::Percent,
+            value: f32::MAX,
+        });
+        let mut line = WrappedLine::unmeasured(0..1, 45.0);
+        line.objects.push(super::super::wrapping::PositionedObject {
+            x: 0.0,
+            visual_rank: 0,
+            prepared: None,
+            object: super::super::objects::MeasuredObject {
+                context: super::super::objects::ObjectMeasurementContext::Frame,
+                source: 0..1,
+                span_index: 0,
+                bounds: crate::BoundingBox {
+                    x_min: 0.0,
+                    y_min: 0.0,
+                    x_max: 100.0,
+                    y_max: 80.0,
+                },
+                width: 100.0,
+                advance: 100.0,
+                height: 80.0,
+                inline: false,
+                left_margin: 0.0,
+                top_margin: 10.0,
+                bottom_margin: 10.0,
+                minimum_first_page_height: None,
+            },
+        });
+        renderer.report_line_geometry(&line, spacing);
+        assert!(renderer.diagnostics().is_empty());
+        line.objects[0].object.inline = true;
+        renderer.report_line_geometry(&line, spacing);
+        assert_eq!(
+            renderer.diagnostics()[0].kind,
+            TextDiagnosticKind::InvalidGeometry
+        );
+    }
+
+    #[test]
+    fn positioning_and_coverage_diagnostics_merge_by_family_and_reason() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        renderer.glyph_positioning_unsupported("Roboto", "e\u{301}😀e");
+        renderer.glyph_positioning_unsupported("Roboto", "😀中");
+        renderer.glyph_positioning_unsupported("Roboto Mono", "e");
+        renderer.missing_glyphs("Roboto", "中😀中");
+        assert_eq!(
+            renderer.diagnostics(),
+            [
+                TextDiagnostic {
+                    kind: TextDiagnosticKind::UnsupportedGlyphPositioning,
+                    family: "Roboto".into(),
+                    codepoints: vec![0x65, 0x301, 0x4e2d, 0x1f600],
+                },
+                TextDiagnostic {
+                    kind: TextDiagnosticKind::UnsupportedGlyphPositioning,
+                    family: "Roboto Mono".into(),
+                    codepoints: vec![0x65],
+                },
+                TextDiagnostic {
+                    kind: TextDiagnosticKind::MissingGlyphs,
+                    family: "Roboto".into(),
+                    codepoints: vec![0x4e2d, 0x1f600],
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn native_configuration_preserves_available_unregistered_families() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        assert!(
+            renderer
+                .resolve_native(Some("Roboto Mono"), Direction::LeftToRight)
+                .is_none()
+        );
+        assert_eq!(
+            renderer
+                .resolve(&style("Roboto Mono"), TextContext::Placed)
+                .unwrap()
+                .family,
+            "Roboto Mono"
+        );
+        assert_eq!(
+            renderer
+                .resolve_native(Some("missing source family"), Direction::LeftToRight)
+                .unwrap()
+                .family,
+            "Roboto"
+        );
+        assert_eq!(
+            renderer
+                .diagnostics()
+                .iter()
+                .map(|issue| &issue.kind)
+                .collect::<Vec<_>>(),
+            [&TextDiagnosticKind::UnavailableFamily]
+        );
+    }
+
+    #[test]
+    fn saved_flow_italic_uses_native_regular_face_only_when_name_contract_accepts_it() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        let mut italic = style("Roboto");
+        italic.italic = true;
+
+        let (saved_face, saved_italic) = renderer
+            .resolve_face(&italic, TextContext::Flow, Direction::LeftToRight)
+            .unwrap();
+        assert_eq!(saved_face.style, fontdb::Style::Normal);
+        assert!(!saved_italic);
+        assert_eq!(
+            saved_face
+                .synthesis(fontdb::Weight::NORMAL, italic.italic)
+                .skew_x(),
+            -0.25
+        );
+
+        let (rtl_face, rtl_italic) = renderer
+            .resolve_face(&italic, TextContext::Flow, Direction::RightToLeft)
+            .unwrap();
+        assert_eq!(rtl_face.style, fontdb::Style::Normal);
+        assert!(!rtl_italic);
+
+        let (placed_face, placed_italic) = renderer
+            .resolve_face(&italic, TextContext::Placed, Direction::LeftToRight)
+            .unwrap();
+        assert_eq!(placed_face.style, fontdb::Style::Italic);
+        assert!(placed_italic);
+
+        let mut explicit_italic_name = italic.clone();
+        explicit_italic_name.family = Some("Roboto-Italic".into());
+        let (explicit_face, explicit_italic) = renderer
+            .resolve_face(
+                &explicit_italic_name,
+                TextContext::Flow,
+                Direction::LeftToRight,
+            )
+            .unwrap();
+        assert_eq!(explicit_face.style, fontdb::Style::Italic);
+        assert!(explicit_italic);
+
+        let mut other_family = italic;
+        other_family.family = Some("Roboto Mono".into());
+        let (other_face, other_italic) = renderer
+            .resolve_face(&other_family, TextContext::Flow, Direction::LeftToRight)
+            .unwrap();
+        assert_eq!(other_face.style, fontdb::Style::Italic);
+        assert!(other_italic);
+    }
+
+    #[test]
+    fn object_diagnostics_preserve_distinct_anchors_and_reasons() {
+        let fonts = FontBook::default();
+        let renderer = renderer(&fonts);
+        let issues = [
+            ObjectDiagnostic {
+                anchor_utf16: -1,
+                kind: ObjectDiagnosticKind::InvalidAnchor,
+            },
+            ObjectDiagnostic {
+                anchor_utf16: 3,
+                kind: ObjectDiagnosticKind::NonReplacementAnchor,
+            },
+            ObjectDiagnostic {
+                anchor_utf16: 3,
+                kind: ObjectDiagnosticKind::UnsupportedContent,
+            },
+        ];
+        renderer.report_object_issues(&issues);
+        renderer.report_object_issues(&issues);
+        renderer.object_layout_unsupported(3);
+        renderer.object_layout_unsupported(3);
+        renderer.object_layout_unsupported(4);
+        let expected = [
+            issues.to_vec(),
+            vec![
+                ObjectDiagnostic {
+                    anchor_utf16: 3,
+                    kind: ObjectDiagnosticKind::MixedParagraphLayout,
+                },
+                ObjectDiagnostic {
+                    anchor_utf16: 4,
+                    kind: ObjectDiagnosticKind::MixedParagraphLayout,
+                },
+            ],
+        ]
+        .concat();
+        assert_eq!(renderer.object_diagnostics(), expected);
+        assert!(renderer.diagnostics().is_empty());
+    }
+}

@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "fixtures": [
+    {
+      "id": "01-basic-formatting",
+      "sdocx": {
+        "path": "01-basic-formatting.sdocx",
+        "sha256": "86716d1ccc070d101272ff0760276b8e2d913bfcde88e34d3d64c5c51a1fd21b"
+      },
+      "reference_pdf": {
+        "path": "01-basic-formatting.pdf",
+        "sha256": "fb1437be8c1c172374b6c798cb65ace68e7ccffaad61db3807e4e8e0d2dcc2a1"
+      },
+      "expected": {
+        "stored_pages": 6,
+        "visible_pages": 5,
+        "title": "01-basic-test",
+        "body": {
+          "minimum_characters": 1600,
+          "required_text": [
+            "Final sentence: The quick brown fox jumps over the lazy dog."
+          ]
+        },
+        "flow": {
+          "text_sections": 6,
+          "hyperlinks": 6,
+          "tables": 1,
+          "code_blocks": 1,
+          "required_link_targets": [
+            "https://example.com/markdown-test"
+          ],
+          "required_table_text": [
+            "Alpha"
+          ],
+          "required_code_text": [
+            "Markdown code fence"
+          ]
+        },
+        "diagnostics": {}
+      }
+    },
+    {
+      "id": "02-shapes-and-dot-calibration",
+      "sdocx": {
+        "path": "02-shapes-and-dot-calibration.sdocx",
+        "sha256": "dd6580a0531cf1712ef6526f1b0d51c42adaeb0d11feacca5d23ba562239da82"
+      },
+      "reference_pdf": {
+        "path": "02-shapes-and-dot-calibration.pdf",
+        "sha256": "2971d07e8aeb8e63d6322d535d4db91311e54830482506828b67273f22e0e507"
+      },
+      "expected": {
+        "stored_pages": 2,
+        "visible_pages": 1,
+        "page_objects": {
+          "strokes": 77,
+          "shapes": 5,
+          "lines": 1,
+          "images": 0,
+          "text_boxes": 0
+        },
+        "diagnostics": {}
+      }
+    },
+    {
+      "id": "03-image-placement",
+      "expected": {
+        "stored_pages": 4,
+        "visible_pages": 3,
+        "flow": {
+          "text_sections": 4,
+          "images": 7,
+          "resolved_images": 7,
+          "tables": 0,
+          "code_blocks": 0
+        },
+        "page_objects": {
+          "images": 0
+        },
+        "diagnostics": {}
+      },
+      "sdocx": {
+        "path": "03-image-placement.sdocx",
+        "sha256": "8bfa5a5117ab2d11a28058dee0f8fc61fdeaeb40a454af971e3bfb9a0ab7af9a"
+      },
+      "reference_pdf": {
+        "path": "03-image-placement.pdf",
+        "sha256": "9d304575876ada6a32da5c4d8a5ffa6bc6c8f64aa4df1a4372d16daa2d60d854"
+      }
+    },
+    {
+      "id": "04-marker4-highlighter",
+      "sdocx": {
+        "path": "04-marker4-highlighter.sdocx",
+        "sha256": "8299abbf763e8e3e5af746815d13dfdf45443da27b0eb79192c328571905cdd2"
+      },
+      "reference_pdf": {
+        "path": "04-marker4-highlighter.pdf",
+        "sha256": "b951e506c2d5ebd0ae100ac5cf7179e2575e6fcc8dcdea59be822de4341f8a9a"
+      },
+      "expected": {
+        "stored_pages": 2,
+        "visible_pages": 1,
+        "page_objects": {
+          "strokes": 41
+        },
+        "diagnostics": {}
+      }
+    }
+  ]
+}

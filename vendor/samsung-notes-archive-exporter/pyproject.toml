@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "samsung-notes-archive-exporter"
+version = "0.1.0a1"
+description = "Guarded, folder-preserving local archive tooling for Samsung Notes exports"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Flukinity" }]
+dependencies = []
+
+[project.scripts]
+sn-archive-builder = "sn_archive_exporter.archive_builder:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

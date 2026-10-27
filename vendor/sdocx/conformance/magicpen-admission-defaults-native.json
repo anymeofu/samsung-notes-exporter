@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "post_return_vector_bytes_le_hex": "000000000000000000006040fcff1f400000000000006040fcff9f400000000000006040faffef400000000000006040000020410000000000006040ffff4741faffff3e00008040feff6f41faff7f3f00009040feff8b41fbffbf3f0000a040"
+    }
+  ],
+  "schema": "sdocx-magicpen-admission-defaults-native-v1",
+  "source_input": {
+    "curve_enabled": false,
+    "points_f32_u32_hex": [
+      "00000000",
+      "00000000",
+      "41200000",
+      "00000000",
+      "41a00000",
+      "40000000"
+    ],
+    "pressure_f32_u32_hex": [
+      "3e99999a",
+      "3f19999a",
+      "3f800000"
+    ],
+    "size": 10.0,
+    "stroke_type": 0,
+    "timestamps_i32": [
+      100,
+      110,
+      120
+    ],
+    "tool_type": 2
+  }
+}

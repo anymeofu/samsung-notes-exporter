@@ -1,0 +1,326 @@
+{
+  "capture_revision": "native-defaults-v1",
+  "original_sha256": "15fbdbe04d58d7b1cdb8e66bf725b62461ed12de842f3446e88ae1f9fe8967f3",
+  "schema": "sdocx-fountain-v14-saved-size-defaults-v1",
+  "source_input": {
+    "tool_type": 2
+  },
+  "cases": [
+    {
+      "case": "size_omitted_tol_omitted",
+      "style_saved_size_setter": "omit",
+      "source_model_get_pen_size_f32_bits": "00000000",
+      "style_initial_tolerance_setter": "omit",
+      "model_get_initial_tolerance_f32_bits": "00000000",
+      "native_pen_getsize_f32_bits": "cdcccc3e",
+      "adapter_public_pen_width_metadata_f32_bits": "0000c642",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "rtv_addpoint_entries": [
+        {
+          "float_words_s0_s5": [
+            "00000000",
+            "00000000",
+            "cdcccc3d",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        },
+        {
+          "float_words_s0_s5": [
+            "cdcc4c3e",
+            "00000000",
+            "cdcccc3d",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_zero_tol_omitted",
+      "style_saved_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "00000000",
+      "style_initial_tolerance_setter": "omit",
+      "model_get_initial_tolerance_f32_bits": "00000000",
+      "native_pen_getsize_f32_bits": "cdcccc3e",
+      "adapter_public_pen_width_metadata_f32_bits": "0000c642",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "rtv_addpoint_entries": [
+        {
+          "float_words_s0_s5": [
+            "00000000",
+            "00000000",
+            "cdcccc3d",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        },
+        {
+          "float_words_s0_s5": [
+            "cdcc4c3e",
+            "00000000",
+            "cdcccc3d",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_subminimum_tol_native",
+      "style_saved_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "cdcccc3d",
+      "style_initial_tolerance_setter": "set",
+      "model_get_initial_tolerance_f32_bits": "058b823e",
+      "native_pen_getsize_f32_bits": "cdcccc3e",
+      "adapter_public_pen_width_metadata_f32_bits": "0000c642",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "rtv_addpoint_entries": [
+        {
+          "float_words_s0_s5": [
+            "00000000",
+            "00000000",
+            "cdcccc3d",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_oversized_tol_omitted",
+      "style_saved_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "00006144",
+      "style_initial_tolerance_setter": "omit",
+      "model_get_initial_tolerance_f32_bits": "00000000",
+      "native_pen_getsize_f32_bits": "00004844",
+      "adapter_public_pen_width_metadata_f32_bits": "0000c642",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "rtv_addpoint_entries": [
+        {
+          "float_words_s0_s5": [
+            "00000000",
+            "00000000",
+            "00002843",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        },
+        {
+          "float_words_s0_s5": [
+            "cdcc4c3e",
+            "00000000",
+            "00002843",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_corpus_numeric_width_tol_omitted",
+      "style_saved_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "1006be40",
+      "style_initial_tolerance_setter": "omit",
+      "model_get_initial_tolerance_f32_bits": "00000000",
+      "native_pen_getsize_f32_bits": "1006be40",
+      "adapter_public_pen_width_metadata_f32_bits": "1006be40",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "rtv_addpoint_entries": [
+        {
+          "float_words_s0_s5": [
+            "00000000",
+            "00000000",
+            "b29e9f3f",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        },
+        {
+          "float_words_s0_s5": [
+            "cdcc4c3e",
+            "00000000",
+            "b29e9f3f",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_corpus_style_pair",
+      "style_saved_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "1006be40",
+      "style_initial_tolerance_setter": "set",
+      "model_get_initial_tolerance_f32_bits": "058b823e",
+      "native_pen_getsize_f32_bits": "1006be40",
+      "adapter_public_pen_width_metadata_f32_bits": "1006be40",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "rtv_addpoint_entries": [
+        {
+          "float_words_s0_s5": [
+            "00000000",
+            "00000000",
+            "1006be3f",
+            "00000000",
+            "0000803f",
+            "0000803f"
+          ]
+        }
+      ]
+    }
+  ]
+}

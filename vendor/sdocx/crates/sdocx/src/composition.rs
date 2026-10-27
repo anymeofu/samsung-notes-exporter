@@ -1,0 +1,265 @@
+use crate::{ObjectRenderLayer, PageObject, PageObjectContent};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RenderPass {
+    Base,
+    Top,
+    Masking,
+}
+
+/// A visible root object that ends the current Standard PDF bitmap batch.
+/// The native exporter flushes before writing images and text objects.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum StandardBatchBoundary {
+    Image,
+    TextBox,
+}
+
+impl PageObject {
+    /// Classify only the original root object. Nested container children are
+    /// drawn into their parent's batch and do not trigger exporter flushes.
+    pub(crate) fn standard_batch_boundary(&self) -> Option<StandardBatchBoundary> {
+        match &self.content {
+            PageObjectContent::Element(element) => match element {
+                crate::PageElement::Image { .. } | crate::PageElement::PlacedImage(_) => {
+                    Some(StandardBatchBoundary::Image)
+                }
+                crate::PageElement::TextBox(_) => Some(StandardBatchBoundary::TextBox),
+                crate::PageElement::FormulaImage(_)
+                | crate::PageElement::Shape(_)
+                | crate::PageElement::Line(_) => None,
+            },
+            PageObjectContent::Stroke(_)
+            | PageObjectContent::Container(_)
+            | PageObjectContent::Descendant(_) => None,
+        }
+    }
+
+    pub(crate) fn render_pass(&self) -> Option<RenderPass> {
+        let stroke = match self.content.leaf() {
+            PageObjectContent::Stroke(stroke) => Some(stroke),
+            _ => None,
+        };
+        if stroke.is_some_and(|stroke| {
+            stroke
+                .rendering
+                .as_ref()
+                .is_some_and(|rendering| rendering.properties.top_layer_pen)
+        }) {
+            return Some(RenderPass::Top);
+        }
+        match self.render_layer {
+            ObjectRenderLayer::Base => Some(RenderPass::Base),
+            ObjectRenderLayer::Top if stroke.is_some() => Some(RenderPass::Top),
+            ObjectRenderLayer::Masking => Some(RenderPass::Masking),
+            ObjectRenderLayer::Top
+            | ObjectRenderLayer::Other(_)
+            | ObjectRenderLayer::Unresolved => None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{BoundingBox, PageElement, Stroke, StrokeProperties, StrokeRendering, StrokeStyle};
+
+    fn stroke(top_layer_pen: bool) -> PageObjectContent {
+        PageObjectContent::Stroke(Stroke {
+            rendering: Some(StrokeRendering {
+                metadata: None,
+                pen_name: None,
+                advanced_settings: None,
+                tool_type_raw: 2,
+                properties: StrokeProperties {
+                    compressed: false,
+                    replay_only: false,
+                    stylus_channels: false,
+                    eraser: false,
+                    fixed_width: false,
+                    millisecond_timestamps: false,
+                    top_layer_pen,
+                    alpha_lock: false,
+                    binary_added: true,
+                    generated: false,
+                    fixed_opacity: false,
+                    rainbow_effect: false,
+                    straighten: false,
+                    reveal_mode: false,
+                },
+                style: StrokeStyle::default(),
+            }),
+            bbox: BoundingBox::default(),
+            points: Vec::new(),
+            pressures: Vec::new(),
+            timestamps: Vec::new(),
+            tilts: Vec::new(),
+            orientations: Vec::new(),
+            color: None,
+            pen_width: 1.0,
+        })
+    }
+
+    fn object(render_layer: ObjectRenderLayer, content: PageObjectContent) -> PageObject {
+        PageObject {
+            render_layer,
+            source_offset: None,
+            content,
+        }
+    }
+
+    #[test]
+    fn native_root_selection_excludes_non_strokes_from_the_top_pass() {
+        for content in [
+            stroke(false),
+            PageObjectContent::Element(PageElement::Image {
+                bbox: BoundingBox::default(),
+                media_index: 0,
+            }),
+            PageObjectContent::Container(Vec::new()),
+        ] {
+            let expected_top =
+                matches!(content, PageObjectContent::Stroke(_)).then_some(RenderPass::Top);
+            for (layer, expected) in [
+                (ObjectRenderLayer::Base, Some(RenderPass::Base)),
+                (ObjectRenderLayer::Top, expected_top),
+                (ObjectRenderLayer::Masking, Some(RenderPass::Masking)),
+                (ObjectRenderLayer::Other(-1), None),
+                (ObjectRenderLayer::Other(3), None),
+                (ObjectRenderLayer::Other(32), None),
+                (ObjectRenderLayer::Unresolved, None),
+            ] {
+                assert_eq!(object(layer, content.clone()).render_pass(), expected);
+            }
+        }
+    }
+
+    #[test]
+    fn top_layer_pen_overrides_conflicting_and_unknown_render_ids() {
+        for layer in [
+            ObjectRenderLayer::Base,
+            ObjectRenderLayer::Top,
+            ObjectRenderLayer::Masking,
+            ObjectRenderLayer::Other(-1),
+            ObjectRenderLayer::Other(3),
+            ObjectRenderLayer::Unresolved,
+        ] {
+            assert_eq!(
+                object(layer, stroke(true)).render_pass(),
+                Some(RenderPass::Top)
+            );
+        }
+    }
+
+    #[test]
+    fn container_selection_does_not_reclassify_its_children() {
+        let children = vec![object(ObjectRenderLayer::Masking, stroke(true))];
+        for layer in [ObjectRenderLayer::Base, ObjectRenderLayer::Masking] {
+            let container = object(layer, PageObjectContent::Container(children.clone()));
+            let expected = if layer == ObjectRenderLayer::Base {
+                RenderPass::Base
+            } else {
+                RenderPass::Masking
+            };
+            assert_eq!(container.render_pass(), Some(expected));
+        }
+    }
+
+    #[test]
+    fn standard_batch_boundaries_preserve_root_object_type() {
+        let image = object(
+            ObjectRenderLayer::Base,
+            PageObjectContent::Element(PageElement::Image {
+                bbox: BoundingBox::default(),
+                media_index: 0,
+            }),
+        );
+        let placed_image = object(
+            ObjectRenderLayer::Base,
+            PageObjectContent::Element(PageElement::PlacedImage(crate::PlacedImage {
+                bbox: BoundingBox::default(),
+                rotation_degrees: None,
+                media_id: None,
+                media_index: None,
+                crop_rect: None,
+                original_bbox: None,
+                border_media_id: None,
+                original_media_id: None,
+                fill_effect_transparency: 0.0,
+            })),
+        );
+        let formula_image = object(
+            ObjectRenderLayer::Base,
+            PageObjectContent::Element(PageElement::FormulaImage(crate::PlacedImage {
+                bbox: BoundingBox::default(),
+                rotation_degrees: None,
+                media_id: None,
+                media_index: None,
+                crop_rect: None,
+                original_bbox: None,
+                border_media_id: None,
+                original_media_id: None,
+                fill_effect_transparency: 0.0,
+            })),
+        );
+        let text = object(
+            ObjectRenderLayer::Base,
+            PageObjectContent::Element(PageElement::TextBox(crate::RichTextBox {
+                text_area_type: None,
+                bbox: BoundingBox::default(),
+                rotation_degrees: None,
+                text: String::new(),
+                color: None,
+                highlight_color: None,
+                underline: false,
+                font_size: None,
+                runs: Vec::new(),
+                spans: Vec::new(),
+                paragraphs: Vec::new(),
+                object_spans: Vec::new(),
+                text_sections: Vec::new(),
+                margins: None,
+                gravity: None,
+            })),
+        );
+
+        assert_eq!(
+            image.standard_batch_boundary(),
+            Some(StandardBatchBoundary::Image)
+        );
+        assert_eq!(
+            placed_image.standard_batch_boundary(),
+            Some(StandardBatchBoundary::Image)
+        );
+        assert_eq!(formula_image.standard_batch_boundary(), None);
+        assert_eq!(
+            text.standard_batch_boundary(),
+            Some(StandardBatchBoundary::TextBox)
+        );
+        let PageObjectContent::Element(element) = &formula_image.content else {
+            unreachable!();
+        };
+        assert_eq!(element.object_type(), crate::ObjectType::Formula);
+        let nested_image = object(
+            ObjectRenderLayer::Base,
+            PageObjectContent::Container(vec![image]),
+        );
+        assert_eq!(nested_image.standard_batch_boundary(), None);
+    }
+
+    #[test]
+    fn stroke_without_native_rendering_uses_its_common_render_layer() {
+        let PageObjectContent::Stroke(mut stroke) = stroke(false) else {
+            unreachable!();
+        };
+        stroke.rendering = None;
+        assert_eq!(
+            PageObject::from(stroke.clone()).render_pass(),
+            Some(RenderPass::Base)
+        );
+        assert_eq!(
+            object(ObjectRenderLayer::Top, PageObjectContent::Stroke(stroke)).render_pass(),
+            Some(RenderPass::Top)
+        );
+    }
+}

@@ -1,0 +1,22 @@
+{
+  "notes": [
+    {
+      "id": "sample-note-001",
+      "title": "Sample Root Folder Note",
+      "source": "Notes_260101_120000.sdocx",
+      "folder_path": "Sample Folder"
+    },
+    {
+      "id": "sample-note-002",
+      "title": "Sample Nested Folder Note",
+      "source": "Notes_260101_121500.sdocx",
+      "folder_path": "Sample Folder/Nested Folder"
+    },
+    {
+      "id": "sample-note-003",
+      "title": "Duplicate Filename Example",
+      "source": "Notes_260101_121500.sdocx",
+      "folder_path": "Sample Folder/Nested Folder"
+    }
+  ]
+}

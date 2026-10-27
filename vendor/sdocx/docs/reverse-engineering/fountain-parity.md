@@ -1,0 +1,458 @@
+# Fountain pen vector parity
+
+The supported saved V14 fountain profile uses Rust-generated vector
+shading in SVG previews and PDF exports. V14/V16 positions and widths retain
+the native reconstruction; no global width adjustment is applied.
+
+Saved V14 (`14;`) and V16 (`18;0;100;`) profiles support input modes 1, 2,
+and 3, fixed width, and saved stroke opacity. Their geometry is verified against
+the native library. Bounded V14/V16 witnesses render in Chromium and Firefox
+with vector-only PDF export. Appearance is not identical across SVG consumers.
+Native pixel identity is not established: the measured partial-alpha differences
+below remain despite matching geometry.
+
+## Geometry and appearance
+
+V14 retains SmPath's direction vectors, including its small-vector
+normalization threshold, zero-vector substitution, and final stamp's retained
+direction. Native fixtures compare positions, radii, directions and
+original-sample boundaries. Pressure, tilt and movement continue through the
+existing native saved-stroke reconstruction.
+
+The native directional gradient is flat over the central half and falls
+linearly to 0.07 at its tangent-aligned ends. `render/fountain.rs` expresses
+that function as an SVG linear gradient,
+transformed with each stamp's native radius and direction.
+
+Opaque grayscale stamps blend with Lighten over black to implement maximum
+coverage instead of accumulating opacity where stamps overlap. An SVG colorizer
+filter maps coverage to stroke color; group opacity applies once to the result.
+PDF export lowers that filter to a vector luminosity mask and preserves gradient
+shadings and Lighten blending. The generated fountain output contains no image
+elements or bitmap strokes.
+
+The SVG/PDF consumer owns edge antialiasing. V14 retains the directional field
+without the native device-pixel fringe; default V16 expresses radial coverage at
+canonical unit inverse scale. Small-field PDF sampling, zoom-dependent coverage
+and native device pixels remain unverified.
+
+The [thin-stamp oracle](https://github.com/twangodev/sdocx/blob/a24179384fbe043a8b5f003ee0c7bebeb394d106/conformance/fountain-v14-fringe-native.json)
+separates fresh native paint at each scale from zooming an existing export.
+For radius 0.1, scales 1×/2×/4× produce document extents 1/0.5/0.25
+and width-alpha factors 0.2/0.4/0.8: outer extent stays one device pixel while
+strength changes. A fixed export field does not recompute these parameters
+when zoomed. Fringe comparisons must name their target inverse scale and
+distinguish fresh scale-specific paint from viewer zoom.
+
+The [V14 Drawing defaults](https://github.com/twangodev/sdocx/blob/a24179384fbe043a8b5f003ee0c7bebeb394d106/conformance/fountain-v14-defaults-native.json)
+use saved style size, default it to zero before the native 0.4–800 clamp, and
+default omitted tolerance to zero. Six cases match all prepared geometry lanes.
+After this correction, all 7,103 corpus V14 strokes retain identical geometry
+(235,343 dots). Paired vector exports across Chromium, Firefox, MuPDF and PDFium
+improve most changed controls, but minimum-width dots can still disappear at 1×;
+the omitted-size/public-width-0.8 control has mixed raster results. Matching
+native geometry does not close the missing V14 fringe paint.
+
+## Explicit V16 output scale
+
+`FountainV16OutputScaleProfile` regenerates ordinary, non-rainbow V16 samples
+for a caller-specified uniform scale. Native `GLV16::getInverseScale` (`0x77e58`)
+sets float32 spacing to `0.82 * min(inverseX, inverseY)`; `drawLine` (`0x77fd4`)
+uses it for sampling. The caller applies the same scale and translation to the
+output. Missing, invalid or over-budget profiles preserve canonical rendering.
+
+A controlled size-1 fork of the 204-point saved source matches native centers,
+radii and all seven upload lanes at these scales. Black host-Mesa controls use
+saved alpha 128 and 255; resvg comparisons use the captured projection and
+viewport, without alignment or resizing. Affected-pixel alpha MAE in bytes is:
+
+| Scale | Native/Rust stamps | Alpha 128: canonical → profile | Alpha 255: canonical → profile |
+| --- | --- | --- | --- |
+| 0.5 | 39 | 12.16 → 1.07 | 23.02 → 1.97 |
+| 1 | 76 | unchanged | unchanged |
+| 2 | 151 | 25.64 → 3.63 | 44.19 → 6.01 |
+
+MAE uses each native/render support union; profile pixel support matches native
+in all six cases, and unit-scale SVG bytes are unchanged. The compact native
+geometry fixture runs in normal Rust tests; framebuffer comparisons remain
+opt-in. The V16 rainbow-flag-ignored route remains canonical. Device zoom policy,
+archive-native thin metadata and native PDF appearance remain unverified.
+
+## Validation on 2026-09-25
+
+Chromium checks observed identical completed replay pixels and preserved SVG
+nodes across seeks, with zero replay canvases, images or filters. A local probe
+measured a 16.6 ms median frame interval (17.4 ms p95) and seeks of 182.6 ms
+median and 239.3 ms maximum. These are fixture-specific host measurements.
+
+- Hash-pinned native fixtures contain 68 V14 cases / 4,062 stamps with zero
+  measured error, and 187 V16 cases / 12,331 stamps with maximum error
+  0.000000954 and identical sample mapping.
+- Regressions check gradient orientation and interior maximum blending with
+  repeated stamps, including stroke opacity. PDF object checks require native
+  shadings and Lighten and reject image XObjects.
+- The real SVG is 10,739,219 bytes. The PDF is 42,045,542 bytes and contains zero
+  image XObjects across all PDF objects, including mask resources.
+- A local Chromium decode-and-draw probe measured about 1.11 seconds for the
+  shaded SVG versus 0.16 seconds for the previous opaque-path SVG. This is one
+  cold probe, not an interaction benchmark. Vector shading increases document
+  complexity and PDF size; it is not flattened to reduce either.
+
+Test commands and optional hash-pinned native geometry oracles are in the
+[conformance guide](../../conformance/README.md#native-geometry-checks).
+
+## Scope limits
+
+Unsupported saved settings remain explicitly approximate, including
+input modes outside 1–3, other historical profiles, and effects. Saved redraw
+validation does not establish live prediction or temporary-tip parity.
+
+## Real-document geometry audit
+
+All 7,282 fountain strokes in the seven available SDOCX fixtures select
+reconstructed V14 or V16 geometry. Native comparison covers 242,800 stamps
+with identical sample boundaries and zero measured stamp-attribute error.
+V14 comparisons include both tangent components as well as centers and radii.
+
+| Document | V14 strokes / stamps | V16 strokes / stamps |
+| --- | ---: | ---: |
+| `quiz.sdocx` | 3,222 / 129,727 | — |
+| `cs61bl_su22.sdocx` | 1,112 / 48,903 | 73 / 1,954 |
+| `handwritten.sdocx` | 2,769 / 56,713 | — |
+| `02-shapes-and-dot-calibration.sdocx` | — | 77 / 3,777 |
+| `04-marker4-highlighter.sdocx` | — | 29 / 1,726 |
+
+The other two fixtures contain no fountain strokes. Local input SHA-256:
+
+```text
+quiz.sdocx           38fd0ef0729d3a113e1c14bcc10557dcc263e5a3582fd80a3cf99c8c2c4ad40a
+cs61bl_su22.sdocx    fa2d3ba44023871c6a53436e810772f7b4f45b190dd28e05c172886b8f7e40a0
+handwritten.sdocx   77e3997a066afa0333d0f5020bb428efffeb783c741bc956ae596292e2d5cda3
+```
+
+The V14 `--prepared` command compares every supplied stamp and sample boundary
+against native output and fails on a mismatch. A deliberately modified tangent
+was rejected; the three real V14 documents passed the comparison.
+Both oracles exclude other pen profiles in mixed documents and reject
+unequal prepared attribute lengths before combining their channels.
+These results prove geometry agreement for the listed inputs, not complete
+native appearance or coverage of absent historical settings.
+
+An input-channel audit checked both profiles with tools 1–3: absent optional
+tilt matched an explicit zero-tilt channel, but a null pressure array caused
+native reads at addresses zero or 0x50. The emulator leaves the null page
+unmapped; null-pressure probes fail with unmapped-memory errors. Rust retains
+its requirement for a complete pressure channel even when the tool's width
+calculation ignores pressure values.
+
+The five-document comparison leaves the null page unmapped; its geometry
+results do not depend on accepting null-page reads.
+
+## Vector replay
+
+The debugger uses the same Rust SVG renderer as the completed page. Replay
+adds stroke indices and prepared-point boundaries without changing geometry or
+paint. The UI reveals stamp groups or path prefixes using `sample_ends`; it
+does not calculate pen shapes, shading, or opacity. Fountain stamps remain in
+their original luminance mask, so partial strokes retain directional shading
+and maximum blending. Ordinary ink, page elements, and the Darken highlighter
+batch keep the renderer's paint order.
+
+A page/color-mode change loads a new SVG; timeline changes retain the same DOM
+and reveal existing vectors. Replay allocates no Canvas or ink tiles. This is
+saved-geometry replay, not native live prediction or temporary tips.
+
+Rust regressions compare annotated and normal page appearance in both color
+modes. Browser checks cover backward seeks, completed-page appearance, zoom,
+scrolling, and resource cleanup. On the dense handwriting fixture, completed
+replay matched the normal page's RGBA output at 462 pixels wide. A local
+Chromium playback probe measured a 16.7 ms median frame interval and 17.3 ms
+p95 with 143,886 SVG nodes and zero replay canvases. These measurements cover
+this fixture and host, not every document or device. Large forward/backward
+seeks in that probe took 179.5 ms median and 229 ms maximum. Normal/replay
+equality alone does not establish native appearance parity: both sides can
+render incorrectly in the same way. The independent visibility and overlap
+checks below isolate Firefox failures.
+
+Firefox currently renders a production V14 stroke completely transparent when
+the SVG is loaded as an image. Inline replay also shows striped stroke interiors.
+The isolated image failure persists with one stamp, full-page mask bounds,
+explicit mask content units, and different grouping. Removing Lighten makes ink
+visible but changes native maximum-coverage semantics, so it is not a parity fix.
+The failure depends on placement in the output viewport: fitting the root
+viewBox tightly to the same stroke paints visible ink (alpha sum 212,951 at
+128 by 128), while retaining page coordinates paints none. Translating the
+whole diagnostic toward the viewport origin also restores ink. Rewriting the
+mask and stamps into local coordinates inside a translated group or nested SVG
+does not resolve it. Nonzero coverage alone does not establish correct shading.
+The browser regression `V14 fountain SVG retains visible ink when loaded as an
+image` isolates a real production stroke, checks nonzero alpha coverage, and
+attaches its SVG. It records Firefox as an expected failure until corrected;
+the existing replay comparisons alone must not be cited as Firefox fidelity.
+
+The rejected workarounds, analytical blend probe, and unshipped geometric
+partition prototypes are recorded separately in
+[fountain-vector-experiments.md](fountain-vector-experiments.md).
+
+## Saved V14 fixed width
+
+V14 redraw supports the saved fixed-width property for input modes 1, 2 and 3. Native
+`GLV14::drawPoint` at `0x731e0..0x73234` overrides each radius with half the
+saved fixed width and applies the same float32 0.1 minimum. Centers, tangent
+directions and sample boundaries still come from the normal redraw. Rust
+applies the override before preparing bounds and vector shading.
+
+Twelve stylus fixed-width cases in `conformance/fountain-v14.json` contain 644 stamps
+captured from the complete hash-verified native redraw. They cover single
+taps, stationary input, short jitter, turns, reversals, pressure and tilt
+changes, closed loops, and widths below/at/above the radius floor. The oracle
+preserves an explicit zero fixed width; it no longer substitutes pen size
+for zero. Missing fixed widths remain unsupported rather than guessed.
+
+The shape-specific quarter-width branch remains excluded.
+
+## Saved V16 fixed width
+
+V16 stylus reconstruction supports saved fixed width. Native
+`GLV16::drawPoint` at `0x79018..0x79048` selects half the saved width and
+applies the float32 0.1 radius floor. Rust applies that override to the
+completed two-pass geometry, preserving native sampling and width history.
+The shape-specific quarter-width branch remains excluded.
+
+The V16 oracle executes native `redraw(ObjectStroke)`, `drawLine`, `endPen`
+and `drawPoint`, including fixed-width selection, the radius floor and the
+fill-mode check. Its collector intercepts the final `RTV5::AddPoint`
+submission. Object initialization and the outer fill/smooth/replay wrapper
+remain host reconstructed. ObjectStroke channels and endpoint MotionEvent
+access are supplied by the host.
+
+Thirty-one fixed-width cases capture 1,874 native stamps across the captured
+trajectories, including pressure, tilt, stationary samples and reversals.
+Single-point cases also cover widths 0, 0.1, 0.2, 0.3, 3 and 1024. Native
+fixed and variable runs produce identical centers and sample boundaries.
+The V16 stylus subset has 57 cases and 3,743 stamps; Rust checks their
+positions, radii and sample boundaries.
+
+## Saved V14 input modes
+
+V14 saved input modes 1 and 3 use native reconstruction, alongside stylus
+mode 2. `GLV14::redraw` at `0x72d9c..0x72df0` and `0x72e3c..0x72eec`
+substitutes pressure 0.5 and tilt 0.8 radians for modes 1 and 3. The tilt is
+processed by the same native degree conversion and clamp as stylus input.
+`0x72cec..0x72d04` selects a short-movement threshold of 50 for mode 1 and
+5 for modes 2 and 3. Midpoint sampling, alternating short-move filtering,
+tangent directions, width limiting and endpoint handling remain shared.
+
+Thirty input-mode cases contain 1,482 stamps, including fixed-width
+input, pressure/tilt changes, taps, jitter, turns, loops, and movements just
+below/at/above both thresholds. Native reruns with changed pressure and tilt
+arrays produced identical geometry for the first 24 cases. The complete V14
+fixture contains 68 cases and 4,062 stamps; the Rust geometry regression
+checks all five stamp attributes and sample boundaries against those captures.
+
+Complete saved pressure and timestamp arrays are still required: native redraw
+reads the final pressure while constructing its endpoint event even when the
+width calculation substitutes a constant. This does not establish parity for
+other input codes, shape redraw, live event processing or temporary tips.
+
+## Saved V16 input modes
+
+V16 reconstructs saved input modes 1 and 3 alongside stylus mode 2.
+Native redraw at `0x78ba4..0x78bcc` and `0x78c68..0x78cd0` substitutes
+pressure 0.5 and tilt 0.8 radians for these modes. `0x78aec..0x78b04`
+sets the short-movement threshold to 50 for mode 1 and 5 otherwise.
+
+`WidthSmoothManager::resetSmoothing` selects parameters (2, 2) for
+non-stylus input. The incremental fill logic finalizes each new entry
+immediately, so there is no forward averaging; the 0.15 smoothing step
+applies after index 3. Stylus reconstruction retains its existing averaging
+and later smoothing start. Native width-history captures verify this
+distinction, rather than inferring it from the parameter names.
+
+Zero distance from the previous accepted sample can still leave a nonempty
+midpoint curve after an alternating short move. Native drawLine consumes
+that curve, resolving the undefined direction ratio through its width
+floors. Rust follows that behavior.
+
+The V16 fixture contains 187 cases and 12,331 stamps. The 120 input-mode
+cases cover variable and fixed widths and both movement thresholds, including
+values immediately below, at and above each threshold. For the first 114,
+changing all saved pressure and tilt values leaves native geometry unchanged.
+Every fixture checks native centers, radii and saved-sample boundaries.
+The oracle executes the native saved redraw loop for both passes;
+the outer two-pass setup remains host supplied.
+
+## Bounded negative saved pressure
+
+Compressed pressure deltas can decode slightly below zero. Native V16 processes
+these values through its width and radius floors. Both Rust profiles accept
+values down to -1; nonfinite values and pressures below -1 fall back.
+
+Ten native V16 cases cover -1/4096, -1, mixed positive/negative
+pressure, two pen sizes, single-point taps, and input modes 1 and 3. Their 1,360
+stamps and sample boundaries match the Rust geometry. The real V16 corpus
+contains no negative-pressure strokes, so this result is synthetic coverage.
+
+## Saved fountain opacity
+
+V14 and V16 preserve saved ARGB opacity while using native geometry.
+`PenDrawableRT::SetPenSettingData` at `0x4a4b8..0x4a500` converts the
+ARGB channels to float32 RGBA by dividing by 255. Direct execution verified
+alpha values 0, 1, 64, 128, 254 and 255. The saved-redraw composite applies
+the resulting alpha once after maximum stamp coverage, as traced in
+[draw-time compositing](fountain-rasterization.md#draw-time-compositing).
+
+Shared Rust preparation retains reconstructed stamps and carries the converted
+alpha into SVG, PDF and replay paint. Both profiles apply it once after maximum
+stamp coverage. Regressions cover the six alpha values, overlapping stamps and
+fully transparent strokes, without raster images. V14 uses a luminance mask;
+V16 uses an isolated grayscale field and one sRGB color matrix. This does not
+add erasing or rainbow effects.
+
+V16 now expresses RTV5 radial coverage at canonical unit inverse scale using
+vector gradients and maximum blending. Scalar coverage and resvg overlap tests
+pass; production SVG witnesses render in Chromium 153 and Firefox 155, and PDF
+lowers the colorizer to vector radial shadings and a luminosity mask without
+image XObjects. This does not establish native pixel parity: PDF raster samples
+differ from SVG, and device-dependent scale compensation remains unimplemented. The paired measurements below predate this coverage change.
+
+## V16 native PDF appearance
+
+The paired `02-shapes-and-dot-calibration` and `04-marker4-highlighter`
+fixtures use saved fountain settings `18;0;100;` and stylus input. Their
+source and PDF hashes were checked against `conformance/corpus.json`.
+The native saved-redraw oracle matches all 77 calibration
+strokes (3,777 stamps) and 29 marker-test fountain strokes (1,726 stamps)
+with identical sample boundaries and zero measured position/radius error.
+This comparison does not validate V14 appearance: no paired native PDF is
+available for the V14 handwriting fixture.
+
+The PDFs embed ink alpha masks at one pixel per source document unit. On
+page 1, calibration soft mask xref 6 is 933 by 778 pixels with source origin
+(79, 125); marker soft mask xref 13 is 565 by 219 pixels with origin
+(86, 151). The calibration mask also contains shapes and a line. Comparing
+that entire mask against fountain-only vectors gives a misleading result.
+The marker mask contains the 29 fountain strokes separately from highlighters.
+
+The candidate was the production Rust SVG with other page content removed,
+cropped to those bounds and rendered by Chromium at the native mask size.
+For calibration, measurements use the union of the 77 prepared fountain
+bounds, padded by three pixels. Visual inspection confirmed that these
+regions exclude the shape outlines. The label and dot-calibration groups
+are separated at source y=600.
+
+| Region | Candidate alpha coverage versus native | Ink intersection over union |
+| --- | ---: | ---: |
+| Calibration labels | -1.879% | 97.093% |
+| Calibration dots and writing | -1.348% | 97.801% |
+| Marker-test fountain writing | +0.071% | 98.203% |
+
+Coverage is the summed alpha difference divided by native summed alpha;
+intersection over union uses alpha greater than 32. All differing pixels
+in these regions have partial alpha in at least one image. There are no
+fully opaque native pixels that are transparent in the candidate, or the
+reverse. The twelve calibration dots individually have 1.15–2.45% less
+summed coverage in the candidate.
+
+These observations locate the residual discrepancy at edges; they do not
+prove its cause is solely antialiasing, or establish identical appearance
+at other scales. They provide no basis for a global width reduction.
+The implementation remains vector geometry, with edge sampling performed
+by the SVG consumer. Native PDF bitmap masks are comparison evidence only.
+
+## V14 embedded native cache appearance
+
+`handwritten.sdocx` contains `media/0@page_0000000.spi`, a native page cache
+with SHA-256 `64327fdf9a1940d1fdd7bfa7ec48c1ddbb2bb262d2653ff7de6f16b1555f660c`.
+The hash-verified Samsung Base library decoded its 20-byte header and
+453,763-byte data block into a transparent 1848 × 3919 image. Both input
+blocks were fully consumed and the native output conversion succeeded.
+
+The reference extraction used 512 MiB of mapped heap and a 300-million-instruction
+allowance per call. Native codec code and tables were unchanged.
+
+The source page is 1848 × 7838, but all its prepared ink lies within the
+cache's shorter height. Chromium rendered the production SVG with its paper
+rectangle removed at one pixel per document unit, cropped to the cache size.
+Native and candidate ink bounds at alpha >32 both equal
+(81, 84)–(1824, 2477). Inspection of the first 700 × 700 region confirms
+matching handwriting and alignment.
+
+The vector candidate has 0.862% more summed alpha coverage, 94.993% ink
+intersection over union at alpha >32, and 8.118% absolute alpha difference
+normalized by native summed alpha. Every differing pixel has partial alpha
+in at least one image; there are no opaque-to-transparent pixel mismatches
+in either direction. This supplies a native V14 appearance reference despite
+the missing paired PDF. It does not establish why every partial-alpha value
+differs, validate appearance at other scales, or justify a global width
+adjustment. Cache freshness is supported by matching content and bounds,
+not by a separate export timestamp.
+
+### Controlled shading and edge checks
+
+Making every gradient stop white, with identical circles and blend groups,
+increases whole-page alpha coverage error from +0.862% to +6.383% and
+absolute alpha difference from 8.118% to 8.598%. Its thresholded ink overlap
+is higher (96.622%), illustrating why threshold overlap alone is insufficient
+to assess shading. This control does not support removing directional shading.
+
+The first 700 × 700 source-unit crop was also rendered at larger pixel sizes
+and averaged in non-overlapping pixel blocks back to native-cache resolution:
+
+| Sampling scale | Summed alpha difference | Absolute alpha error | Ink overlap |
+| --- | ---: | ---: | ---: |
+| 1× | +2.864% | 6.987% | 96.652% |
+| 2×, averaged down | +0.890% | 3.940% | 97.985% |
+| 4×, averaged down | -1.187% | 3.134% | 98.078% |
+
+The vector geometry and gradients are identical in all three cases. The
+changing coverage and smaller error establish a material sampling effect,
+but do not fully explain the residual or prescribe an export scale. These
+are diagnostic renders only; production remains vector output. Only one
+of the 56,713 native V14 stamps is an exact repeated center/radius/direction
+within its stroke, so duplicate removal cannot explain the whole-page gap.
+
+### Explicit V14 output scale
+
+`FountainV14OutputScaleProfile` adds the native half-pixel fringe and
+minimum-width alpha at a caller-declared uniform output scale. Each stamp's
+radial mask and width alpha are first painted onto an opaque scalar field;
+maximum blending then combines those fields before the existing colorizer.
+Rust tests check all 180 archived AddPoint records and
+[compact shader tiles](../../conformance/fountain-v14-fringe-atlas.json),
+compare rendered alpha with the canonical route at 1×/2×/4×, and verify
+that duplicate stamps do not accumulate alpha.
+
+A fresh decode of the same saved handwriting cache gives normalized absolute
+alpha error of 7.868% → 3.777% in resvg 0.47 and 8.124% → 4.117% in Chromium
+153 at 1×. Thresholded ink overlap decreases from 94.526% → 93.601% and
+94.993% → 93.027%, respectively; summed alpha is 2.978% / 3.383% below the
+native reference. Sampling differences and cache freshness remain unresolved.
+The full-page SVG grows from 11.6 MB to 33.1 MB and PDF from 42.3 MB to
+67.6 MB; both PDFs contain zero image objects. Transparent cropped PDFs
+rendered by MuPDF at 1× have worse alpha error against the same cache:
+9.943% for canonical paint versus 24.515% for the profile. On a 103-stamp
+control, PDF-versus-SVG error drops from 10.592% at 1× to 1.41% after an
+8× diagnostic render is area-averaged down. This points mainly to small-mark
+sampling and nested-mask rasterization; it does not justify a global width or
+opacity adjustment. A vector formulation with fewer mask layers is under
+investigation. No paired native PDF appearance match is established.
+Default output is unchanged.
+
+### PDF appearance check
+
+A fresh production export of `handwritten.sdocx` is 42,045,542 bytes,
+with one 1386 × 5878.5 point page and no image objects. MuPDF rendered its
+first 525 × 525 points at 96 dpi, matching the first 700 × 700 source units
+of Chromium's production SVG. Inspection confirmed matching content,
+directional shading and alignment. Mean absolute RGB difference across
+that crop was 0.905 on the 0–255 scale, including the blank paper.
+
+Color conversion matters when comparing coverage: MuPDF rendered the paper
+as (251, 252, 251), while Chromium rendered (252, 252, 252). In the
+monochrome source region x=180..480, y=265..350, estimating alpha from each
+renderer's own paper and darkest ink gives 6.86% normalized alpha error
+against the native cache for PDF and 7.00% for SVG. Their estimated coverage
+excesses are 2.13% and 2.29%, respectively. This is a local estimate, not
+direct PDF alpha extraction or a whole-document fidelity score. It provides
+no evidence of a large appearance change introduced by PDF conversion.

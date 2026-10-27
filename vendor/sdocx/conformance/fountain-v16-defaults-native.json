@@ -1,0 +1,254 @@
+{
+  "capture_revision": "native-defaults-v1",
+  "original_sha256": "d4b5cef1533d88776b0ce61d9a98666fb11cb9d38119ca0d32ed89b4af1dc9ea",
+  "schema": "sdocx-fountain-v16-defaults-v1",
+  "source_input": {
+    "tool_type": 2
+  },
+  "cases": [
+    {
+      "case": "size_omitted_tol_omitted",
+      "advanced_setting": "18;0;100;",
+      "style_pen_size_setter": "omit",
+      "source_model_get_pen_size_f32_bits": "00000000",
+      "style_initial_tolerance_setter": "omit",
+      "model_get_initial_tolerance_f32_bits": "00000000",
+      "native_pen_getsize_f32_bits": "cdcccc3e",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "v16_rtv5_addpoint_host_boundary": [
+        {
+          "float_words_s0_s3": [
+            "00000000",
+            "00000000",
+            "cdcccc3d",
+            "0000803f"
+          ]
+        },
+        {
+          "float_words_s0_s3": [
+            "cdcc4c3e",
+            "00000000",
+            "cdcccc3d",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_zero_tol_zero",
+      "advanced_setting": "18;0;100;",
+      "style_pen_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "00000000",
+      "style_initial_tolerance_setter": "set",
+      "model_get_initial_tolerance_f32_bits": "00000000",
+      "native_pen_getsize_f32_bits": "cdcccc3e",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "v16_rtv5_addpoint_host_boundary": [
+        {
+          "float_words_s0_s3": [
+            "00000000",
+            "00000000",
+            "cdcccc3d",
+            "0000803f"
+          ]
+        },
+        {
+          "float_words_s0_s3": [
+            "cdcc4c3e",
+            "00000000",
+            "cdcccc3d",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_small_tol_native",
+      "advanced_setting": "18;0;100;",
+      "style_pen_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "cdcccc3d",
+      "style_initial_tolerance_setter": "set",
+      "model_get_initial_tolerance_f32_bits": "058b823e",
+      "native_pen_getsize_f32_bits": "cdcccc3e",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "v16_rtv5_addpoint_host_boundary": [
+        {
+          "float_words_s0_s3": [
+            "00000000",
+            "00000000",
+            "cdcccc3d",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size_saved_tol_omitted",
+      "advanced_setting": "18;0;100;",
+      "style_pen_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "1006be40",
+      "style_initial_tolerance_setter": "omit",
+      "model_get_initial_tolerance_f32_bits": "00000000",
+      "native_pen_getsize_f32_bits": "1006be40",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "v16_rtv5_addpoint_host_boundary": [
+        {
+          "float_words_s0_s3": [
+            "00000000",
+            "00000000",
+            "b29e9f3f",
+            "0000803f"
+          ]
+        },
+        {
+          "float_words_s0_s3": [
+            "cdcc4c3e",
+            "00000000",
+            "b29e9f3f",
+            "0000803f"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "size10_tol_2_75",
+      "advanced_setting": "18;0;100;",
+      "style_pen_size_setter": "set",
+      "source_model_get_pen_size_f32_bits": "00002041",
+      "style_initial_tolerance_setter": "set",
+      "model_get_initial_tolerance_f32_bits": "00003040",
+      "native_pen_getsize_f32_bits": "00002041",
+      "source_arrays": {
+        "points_f32_bits": [
+          "00000000",
+          "00000000",
+          "3dcccccd",
+          "00000000",
+          "3e4ccccd",
+          "00000000"
+        ],
+        "pressure_f32_bits": [
+          "3e99999a",
+          "3f19999a",
+          "3f800000"
+        ],
+        "tilt_f32_bits": [
+          "00000000",
+          "00000000",
+          "00000000"
+        ],
+        "timestamps_i32": [
+          100,
+          110,
+          120
+        ]
+      },
+      "v16_rtv5_addpoint_host_boundary": [
+        {
+          "float_words_s0_s3": [
+            "00000000",
+            "00000000",
+            "0000403f",
+            "0000803f"
+          ]
+        }
+      ]
+    }
+  ]
+}

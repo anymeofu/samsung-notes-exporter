@@ -1,0 +1,215 @@
+{
+  "cases": {
+    "airbrush-explicit-empty-tool2-v2": {
+      "case_id": "airbrush-explicit-empty-tool2-v2",
+      "input": {
+        "advanced_setting_mode": "explicit-empty",
+        "advanced_setting_mutation": "SetAdvancedPenSetting was called with empty String",
+        "native_model_getter_snapshot": {
+          "advanced_setting": "",
+          "size": 3.1440000534057617
+        },
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          }
+        }
+      },
+      "native_selection": {
+        "selected_drawable_profile_version": 2,
+        "size_f32_bits": "4c374940"
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "delta_bytes": "0000803f000000c0000000000000803f"
+          },
+          {
+            "delta_bytes": "398e833fabaafabf71972e3f003a3bbf"
+          },
+          {
+            "delta_bytes": "e3388e3facaaeabf5b607fbf88dc8e3d"
+          },
+          {
+            "delta_bytes": "feff9f3f0200d0bf09f3463f251b213f"
+          },
+          {
+            "delta_bytes": "8be3b83fb0aaaabf71830ebe35827dbf"
+          },
+          {
+            "delta_bytes": "8ae3d83f635575bfe8d512bff3b3513f"
+          },
+          {
+            "delta_bytes": "00000040000000bfe2677a3fc0e654be"
+          },
+          {
+            "delta_bytes": "52b80640af47b1be4e6f5bbf8fd903bf"
+          },
+          {
+            "delta_bytes": "7a140e40ac703dbe63208d3e3d15763f"
+          },
+          {
+            "delta_bytes": "7a141640fd1e85bc8871e83efb1864bf"
+          },
+          {
+            "delta_bytes": "51b81e40fad6233eb28f70bf431daf3e"
+          },
+          {
+            "delta_bytes": "ffff2740f6ffaf3e3aa66b3fd20dc83e"
+          },
+          {
+            "delta_bytes": "84eb3140bdf5083fbd3fd0be20de69bf"
+          },
+          {
+            "delta_bytes": "e07a3c4006d73b3fd3b0a6be830d723f"
+          },
+          {
+            "delta_bytes": "13ae4740cea3703fe108623f7d5ef0be"
+          },
+          {
+            "delta_bytes": "1d85534010ae933fea4677bfef8384be"
+          },
+          {
+            "delta_bytes": "feff5f40fbffaf3fd5a8073fa719593f"
+          },
+          {
+            "delta_bytes": "b61e6d40aa47cd3f0c63433ef04b7bbf"
+          },
+          {
+            "delta_bytes": "46e17a401b85eb3fcc1b4fbf0379163f"
+          },
+          {
+            "delta_bytes": "d6a38440265c054080177e3f0b97f93d"
+          },
+          {
+            "delta_bytes": "f4288c40a1701540ba8d24bf7d1b44bf"
+          },
+          {
+            "delta_bytes": "feff9340fcff2540735d56bd30a67f3f"
+          },
+          {
+            "delta_bytes": "f3289c40370a37409626383f34d531bf"
+          },
+          {
+            "delta_bytes": "d4a3a440558f484005f67fbf1af58e3c"
+          },
+          {
+            "delta_bytes": "a070ad40548f5a40b43e3e3f2f4c2b3f"
+          },
+          {
+            "delta_bytes": "588fb640350a6d40b27eb2bd9e067fbf"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000000000000803f398e833fabaafabf71972e3f003a3bbfe3388e3facaaeabf5b607fbf88dc8e3dfeff9f3f0200d0bf09f3463f251b213f8be3b83fb0aaaabf71830ebe35827dbf8ae3d83f635575bfe8d512bff3b3513f00000040000000bfe2677a3fc0e654be52b80640af47b1be4e6f5bbf8fd903bf7a140e40ac703dbe63208d3e3d15763f7a141640fd1e85bc8871e83efb1864bf51b81e40fad6233eb28f70bf431daf3effff2740f6ffaf3e3aa66b3fd20dc83e84eb3140bdf5083fbd3fd0be20de69bfe07a3c4006d73b3fd3b0a6be830d723f13ae4740cea3703fe108623f7d5ef0be1d85534010ae933fea4677bfef8384befeff5f40fbffaf3fd5a8073fa719593fb61e6d40aa47cd3f0c63433ef04b7bbf46e17a401b85eb3fcc1b4fbf0379163fd6a38440265c054080177e3f0b97f93df4288c40a1701540ba8d24bf7d1b44bffeff9340fcff2540735d56bd30a67f3ff3289c40370a37409626383f34d531bfd4a3a440558f484005f67fbf1af58e3ca070ad40548f5a40b43e3e3f2f4c2b3f588fb640350a6d40b27eb2bd9e067fbf"
+      },
+      "schema": "airbrush-saved-caller-native-v1"
+    },
+    "airbrush-unset-tool2-v1": {
+      "case_id": "airbrush-unset-tool2-v1",
+      "input": {
+        "advanced_setting_mode": "unset",
+        "advanced_setting_mutation": "SetAdvancedPenSetting was omitted; native getter returned null",
+        "native_model_getter_snapshot": {
+          "advanced_setting": null,
+          "size": 3.1440000534057617
+        },
+        "size_f32_bits": "4c374940",
+        "source_arrays": {
+          "points": {
+            "data_hex": "0000803f000000c0000040400000803f0000c04000008040"
+          }
+        }
+      },
+      "native_selection": {
+        "selected_drawable_profile_version": 1,
+        "size_f32_bits": "4c374940"
+      },
+      "producer": {
+        "append_rows": [
+          {
+            "delta_bytes": "0000803f000000c0000000000000803f"
+          },
+          {
+            "delta_bytes": "398e833fabaafabf71972e3f003a3bbf"
+          },
+          {
+            "delta_bytes": "e3388e3facaaeabf5b607fbf88dc8e3d"
+          },
+          {
+            "delta_bytes": "feff9f3f0200d0bf09f3463f251b213f"
+          },
+          {
+            "delta_bytes": "8be3b83fb0aaaabf71830ebe35827dbf"
+          },
+          {
+            "delta_bytes": "8ae3d83f635575bfe8d512bff3b3513f"
+          },
+          {
+            "delta_bytes": "00000040000000bfe2677a3fc0e654be"
+          },
+          {
+            "delta_bytes": "52b80640af47b1be4e6f5bbf8fd903bf"
+          },
+          {
+            "delta_bytes": "7a140e40ac703dbe63208d3e3d15763f"
+          },
+          {
+            "delta_bytes": "7a141640fd1e85bc8871e83efb1864bf"
+          },
+          {
+            "delta_bytes": "51b81e40fad6233eb28f70bf431daf3e"
+          },
+          {
+            "delta_bytes": "ffff2740f6ffaf3e3aa66b3fd20dc83e"
+          },
+          {
+            "delta_bytes": "84eb3140bdf5083fbd3fd0be20de69bf"
+          },
+          {
+            "delta_bytes": "e07a3c4006d73b3fd3b0a6be830d723f"
+          },
+          {
+            "delta_bytes": "13ae4740cea3703fe108623f7d5ef0be"
+          },
+          {
+            "delta_bytes": "1d85534010ae933fea4677bfef8384be"
+          },
+          {
+            "delta_bytes": "feff5f40fbffaf3fd5a8073fa719593f"
+          },
+          {
+            "delta_bytes": "b61e6d40aa47cd3f0c63433ef04b7bbf"
+          },
+          {
+            "delta_bytes": "46e17a401b85eb3fcc1b4fbf0379163f"
+          },
+          {
+            "delta_bytes": "d6a38440265c054080177e3f0b97f93d"
+          },
+          {
+            "delta_bytes": "f4288c40a1701540ba8d24bf7d1b44bf"
+          },
+          {
+            "delta_bytes": "feff9340fcff2540735d56bd30a67f3f"
+          },
+          {
+            "delta_bytes": "f3289c40370a37409626383f34d531bf"
+          },
+          {
+            "delta_bytes": "d4a3a440558f484005f67fbf1af58e3c"
+          },
+          {
+            "delta_bytes": "a070ad40548f5a40b43e3e3f2f4c2b3f"
+          },
+          {
+            "delta_bytes": "588fb640350a6d40b27eb2bd9e067fbf"
+          }
+        ],
+        "buffer_hex": "0000803f000000c0000000000000803f398e833fabaafabf71972e3f003a3bbfe3388e3facaaeabf5b607fbf88dc8e3dfeff9f3f0200d0bf09f3463f251b213f8be3b83fb0aaaabf71830ebe35827dbf8ae3d83f635575bfe8d512bff3b3513f00000040000000bfe2677a3fc0e654be52b80640af47b1be4e6f5bbf8fd903bf7a140e40ac703dbe63208d3e3d15763f7a141640fd1e85bc8871e83efb1864bf51b81e40fad6233eb28f70bf431daf3effff2740f6ffaf3e3aa66b3fd20dc83e84eb3140bdf5083fbd3fd0be20de69bfe07a3c4006d73b3fd3b0a6be830d723f13ae4740cea3703fe108623f7d5ef0be1d85534010ae933fea4677bfef8384befeff5f40fbffaf3fd5a8073fa719593fb61e6d40aa47cd3f0c63433ef04b7bbf46e17a401b85eb3fcc1b4fbf0379163fd6a38440265c054080177e3f0b97f93df4288c40a1701540ba8d24bf7d1b44bffeff9340fcff2540735d56bd30a67f3ff3289c40370a37409626383f34d531bfd4a3a440558f484005f67fbf1af58e3ca070ad40548f5a40b43e3e3f2f4c2b3f588fb640350a6d40b27eb2bd9e067fbf"
+      },
+      "schema": "airbrush-saved-caller-native-v1"
+    }
+  },
+  "schema": "airbrush-saved-caller-native-v1"
+}
